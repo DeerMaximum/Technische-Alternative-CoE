@@ -17,7 +17,7 @@ from .const import _LOGGER, CONF_SCAN_INTERVAL, DOMAIN, SCAN_INTERVAL
 
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
-    """Handle a config flow for Technische Alternative C.M.I.."""
+    """Handle a config flow for Technische Alternative CoE."""
 
     VERSION = 1
 

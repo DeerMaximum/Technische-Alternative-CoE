@@ -31,7 +31,7 @@ async def async_setup_entry(
 
 
 class DeviceChannelSensor(CoordinatorEntity, SensorEntity):
-    """Representation of an C.M.I channel."""
+    """Representation of an CoE channel."""
 
     def __init__(self, coordinator: CoEDataUpdateCoordinator, id: str) -> None:
         """Initialize."""
