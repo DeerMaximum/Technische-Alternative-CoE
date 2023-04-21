@@ -1,15 +1,10 @@
-# https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
 version: 2
 updates:
-  - package-ecosystem: "github-actions"
+  - package-ecosystem: github-actions
     directory: "/"
     schedule:
-      interval: "weekly"
-
-  - package-ecosystem: "pip"
+      interval: daily
+  - package-ecosystem: pip
     directory: "/"
     schedule:
-      interval: "weekly"
-    ignore:
-      # Dependabot should not update Home Assistant as that should match the homeassistant key in hacs.json
-      - dependency-name: "homeassistant"
+      interval: daily
