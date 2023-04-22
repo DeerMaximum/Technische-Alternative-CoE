@@ -12,6 +12,9 @@ SCAN_INTERVAL: timedelta = timedelta(minutes=1)
 
 DOMAIN: str = "ta_coe"
 
+ADDON_HOSTNAME = "a824d5a9_ta_coe"
+ADDON_DEFAULT_PORT = 9000
+
 CONF_SCAN_INTERVAL = "scan_interval"
 
 DEFAULT_DEVICE_CLASS_MAP: dict[str, SensorDeviceClass] = {

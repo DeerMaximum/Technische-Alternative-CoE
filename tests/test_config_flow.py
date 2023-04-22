@@ -14,7 +14,7 @@ from ta_cmi import ApiError
 
 from custom_components.ta_coe.const import CONF_SCAN_INTERVAL, DOMAIN
 
-from . import COEAPI_PACKAGE
+from . import COEAPI_PACKAGE, COEAPI_RAW_REQUEST_PACKAGE
 
 DUMMY_CONNECTION_DATA: dict[str, Any] = {CONF_HOST: "http://1.2.3.4"}
 
@@ -42,12 +42,17 @@ DUMMY_CONFIG_ENTRY_UPDATED: dict[str, Any] = {
 @pytest.mark.asyncio
 async def test_show_set_form(hass: HomeAssistant) -> None:
     """Test that the setup form is served."""
-    result = await hass.config_entries.flow.async_init(
-        DOMAIN, context={"source": SOURCE_USER}
-    )
 
-    assert result["type"] == data_entry_flow.RESULT_TYPE_FORM
-    assert result["step_id"] == "user"
+    with patch(
+        COEAPI_PACKAGE,
+        side_effect=ApiError("Could not connect to server"),
+    ):
+        result = await hass.config_entries.flow.async_init(
+            DOMAIN, context={"source": SOURCE_USER}
+        )
+
+        assert result["type"] == data_entry_flow.RESULT_TYPE_FORM
+        assert result["step_id"] == "user"
 
 
 @pytest.mark.asyncio
@@ -95,6 +100,29 @@ async def test_step_user(hass: HomeAssistant) -> None:
 
         assert result["type"] == data_entry_flow.RESULT_TYPE_CREATE_ENTRY
         assert result["title"] == "CoE"
+
+
+@pytest.mark.asyncio
+async def test_step_user_with_addon_detected(hass: HomeAssistant) -> None:
+    """Test starting a flow by user and addon is installed."""
+
+    with patch(
+        COEAPI_RAW_REQUEST_PACKAGE,
+        return_value=DUMMY_DEVICE_API_DATA,
+    ) as api_mock, patch(
+        "custom_components.ta_coe.async_setup_entry", return_value=True
+    ):
+        result = await hass.config_entries.flow.async_init(
+            DOMAIN, context={"source": SOURCE_USER}
+        )
+
+        assert result["type"] == data_entry_flow.RESULT_TYPE_CREATE_ENTRY
+        assert result["title"] == "CoE"
+        assert result["data"] == {
+            CONF_HOST: "http://a824d5a9_ta_coe:9000",
+        }
+
+        api_mock.assert_called_once_with("http://a824d5a9_ta_coe:9000/")
 
 
 @pytest.mark.asyncio

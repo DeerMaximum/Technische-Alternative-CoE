@@ -13,7 +13,14 @@ from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from ta_cmi import ApiError, CoE
 
-from .const import _LOGGER, CONF_SCAN_INTERVAL, DOMAIN, SCAN_INTERVAL
+from .const import (
+    _LOGGER,
+    ADDON_DEFAULT_PORT,
+    ADDON_HOSTNAME,
+    CONF_SCAN_INTERVAL,
+    DOMAIN,
+    SCAN_INTERVAL,
+)
 
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -21,11 +28,31 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     VERSION = 1
 
+    async def check_addon_available(self) -> bool:
+        """Check if the CoE to HTTP addon is available."""
+        coe: CoE = CoE(
+            f"http://{ADDON_HOSTNAME}:{ADDON_DEFAULT_PORT}",
+            async_get_clientsession(self.hass),
+        )
+
+        try:
+            await coe.update()
+        except ApiError:
+            return False
+        else:
+            return True
+
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
         """Handle the initial step."""
         errors: dict[str, Any] = {}
+
+        if user_input is None and await self.check_addon_available():
+            return self.async_create_entry(
+                title="CoE",
+                data={CONF_HOST: f"http://{ADDON_HOSTNAME}:{ADDON_DEFAULT_PORT}"},
+            )
 
         if user_input is not None:
             if not user_input[CONF_HOST].startswith("http://"):

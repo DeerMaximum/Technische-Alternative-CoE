@@ -24,6 +24,12 @@ The data is fetched every minute.
 
 {% endif %}
 
+## Configuration
+
+The integration automatically detects if the [Coe to HTTP add-on][CoEHttpAddon] is installed in the Home Assistant instance, in which case no further configuration is necessary.
+
+If an external server is used, the IP and PORT of this server must be specified during setup.
+
 
 [taWebsite]: https://www.ta.co.at/
 [CoEHttpAddon]: https://github.com/DeerMaximum/ha-addons/tree/main/ta_coe
