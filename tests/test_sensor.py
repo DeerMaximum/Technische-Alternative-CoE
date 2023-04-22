@@ -5,7 +5,7 @@ from unittest.mock import patch
 import pytest
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import STATE_ON
+from homeassistant.const import CONF_HOST, STATE_ON
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 from pytest_homeassistant_custom_component.common import MockConfigEntry
@@ -20,7 +20,7 @@ DUMMY_DEVICE_API_DATA: dict[str, Any] = {
     "last_update": "2023-04-01T12:00:00",
 }
 
-ENTRY_DATA: dict[str, Any] = {"host": "http://192.168.2.101"}
+ENTRY_DATA: dict[str, Any] = {CONF_HOST: "http://192.168.2.101"}
 
 
 @pytest.mark.asyncio
