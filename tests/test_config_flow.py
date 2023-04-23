@@ -136,10 +136,10 @@ async def test_step_user_with_addon_detected(hass: HomeAssistant) -> None:
         assert result["type"] == data_entry_flow.RESULT_TYPE_CREATE_ENTRY
         assert result["title"] == "CoE"
         assert result["data"] == {
-            CONF_HOST: "http://a824d5a9_ta_coe:9000",
+            CONF_HOST: "http://a824d5a9-ta-coe:9000",
         }
 
-        api_mock.assert_called_once_with("http://a824d5a9_ta_coe:9000/")
+        api_mock.assert_called_once_with("http://a824d5a9-ta-coe:9000/")
 
 
 @pytest.mark.asyncio
