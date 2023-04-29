@@ -6,6 +6,8 @@ The integration polls the digital and analog data from a [Technische Alternative
 
 The data is fetched every minute.
 
+To apply changes from the CoE configuration, reload the integration.
+
 > **Note**
 > This integration requires the [Coe to HTTP add-on][CoEHttpAddon].
 
