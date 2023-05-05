@@ -3,7 +3,11 @@ from __future__ import annotations
 
 from typing import Any
 
-from homeassistant.components.sensor import SensorDeviceClass, SensorEntity
+from homeassistant.components.sensor import (
+    SensorDeviceClass,
+    SensorEntity,
+    SensorStateClass,
+)
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -64,7 +68,10 @@ class DeviceChannelSensor(CoordinatorEntity, SensorEntity):
     @property
     def state_class(self) -> str:
         """Return the state class of the sensor."""
-        return "measurement"
+        if self.device_class == SensorDeviceClass.ENERGY:
+            return SensorStateClass.TOTAL_INCREASING
+
+        return SensorStateClass.MEASUREMENT
 
     @property
     def device_class(self) -> SensorDeviceClass | None:
