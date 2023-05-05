@@ -69,7 +69,7 @@ class DeviceChannelSensor(CoordinatorEntity, SensorEntity):
     def state_class(self) -> str:
         """Return the state class of the sensor."""
         if self.device_class == SensorDeviceClass.ENERGY:
-            return SensorStateClass.TOTAL_INCREASING
+            return SensorStateClass.TOTAL
 
         return SensorStateClass.MEASUREMENT
 

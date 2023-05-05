@@ -59,9 +59,7 @@ async def test_sensors(hass: HomeAssistant) -> None:
         assert state_a2.state == "50.0"
         assert state_a2.attributes.get("friendly_name") == "CoE Analog - 2"
         assert state_a2.attributes.get("device_class") == SensorDeviceClass.ENERGY
-        assert (
-            state_a2.attributes.get("state_class") == SensorStateClass.TOTAL_INCREASING
-        )
+        assert state_a2.attributes.get("state_class") == SensorStateClass.TOTAL
 
         assert entry_a2.unique_id == "ta-coe-analog-2"
 
@@ -71,9 +69,7 @@ async def test_sensors(hass: HomeAssistant) -> None:
         assert state_a3.state == "60.0"
         assert state_a3.attributes.get("friendly_name") == "CoE Analog - 3"
         assert state_a3.attributes.get("device_class") == SensorDeviceClass.ENERGY
-        assert (
-            state_a2.attributes.get("state_class") == SensorStateClass.TOTAL_INCREASING
-        )
+        assert state_a2.attributes.get("state_class") == SensorStateClass.TOTAL
 
         assert entry_a3.unique_id == "ta-coe-analog-3"
 
