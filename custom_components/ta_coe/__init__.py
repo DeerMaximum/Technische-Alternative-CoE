@@ -33,7 +33,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     if entry.data.get(CONF_SCAN_INTERVAL, None) is not None:
         update_interval = timedelta(minutes=entry.data.get(CONF_SCAN_INTERVAL))
 
-    coordinator = CoEDataUpdateCoordinator(hass, host, update_interval)
+    coordinator = CoEDataUpdateCoordinator(hass, entry, host, update_interval)
 
     entry.async_on_unload(entry.add_update_listener(_async_update_listener))
 
@@ -64,15 +64,19 @@ async def _async_update_listener(hass: HomeAssistant, entry: ConfigEntry) -> Non
 class CoEDataUpdateCoordinator(DataUpdateCoordinator):
     """Class to manage fetching CoE data."""
 
+    channel_count = 0
+
     def __init__(
         self,
         hass: HomeAssistant,
+        config_entry: ConfigEntry,
         host: str,
         update_interval: timedelta,
     ) -> None:
         """Initialize."""
-        self.host = host
+        self.config_entry = config_entry
 
+        self.host = host
         self.coe = CoE(host, async_get_clientsession(hass))
 
         _LOGGER.debug("Used update interval: %s", update_interval)
@@ -109,6 +113,18 @@ class CoEDataUpdateCoordinator(DataUpdateCoordinator):
 
         return TYPE_BINARY
 
+    async def _check_new_channel(self, new_data: dict[str, Any]) -> None:
+        """Check and reload if a new channel exists."""
+        new_channel_count = len(new_data[TYPE_BINARY]) + len(new_data[TYPE_SENSOR])
+
+        if self.channel_count != new_channel_count and self.channel_count != 0:
+            _LOGGER.debug("New channels detected. Reload integration.")
+            await self.hass.async_add_job(
+                self.hass.config_entries.async_reload(self.config_entry.entry_id)
+            )
+
+        self.channel_count = new_channel_count
+
     async def _async_update_data(self) -> dict[str, Any]:
         """Update data."""
         try:
@@ -125,6 +141,8 @@ class CoEDataUpdateCoordinator(DataUpdateCoordinator):
                         "value": value,
                         "unit": unit,
                     }
+
+            await self._check_new_channel(return_data)
 
             return return_data
         except ApiError as err:
