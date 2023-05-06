@@ -1,11 +1,13 @@
 """Config flow for Technische Alternative CoE integration."""
 from __future__ import annotations
 
+import asyncio
 from datetime import timedelta
 from typing import Any
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
+from async_timeout import timeout
 from homeassistant import config_entries
 from homeassistant.const import CONF_HOST
 from homeassistant.core import callback
@@ -34,10 +36,10 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             f"http://{ADDON_HOSTNAME}:{ADDON_DEFAULT_PORT}",
             async_get_clientsession(self.hass),
         )
-
         try:
-            await coe.update()
-        except ApiError:
+            async with timeout(10):
+                await coe.update()
+        except (ApiError, asyncio.TimeoutError):
             return False
         else:
             return True
