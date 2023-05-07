@@ -1,6 +1,6 @@
 # Home Assistant integration to read Values from C.M.I
 [![GitHub Release][releases-shield]][releases]
-<!-- [![hacs][hacsbadge]][hacs] -->
+[![hacs][hacsbadge]][hacs]
 
 The integration polls the digital and analog data from a [Technische Alternative][taWebsite] C.M.I. via the CanOverEthernet(CoE) interface.
 
