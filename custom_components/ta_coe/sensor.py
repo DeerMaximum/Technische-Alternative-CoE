@@ -63,6 +63,9 @@ class DeviceChannelSensor(CoordinatorEntity, SensorEntity):
 
         unit: str = channel_raw["unit"]
 
+        if unit == "l":
+            return unit.upper()
+
         return unit
 
     @property

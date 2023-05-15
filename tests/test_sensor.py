@@ -19,6 +19,7 @@ DUMMY_DEVICE_API_DATA: dict[str, Any] = {
         {"value": 34.4, "unit": 1},
         {"value": 50, "unit": 11},
         {"value": 60, "unit": 12},
+        {"value": 60, "unit": 19},
     ],
     "last_update_unix": 1680410064.03764,
     "last_update": "2023-04-01T12:00:00",
@@ -50,6 +51,7 @@ async def test_sensors(hass: HomeAssistant) -> None:
         assert state_a1.attributes.get("friendly_name") == "CoE Analog - 1"
         assert state_a1.attributes.get("device_class") == SensorDeviceClass.TEMPERATURE
         assert state_a1.attributes.get("state_class") == SensorStateClass.MEASUREMENT
+        assert state_a1.attributes.get("unit_of_measurement") == "°C"
 
         assert entry_a1.unique_id == "ta-coe-analog-1"
 
@@ -69,9 +71,20 @@ async def test_sensors(hass: HomeAssistant) -> None:
         assert state_a3.state == "60.0"
         assert state_a3.attributes.get("friendly_name") == "CoE Analog - 3"
         assert state_a3.attributes.get("device_class") == SensorDeviceClass.ENERGY
-        assert state_a2.attributes.get("state_class") == SensorStateClass.TOTAL
+        assert state_a3.attributes.get("state_class") == SensorStateClass.TOTAL
 
         assert entry_a3.unique_id == "ta-coe-analog-3"
+
+        state_a4 = hass.states.get("sensor.coe_analog_4")
+        entry_a4 = entity_registry.async_get("sensor.coe_analog_4")
+
+        assert state_a4.state == "60.0"
+        assert state_a4.attributes.get("friendly_name") == "CoE Analog - 4"
+        assert state_a4.attributes.get("device_class") is None
+        assert state_a4.attributes.get("state_class") == SensorStateClass.MEASUREMENT
+        assert state_a4.attributes.get("unit_of_measurement") == "L"
+
+        assert entry_a4.unique_id == "ta-coe-analog-4"
 
         state_d2 = hass.states.get("binary_sensor.coe_digital_1")
         entry_d2 = entity_registry.async_get("binary_sensor.coe_digital_1")
