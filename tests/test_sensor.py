@@ -80,8 +80,8 @@ async def test_sensors(hass: HomeAssistant) -> None:
 
         assert state_a4.state == "60.0"
         assert state_a4.attributes.get("friendly_name") == "CoE Analog - 4"
-        assert state_a4.attributes.get("device_class") is None
-        assert state_a4.attributes.get("state_class") == SensorStateClass.MEASUREMENT
+        assert state_a4.attributes.get("device_class") == SensorDeviceClass.WATER
+        assert state_a4.attributes.get("state_class") == SensorStateClass.TOTAL
         assert state_a4.attributes.get("unit_of_measurement") == "L"
 
         assert entry_a4.unique_id == "ta-coe-analog-4"
