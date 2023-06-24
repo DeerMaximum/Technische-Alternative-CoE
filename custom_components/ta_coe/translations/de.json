@@ -6,6 +6,20 @@
         "data": {
           "host": "Basis URL des Servers (http://IP:PORT)"
         }
+      },
+      "menu": {
+        "title": "Nächster Schritt",
+        "menu_options": {
+          "send_values": "Bereitstellung von Sensoren via C.M.I.",
+          "exit": "Einrichtung abschließen"
+        }
+      },
+      "send_values": {
+        "title": "Entitäten zu senden",
+        "data": {
+          "entities_to_send": "ID der Entität zum senden",
+          "next": "Weitere hinzufügen"
+        }
       }
     },
     "abort": {

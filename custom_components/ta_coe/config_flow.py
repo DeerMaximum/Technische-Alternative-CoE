@@ -19,6 +19,8 @@ from .const import (
     _LOGGER,
     ADDON_DEFAULT_PORT,
     ADDON_HOSTNAME,
+    ALLOWED_DOMAINS,
+    CONF_ENTITIES_TO_SEND,
     CONF_SCAN_INTERVAL,
     DOMAIN,
     SCAN_INTERVAL,
@@ -29,6 +31,11 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for Technische Alternative CoE."""
 
     VERSION = 1
+
+    override_data: dict[str, Any] = {}
+
+    def __init__(self):
+        self._config = self.override_data
 
     async def check_addon_available(self) -> bool:
         """Check if the CoE to HTTP addon is available."""
@@ -54,10 +61,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             return self.async_abort(reason="single_instance_allowed")
 
         if user_input is None and await self.check_addon_available():
-            return self.async_create_entry(
-                title="CoE",
-                data={CONF_HOST: f"http://{ADDON_HOSTNAME}:{ADDON_DEFAULT_PORT}"},
-            )
+            self._config = {CONF_HOST: f"http://{ADDON_HOSTNAME}:{ADDON_DEFAULT_PORT}"}
+            return await self.async_step_menu()
 
         if user_input is not None:
             if not user_input[CONF_HOST].startswith("http://"):
@@ -67,20 +72,76 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 coe: CoE = CoE(
                     user_input[CONF_HOST], async_get_clientsession(self.hass)
                 )
-                await coe.update()
-            except ApiError:
+                async with timeout(10):
+                    await coe.update()
+            except (ApiError, asyncio.TimeoutError):
                 errors["base"] = "cannot_connect"
             except Exception as err:  # pylint: disable=broad-except
                 _LOGGER.exception("Unexpected exception: %s", err)
                 errors["base"] = "unknown"
             else:
-                return self.async_create_entry(title="CoE", data=user_input)
+                self._config = user_input
+                return await self.async_step_menu()
 
         return self.async_show_form(
             step_id="user",
             data_schema=vol.Schema({vol.Required(CONF_HOST): cv.string}),
             errors=errors,
         )
+
+    async def async_step_menu(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
+        """Handle the menu step."""
+        return self.async_show_menu(
+            step_id="menu", menu_options=["send_values", "exit"]
+        )
+
+    def _validate_entity(self, entity_id: str) -> bool:
+        """Validate an entity."""
+        return entity_id.startswith(ALLOWED_DOMAINS) and self.hass.states.get(entity_id)
+
+    async def async_step_send_values(self, user_input: dict[str, Any] | None = None):
+        """Handle the configuration of sensors send via CoE."""
+
+        errors: dict[str, Any] = {}
+
+        if user_input is not None:
+            if self._validate_entity(user_input[CONF_ENTITIES_TO_SEND]):
+                if self._config.get(CONF_ENTITIES_TO_SEND, None) is None:
+                    self._config[CONF_ENTITIES_TO_SEND] = []
+
+                self._config[CONF_ENTITIES_TO_SEND].append(
+                    user_input[CONF_ENTITIES_TO_SEND]
+                )
+
+                self._config[CONF_ENTITIES_TO_SEND] = list(
+                    set(self._config[CONF_ENTITIES_TO_SEND])
+                )
+
+                if user_input["next"]:
+                    return await self.async_step_send_values()
+
+                return await self.async_step_exit()
+
+            errors["base"] = "invalid_entity"
+
+        return self.async_show_form(
+            step_id="send_values",
+            data_schema=vol.Schema(
+                {
+                    vol.Required(CONF_ENTITIES_TO_SEND): cv.string,
+                    vol.Required("next"): cv.boolean,
+                }
+            ),
+            errors=errors,
+        )
+
+    async def async_step_exit(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
+        """Exit the flow and save."""
+        return self.async_create_entry(title="CoE", data=self._config)
 
     @staticmethod
     @callback

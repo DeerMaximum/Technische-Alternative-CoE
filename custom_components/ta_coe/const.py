@@ -16,6 +16,9 @@ ADDON_HOSTNAME = "a824d5a9-ta-coe"
 ADDON_DEFAULT_PORT = 9000
 
 CONF_SCAN_INTERVAL = "scan_interval"
+CONF_ENTITIES_TO_SEND = "entities_to_send"
+
+ALLOWED_DOMAINS = ("sensor", "binary_sensor", "number")
 
 DEFAULT_DEVICE_CLASS_MAP: dict[str, SensorDeviceClass] = {
     "°C": SensorDeviceClass.TEMPERATURE,

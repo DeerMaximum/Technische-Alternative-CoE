@@ -6,6 +6,20 @@
         "data": {
           "host": "Base url of the server (http://IP:PORT)"
         }
+      },
+      "menu": {
+        "title": "Next step",
+        "menu_options": {
+          "send_values": "Provision of sensors via CoE",
+          "exit": "Finish wizard"
+        }
+      },
+      "send_values": {
+        "title": "Entities to send",
+        "data": {
+          "entities_to_send": "Entity id to send",
+          "next": "Add more entities"
+        }
       }
     },
     "abort": {
