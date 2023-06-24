@@ -35,6 +35,7 @@ DEFAULT_DEVICE_CLASS_MAP: dict[str, SensorDeviceClass] = {
     "kg": SensorDeviceClass.WEIGHT,
     "t": SensorDeviceClass.WEIGHT,
     "g": SensorDeviceClass.WEIGHT,
+    "l": SensorDeviceClass.WATER,
     "lx": SensorDeviceClass.ILLUMINANCE,
     "W": SensorDeviceClass.POWER,
     "kW": SensorDeviceClass.POWER,

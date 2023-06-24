@@ -63,12 +63,15 @@ class DeviceChannelSensor(CoordinatorEntity, SensorEntity):
 
         unit: str = channel_raw["unit"]
 
+        if unit == "l":
+            return unit.upper()
+
         return unit
 
     @property
     def state_class(self) -> str:
         """Return the state class of the sensor."""
-        if self.device_class == SensorDeviceClass.ENERGY:
+        if self.device_class in [SensorDeviceClass.ENERGY, SensorDeviceClass.WATER]:
             return SensorStateClass.TOTAL
 
         return SensorStateClass.MEASUREMENT
