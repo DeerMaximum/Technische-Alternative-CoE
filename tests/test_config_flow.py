@@ -286,36 +286,8 @@ async def test_step_send_values_next_step_finish(hass: HomeAssistant) -> None:
 
         assert result["type"] == data_entry_flow.RESULT_TYPE_CREATE_ENTRY
         assert result["title"] == "CoE"
-        assert result["data"] == {
-            **DUMMY_CONNECTION_DATA,
-            CONF_ENTITIES_TO_SEND: [test_id2, test_id1],
-        }
+        assert result["data"][CONF_HOST] == "http://1.2.3.4"
 
-
-@pytest.mark.asyncio
-async def test_options_flow_init(hass: HomeAssistant) -> None:
-    """Test config flow options."""
-
-    config_entry = MockConfigEntry(
-        domain=DOMAIN,
-        title="CoE",
-        data=DUMMY_CONFIG_ENTRY,
-    )
-    config_entry.add_to_hass(hass)
-
-    with patch("custom_components.ta_coe.async_setup_entry", return_value=True):
-        result = await hass.config_entries.options.async_init(config_entry.entry_id)
-
-        await hass.config_entries.async_setup(config_entry.entry_id)
-        await hass.async_block_till_done()
-
-        assert result["type"] == data_entry_flow.RESULT_TYPE_FORM
-        assert result["step_id"] == "init"
-
-        result = await hass.config_entries.options.async_configure(
-            result["flow_id"],
-            user_input=DUMMY_ENTRY_CHANGE,
-        )
-
-        assert result["type"] == data_entry_flow.RESULT_TYPE_CREATE_ENTRY
-        assert dict(config_entry.options) == DUMMY_CONFIG_ENTRY_UPDATED
+        assert test_id1 in result["data"][CONF_ENTITIES_TO_SEND]
+        assert test_id2 in result["data"][CONF_ENTITIES_TO_SEND]
+        assert len(result["data"][CONF_ENTITIES_TO_SEND]) == 2

@@ -32,8 +32,28 @@
   },
   "options": {
     "step": {
-      "init": {
+      "init":{
         "title": "Options",
+        "menu_options": {
+          "add_send_values": "Add exposed sensors",
+          "remove_send_values": "Remove exposed sensors",
+          "general": "General settings"
+        }
+      },
+      "add_send_values": {
+        "title": "Add sensor",
+        "data": {
+          "entities_to_send": "Entity id to send"
+        }
+      },
+      "remove_send_values": {
+        "title": "Remove sensors",
+        "data": {
+          "entities_to_send": "Entities to remove"
+        }
+      },
+      "general": {
+        "title": "General",
         "data": {
           "scan_interval": "Update interval (minutes)"
         }

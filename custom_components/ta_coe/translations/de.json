@@ -32,8 +32,28 @@
   },
   "options": {
     "step": {
-      "init": {
+      "init":{
         "title": "Optionen",
+        "menu_options": {
+          "add_send_values": "CoE Sensoren hinzufügen",
+          "remove_send_values": "CoE Sensoren entfernen",
+          "general": "Allgemeine Optionen"
+        }
+      },
+      "add_send_values": {
+        "title": "Sensor hinzufügen",
+        "data": {
+          "entities_to_send": "ID der Entität zum senden"
+        }
+      },
+      "remove_send_values": {
+        "title": "Sensoren entfernen",
+        "data": {
+          "entities_to_send": "Entitäten die entfernt werden sollen"
+        }
+      },
+      "general": {
+        "title": "Allgemein",
         "data": {
           "scan_interval": "Aktualisierungsintervall (Minuten)"
         }

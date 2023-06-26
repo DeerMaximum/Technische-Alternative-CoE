@@ -10,7 +10,7 @@ import voluptuous as vol
 from async_timeout import timeout
 from homeassistant import config_entries
 from homeassistant.const import CONF_HOST
-from homeassistant.core import callback
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from ta_cmi import ApiError, CoE
@@ -25,6 +25,11 @@ from .const import (
     DOMAIN,
     SCAN_INTERVAL,
 )
+
+
+def validate_entity(hass: HomeAssistant, entity_id: str) -> bool:
+    """Validate an entity."""
+    return entity_id.startswith(ALLOWED_DOMAINS) and hass.states.get(entity_id)
 
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -97,17 +102,13 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             step_id="menu", menu_options=["send_values", "exit"]
         )
 
-    def _validate_entity(self, entity_id: str) -> bool:
-        """Validate an entity."""
-        return entity_id.startswith(ALLOWED_DOMAINS) and self.hass.states.get(entity_id)
-
     async def async_step_send_values(self, user_input: dict[str, Any] | None = None):
         """Handle the configuration of sensors send via CoE."""
 
         errors: dict[str, Any] = {}
 
         if user_input is not None:
-            if self._validate_entity(user_input[CONF_ENTITIES_TO_SEND]):
+            if validate_entity(self.hass, user_input[CONF_ENTITIES_TO_SEND]):
                 if self._config.get(CONF_ENTITIES_TO_SEND, None) is None:
                     self._config[CONF_ENTITIES_TO_SEND] = []
 
@@ -181,6 +182,70 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
         """Handle options flow."""
+        return self.async_show_menu(
+            step_id="init",
+            menu_options=["general", "add_send_values", "remove_send_values"],
+        )
+
+    async def async_step_add_send_values(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
+        """Handle options add sensors send via CoE."""
+
+        errors: dict[str, Any] = {}
+
+        if user_input is not None:
+            if validate_entity(self.hass, user_input[CONF_ENTITIES_TO_SEND]):
+                if self.data.get(CONF_ENTITIES_TO_SEND, None) is None:
+                    self.data[CONF_ENTITIES_TO_SEND] = []
+
+                self.data[CONF_ENTITIES_TO_SEND].append(
+                    user_input[CONF_ENTITIES_TO_SEND]
+                )
+
+                self.data[CONF_ENTITIES_TO_SEND] = list(
+                    set(self.data[CONF_ENTITIES_TO_SEND])
+                )
+
+                return self.async_create_entry(title="", data=self.data)
+
+            errors["base"] = "invalid_entity"
+
+        return self.async_show_form(
+            step_id="add_send_values",
+            data_schema=vol.Schema({vol.Required(CONF_ENTITIES_TO_SEND): cv.string}),
+            errors=errors,
+        )
+
+    async def async_step_remove_send_values(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
+        """Handle options remove sensors send via CoE."""
+
+        errors: dict[str, Any] = {}
+
+        if user_input is not None:
+            for entity in user_input[CONF_ENTITIES_TO_SEND]:
+                self.data[CONF_ENTITIES_TO_SEND].remove(entity)
+
+            return self.async_create_entry(title="", data=self.data)
+
+        return self.async_show_form(
+            step_id="remove_send_values",
+            data_schema=vol.Schema(
+                {
+                    vol.Optional(CONF_ENTITIES_TO_SEND): cv.multi_select(
+                        self.data.get(CONF_ENTITIES_TO_SEND, [])
+                    )
+                }
+            ),
+            errors=errors,
+        )
+
+    async def async_step_general(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
+        """Handle the general options."""
 
         errors: dict[str, Any] = {}
 
@@ -190,7 +255,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             return self.async_create_entry(title="", data=self.data)
 
         return self.async_show_form(
-            step_id="init",
+            step_id="general",
             data_schema=get_schema(self.data),
             errors=errors,
         )
