@@ -22,6 +22,7 @@ from .const import (
     ALLOWED_DOMAINS,
     CONF_ENTITIES_TO_SEND,
     CONF_SCAN_INTERVAL,
+    CONF_SLOT_COUNT,
     DOMAIN,
     SCAN_INTERVAL,
 )
@@ -108,22 +109,21 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         errors: dict[str, Any] = {}
 
         if user_input is not None:
-            if validate_entity(self.hass, user_input[CONF_ENTITIES_TO_SEND]):
+            new_id = user_input[CONF_ENTITIES_TO_SEND]
+            if validate_entity(self.hass, new_id):
                 if self._config.get(CONF_ENTITIES_TO_SEND, None) is None:
-                    self._config[CONF_ENTITIES_TO_SEND] = []
+                    self._config[CONF_ENTITIES_TO_SEND] = {}
 
-                self._config[CONF_ENTITIES_TO_SEND].append(
-                    user_input[CONF_ENTITIES_TO_SEND]
-                )
+                if new_id not in self._config[CONF_ENTITIES_TO_SEND].values():
+                    index = self._config.get(CONF_SLOT_COUNT, 0)
 
-                self._config[CONF_ENTITIES_TO_SEND] = list(
-                    set(self._config[CONF_ENTITIES_TO_SEND])
-                )
+                    self._config[CONF_ENTITIES_TO_SEND][str(index)] = new_id
+                    self._config[CONF_SLOT_COUNT] = index + 1
 
-                if user_input["next"]:
-                    return await self.async_step_send_values()
+                    if user_input["next"]:
+                        return await self.async_step_send_values()
 
-                return await self.async_step_exit()
+                    return await self.async_step_exit()
 
             errors["base"] = "invalid_entity"
 
@@ -184,7 +184,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         """Handle options flow."""
         return self.async_show_menu(
             step_id="init",
-            menu_options=["general", "add_send_values", "remove_send_values"],
+            menu_options=["general", "add_send_values", "change_send_values"],
         )
 
     async def async_step_add_send_values(
@@ -195,19 +195,19 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         errors: dict[str, Any] = {}
 
         if user_input is not None:
+            new_id = user_input[CONF_ENTITIES_TO_SEND]
+
             if validate_entity(self.hass, user_input[CONF_ENTITIES_TO_SEND]):
                 if self.data.get(CONF_ENTITIES_TO_SEND, None) is None:
-                    self.data[CONF_ENTITIES_TO_SEND] = []
+                    self.data[CONF_ENTITIES_TO_SEND] = {}
 
-                self.data[CONF_ENTITIES_TO_SEND].append(
-                    user_input[CONF_ENTITIES_TO_SEND]
-                )
+                if new_id not in self.data[CONF_ENTITIES_TO_SEND].values():
+                    index = self.data.get(CONF_SLOT_COUNT, 0)
 
-                self.data[CONF_ENTITIES_TO_SEND] = list(
-                    set(self.data[CONF_ENTITIES_TO_SEND])
-                )
+                    self.data[CONF_ENTITIES_TO_SEND][str(index)] = new_id
+                    self.data[CONF_SLOT_COUNT] = index + 1
 
-                return self.async_create_entry(title="", data=self.data)
+                    return self.async_create_entry(title="", data=self.data)
 
             errors["base"] = "invalid_entity"
 
@@ -217,7 +217,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             errors=errors,
         )
 
-    async def async_step_remove_send_values(
+    async def async_step_change_send_values(
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
         """Handle options remove sensors send via CoE."""
@@ -225,18 +225,31 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         errors: dict[str, Any] = {}
 
         if user_input is not None:
-            for entity in user_input[CONF_ENTITIES_TO_SEND]:
-                self.data[CONF_ENTITIES_TO_SEND].remove(entity)
+            new_id = user_input[CONF_ENTITIES_TO_SEND]
+            old_id = user_input["old_value"]
 
-            return self.async_create_entry(title="", data=self.data)
+            if (
+                old_id in self.data[CONF_ENTITIES_TO_SEND].values()
+                or new_id not in self.data[CONF_ENTITIES_TO_SEND].values()
+            ):
+                index = [
+                    k
+                    for k, v in self.data[CONF_ENTITIES_TO_SEND].items()
+                    if v == old_id
+                ][0]
+
+                self.data[CONF_ENTITIES_TO_SEND][index] = new_id
+
+                return self.async_create_entry(title="", data=self.data)
+
+            errors["base"] = "invalid_entity"
 
         return self.async_show_form(
-            step_id="remove_send_values",
+            step_id="change_send_values",
             data_schema=vol.Schema(
                 {
-                    vol.Optional(CONF_ENTITIES_TO_SEND): cv.multi_select(
-                        self.data.get(CONF_ENTITIES_TO_SEND, [])
-                    )
+                    vol.Required(CONF_ENTITIES_TO_SEND): cv.string,
+                    vol.Required("old_value"): cv.string,
                 }
             ),
             errors=errors,

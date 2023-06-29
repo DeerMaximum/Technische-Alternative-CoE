@@ -36,7 +36,7 @@
         "title": "Optionen",
         "menu_options": {
           "add_send_values": "CoE Sensoren hinzufügen",
-          "remove_send_values": "CoE Sensoren entfernen",
+          "change_send_values": "CoE Sensor ändern",
           "general": "Allgemeine Optionen"
         }
       },
@@ -46,10 +46,11 @@
           "entities_to_send": "ID der Entität zum senden"
         }
       },
-      "remove_send_values": {
-        "title": "Sensoren entfernen",
+      "change_send_values": {
+        "title": "Sensoren ändern",
         "data": {
-          "entities_to_send": "Entitäten die entfernt werden sollen"
+          "old_value": "Alte ID",
+          "entities_to_send": "Neu ID"
         }
       },
       "general": {

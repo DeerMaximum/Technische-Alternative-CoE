@@ -17,6 +17,7 @@ from custom_components.ta_coe.config_flow import ConfigFlow
 from custom_components.ta_coe.const import (
     CONF_ENTITIES_TO_SEND,
     CONF_SCAN_INTERVAL,
+    CONF_SLOT_COUNT,
     DOMAIN,
 )
 
@@ -149,7 +150,7 @@ async def test_step_user_with_addon_detected(hass: HomeAssistant) -> None:
         assert result["type"] == data_entry_flow.RESULT_TYPE_MENU
         assert result["step_id"] == "menu"
 
-        api_mock.assert_called_once_with("http://a824d5a9-ta-coe:9000/")
+        api_mock.assert_called_once_with("http://a824d5a9-ta-coe:9000/receive")
 
 
 @pytest.mark.asyncio
@@ -210,7 +211,8 @@ async def test_step_send_values_valid_input(hass: HomeAssistant) -> None:
         assert result["title"] == "CoE"
         assert result["data"] == {
             **DUMMY_CONNECTION_DATA,
-            CONF_ENTITIES_TO_SEND: [test_id],
+            CONF_ENTITIES_TO_SEND: {"0": test_id},
+            CONF_SLOT_COUNT: 1,
         }
 
         state_mock.assert_called_once_with(test_id)
@@ -290,7 +292,5 @@ async def test_step_send_values_next_step_finish(hass: HomeAssistant) -> None:
         assert result["type"] == data_entry_flow.RESULT_TYPE_CREATE_ENTRY
         assert result["title"] == "CoE"
         assert result["data"][CONF_HOST] == DUMMY_HOST
-
-        assert test_id1 in result["data"][CONF_ENTITIES_TO_SEND]
-        assert test_id2 in result["data"][CONF_ENTITIES_TO_SEND]
-        assert len(result["data"][CONF_ENTITIES_TO_SEND]) == 2
+        assert result["data"][CONF_SLOT_COUNT] == 2
+        assert result["data"][CONF_ENTITIES_TO_SEND] == {"0": test_id1, "1": test_id2}
