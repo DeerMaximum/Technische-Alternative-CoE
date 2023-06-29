@@ -1,6 +1,7 @@
 """Test the Technische Alternative CoE config flow."""
 from __future__ import annotations
 
+from copy import deepcopy
 from typing import Any
 from unittest.mock import patch
 
@@ -26,7 +27,9 @@ from . import (
     STATE_AVAILABLE_PACKAGE,
 )
 
-DUMMY_CONNECTION_DATA: dict[str, Any] = {CONF_HOST: "http://1.2.3.4"}
+DUMMY_HOST = "http://1.2.3.4"
+
+DUMMY_CONNECTION_DATA: dict[str, Any] = {CONF_HOST: DUMMY_HOST}
 
 DUMMY_DEVICE_API_DATA: dict[str, Any] = {
     "digital": [{"value": True, "unit": 43}],
@@ -43,7 +46,7 @@ DUMMY_ENTRY_CHANGE: dict[str, Any] = {
     CONF_SCAN_INTERVAL: 15,
 }
 
-DATA_OVERRIDE: dict[str, Any] = {CONF_HOST: "http://1.2.3.4"}
+DATA_OVERRIDE: dict[str, Any] = deepcopy(DUMMY_CONNECTION_DATA)
 
 DUMMY_CONFIG_ENTRY_UPDATED: dict[str, Any] = {
     CONF_HOST: "http://localhost",
@@ -286,7 +289,7 @@ async def test_step_send_values_next_step_finish(hass: HomeAssistant) -> None:
 
         assert result["type"] == data_entry_flow.RESULT_TYPE_CREATE_ENTRY
         assert result["title"] == "CoE"
-        assert result["data"][CONF_HOST] == "http://1.2.3.4"
+        assert result["data"][CONF_HOST] == DUMMY_HOST
 
         assert test_id1 in result["data"][CONF_ENTITIES_TO_SEND]
         assert test_id2 in result["data"][CONF_ENTITIES_TO_SEND]

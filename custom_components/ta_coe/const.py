@@ -18,7 +18,10 @@ ADDON_DEFAULT_PORT = 9000
 CONF_SCAN_INTERVAL = "scan_interval"
 CONF_ENTITIES_TO_SEND = "entities_to_send"
 
-ALLOWED_DOMAINS = ("sensor", "binary_sensor", "number")
+ALLOWED_DOMAINS = ("sensor", "binary_sensor", "number", "input_boolean")
+
+DIGITAL_DOMAINS = ["binary_sensor", "input_boolean"]
+ANALOG_DOMAINS = ["sensor", "number"]
 
 DEFAULT_DEVICE_CLASS_MAP: dict[str, SensorDeviceClass] = {
     "°C": SensorDeviceClass.TEMPERATURE,
