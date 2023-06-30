@@ -1,24 +1,33 @@
-"""CoE state observer to update CAN values."""
+"""CoE state observer to track state changes."""
+from typing import Any
 
+from homeassistant.const import ATTR_UNIT_OF_MEASUREMENT
 from homeassistant.core import Event, HomeAssistant, State, callback
 from homeassistant.helpers.event import async_track_state_change_event
 from ta_cmi import CoE
 
 from .const import _LOGGER, ANALOG_DOMAINS, DIGITAL_DOMAINS, TYPE_BINARY, TYPE_SENSOR
+from .state_sender import StateSender
 
 
 class StateObserver:
     """Handle state updates for configured entities."""
 
-    def __init__(self, hass: HomeAssistant, coe: CoE, entity_list: list[str]):
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        coe: CoE,
+        sender: StateSender,
+        entity_list: dict[str, Any],
+    ):
         """Initialize."""
         self._hass = hass
         self._coe = coe
-        self._entity_list = entity_list
+        self._sender = sender
+        self._entity_dict = entity_list
+        self._entity_list = entity_list.values()
 
         self._states = {TYPE_BINARY: {}, TYPE_SENSOR: {}}
-
-        self._get_all_states()
 
         async_track_state_change_event(
             self._hass, self._entity_list, self._update_listener
@@ -36,7 +45,7 @@ class StateObserver:
             and self._states[TYPE_SENSOR].get(state.entity_id) != state.state
         )
 
-    def _get_all_states(self) -> None:
+    async def _get_all_states(self) -> None:
         """Get all states from entities."""
         for entity_id in self._entity_list:
             state = self._hass.states.get(entity_id)
@@ -46,10 +55,20 @@ class StateObserver:
                 continue
 
             if domain in ANALOG_DOMAINS:
-                self._states[TYPE_SENSOR][entity_id] = float(state)
+                state_value = float(state.state)
+                self._states[TYPE_SENSOR][entity_id] = state_value
+                self._sender.update_analog_manuel(
+                    entity_id,
+                    state_value,
+                    state.attributes.get(ATTR_UNIT_OF_MEASUREMENT, ""),
+                )
 
             if domain in DIGITAL_DOMAINS:
-                self._states[TYPE_BINARY][entity_id] = bool(state)
+                state_value = bool(state.state)
+                self._states[TYPE_BINARY][entity_id] = state_value
+                self._sender.update_digital_manuel(entity_id, state_value)
+
+        await self._sender.update()
 
     @callback
     async def _update_listener(self, event: Event) -> None:
@@ -66,7 +85,18 @@ class StateObserver:
         _LOGGER.debug(f"Handle new state {new_state.entity_id}: {new_state.state}")
 
         if new_state.domain in ANALOG_DOMAINS:
-            self._states[TYPE_SENSOR][new_state.entity_id] = float(new_state.state)
+            state_value = float(new_state.state)
+
+            self._states[TYPE_SENSOR][new_state.entity_id] = state_value
+
+            await self._sender.update_analog(
+                new_state.entity_id,
+                state_value,
+                new_state.attributes.get(ATTR_UNIT_OF_MEASUREMENT, ""),
+            )
 
         if new_state.domain in DIGITAL_DOMAINS:
-            self._states[TYPE_BINARY][new_state.entity_id] = bool(new_state.state)
+            state_value = bool(new_state.state)
+            self._states[TYPE_BINARY][new_state.entity_id] = state_value
+
+            await self._sender.update_digital(new_state.entity_id, state_value)

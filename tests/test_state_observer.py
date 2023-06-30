@@ -3,28 +3,38 @@ import asyncio
 from unittest.mock import patch
 
 import pytest
+from homeassistant.const import ATTR_UNIT_OF_MEASUREMENT
 from homeassistant.core import HomeAssistant, State
 from pytest_homeassistant_custom_component.common import mock_state_change_event
 from ta_cmi import CoE
 
 from custom_components.ta_coe import TYPE_BINARY, TYPE_SENSOR, StateObserver
 from custom_components.ta_coe.const import ANALOG_DOMAINS, DIGITAL_DOMAINS
-from tests import STATE_AVAILABLE_PACKAGE
+from custom_components.ta_coe.state_sender import StateSender
+from tests import (
+    STATE_AVAILABLE_PACKAGE,
+    STATE_SENDER_UPDATE,
+    STATE_SENDER_UPDATE_ANALOG_MANUEL_PACKAGE,
+    STATE_SENDER_UPDATE_ANALOG_PACKAGE,
+    STATE_SENDER_UPDATE_DIGITAL_MANUEL_PACKAGE,
+    STATE_SENDER_UPDATE_DIGITAL_PACKAGE,
+)
 
 coe = CoE("")
+state_sender = StateSender()
 
 
 @pytest.mark.asyncio
-async def test_observer_receive_all_states_init(hass: HomeAssistant):
-    """Test if the observer receives all states on init."""
-    entity_list = ["sensor.test9", "binary_sensor.test"]
+async def test_observer_receive_all_states_all_states(hass: HomeAssistant):
+    """Test if the observer receives all states on get all states."""
+    entity_list = {"0": "sensor.test9", "1": "binary_sensor.test"}
 
-    with patch(STATE_AVAILABLE_PACKAGE) as get_states_mock:
-        StateObserver(hass, coe, entity_list)
+    with patch(STATE_AVAILABLE_PACKAGE) as get_states_mock, patch(STATE_SENDER_UPDATE):
+        await StateObserver(hass, coe, state_sender, entity_list)._get_all_states()
 
         assert len(get_states_mock.call_args_list) == len(entity_list)
 
-        for entity_id in entity_list:
+        for entity_id in entity_list.values():
             matched = False
             for called_id in get_states_mock.call_args_list:
                 if called_id.args[0] == entity_id:
@@ -38,11 +48,13 @@ async def test_observer_receive_all_states_init(hass: HomeAssistant):
 async def test_observer_update_handler_ignore_state(hass: HomeAssistant, state: str):
     """Test if the observer handles state changes states that are ignored."""
 
-    entity_list = ["sensor.test"]
+    entity_list = {"0": "sensor.test"}
 
-    with patch(STATE_AVAILABLE_PACKAGE, return_value=None):
-        observer = StateObserver(hass, coe, entity_list)
-        new_state = State(entity_list[0], state)
+    with patch(STATE_AVAILABLE_PACKAGE, return_value=None), patch(
+        STATE_SENDER_UPDATE_DIGITAL_PACKAGE
+    ) as digital_mock, patch(STATE_SENDER_UPDATE_ANALOG_PACKAGE) as analog_mock:
+        observer = StateObserver(hass, coe, state_sender, entity_list)
+        new_state = State(entity_list["0"], state)
 
         mock_state_change_event(hass, new_state)
         await hass.async_block_till_done()
@@ -50,20 +62,28 @@ async def test_observer_update_handler_ignore_state(hass: HomeAssistant, state: 
         assert len(observer._states[TYPE_BINARY]) == 0
         assert len(observer._states[TYPE_SENSOR]) == 0
 
+        analog_mock.assert_not_called()
+        digital_mock.assert_not_called()
+
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("state", ["unavailable", "unknown"])
-async def test_observer_update_handler_ignore_state_init(
+async def test_observer_update_handler_ignore_state_all_states(
     hass: HomeAssistant, state: str
 ):
-    """Test if the observer handles state changes states that are ignored on init."""
-    entity_list = ["sensor.test"]
+    """Test if the observer handles state changes states that are ignored on get all states."""
+    entity_list = {"0": "sensor.test"}
 
-    with patch(STATE_AVAILABLE_PACKAGE, return_value=state):
-        observer = StateObserver(hass, coe, entity_list)
+    with patch(STATE_AVAILABLE_PACKAGE, return_value=state), patch(
+        STATE_SENDER_UPDATE
+    ) as update_mock:
+        observer = StateObserver(hass, coe, state_sender, entity_list)
+        await observer._get_all_states()
 
         assert len(observer._states[TYPE_BINARY]) == 0
         assert len(observer._states[TYPE_SENSOR]) == 0
+
+        update_mock.assert_called_once()
 
 
 @pytest.mark.asyncio
@@ -72,36 +92,48 @@ async def test_observer_update_handler_update_digital_state(
     hass: HomeAssistant, domain: str
 ):
     """Test if the observer handles state changes states of digital entities."""
-    entity_list = [domain + ".test"]
+    entity_list = {"0": domain + ".test"}
 
-    with patch(STATE_AVAILABLE_PACKAGE, return_value=None):
-        observer = StateObserver(hass, coe, entity_list)
-        new_state = State(entity_list[0], "on")
+    with patch(STATE_AVAILABLE_PACKAGE, return_value=None), patch(
+        STATE_SENDER_UPDATE_DIGITAL_PACKAGE
+    ) as update_mock:
+        observer = StateObserver(hass, coe, state_sender, entity_list)
+        new_state = State(entity_list["0"], "on")
 
         mock_state_change_event(hass, new_state)
         await asyncio.sleep(0.1)
 
         assert len(observer._states[TYPE_BINARY]) == 1
         assert len(observer._states[TYPE_SENSOR]) == 0
-        assert observer._states[TYPE_BINARY][entity_list[0]]
+        assert observer._states[TYPE_BINARY][entity_list["0"]]
+
+        update_mock.assert_called_once_with(entity_list["0"], True)
 
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("domain", DIGITAL_DOMAINS)
-async def test_observer_update_handler_update_digital_state_init(
+async def test_observer_update_handler_update_digital_state_all_states(
     hass: HomeAssistant, domain: str
 ):
-    """Test if the observer handles state changes states of digital entities on init."""
-    entity_list = [domain + ".test2"]
+    """Test if the observer handles state changes states of digital entities on get all states."""
+    entity_list = {"0": domain + ".test2"}
 
-    with patch(STATE_AVAILABLE_PACKAGE, return_value="on") as get_mock:
-        observer = StateObserver(hass, coe, entity_list)
+    state = State(entity_list["0"], "on")
+
+    with patch(STATE_AVAILABLE_PACKAGE, return_value=state) as get_mock, patch(
+        STATE_SENDER_UPDATE_DIGITAL_MANUEL_PACKAGE
+    ) as update_add_mock, patch(STATE_SENDER_UPDATE) as update_mock:
+        observer = StateObserver(hass, coe, state_sender, entity_list)
+        await observer._get_all_states()
 
         assert len(observer._states[TYPE_BINARY]) == 1
         assert len(observer._states[TYPE_SENSOR]) == 0
-        assert observer._states[TYPE_BINARY][entity_list[0]]
+        assert observer._states[TYPE_BINARY][entity_list["0"]]
 
-        get_mock.assert_called_with(entity_list[0])
+        get_mock.assert_called_with(entity_list["0"])
+
+        update_add_mock.assert_called_once_with(entity_list["0"], True)
+        update_mock.assert_called_once()
 
 
 @pytest.mark.asyncio
@@ -110,36 +142,49 @@ async def test_observer_update_handler_update_analog_state(
     hass: HomeAssistant, domain: str
 ):
     """Test if the observer handles state changes states of analog entities."""
-    entity_list = [domain + ".test2"]
+    entity_list = {"0": domain + ".test2"}
 
-    with patch(STATE_AVAILABLE_PACKAGE, return_value=None):
-        observer = StateObserver(hass, coe, entity_list)
-        new_state = State(entity_list[0], "5.5")
+    with patch(STATE_AVAILABLE_PACKAGE, return_value=None), patch(
+        STATE_SENDER_UPDATE_ANALOG_PACKAGE
+    ) as update_mock:
+        observer = StateObserver(hass, coe, state_sender, entity_list)
+        new_state = State(
+            entity_list["0"], "5.5", attributes={ATTR_UNIT_OF_MEASUREMENT: "°C"}
+        )
 
         mock_state_change_event(hass, new_state)
         await asyncio.sleep(0.1)
 
         assert len(observer._states[TYPE_BINARY]) == 0
         assert len(observer._states[TYPE_SENSOR]) == 1
-        assert observer._states[TYPE_SENSOR][entity_list[0]]
+        assert observer._states[TYPE_SENSOR][entity_list["0"]]
+
+        update_mock.assert_called_once_with(entity_list["0"], 5.5, "°C")
 
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("domain", ANALOG_DOMAINS)
-async def test_observer_update_handler_update_analog_state_init(
+async def test_observer_update_handler_update_analog_state_all_states(
     hass: HomeAssistant, domain: str
 ):
-    """Test if the observer handles state changes states of analog entities on init."""
-    entity_list = [domain + ".test3"]
+    """Test if the observer handles state changes states of analog entities on get all states."""
+    entity_list = {"0": domain + ".test3"}
+    state = State(entity_list["0"], "1", attributes={ATTR_UNIT_OF_MEASUREMENT: "°C"})
 
-    with patch(STATE_AVAILABLE_PACKAGE, return_value="5.5") as get_mock:
-        observer = StateObserver(hass, coe, entity_list)
+    with patch(STATE_AVAILABLE_PACKAGE, return_value=state) as get_mock, patch(
+        STATE_SENDER_UPDATE_ANALOG_MANUEL_PACKAGE
+    ) as update_add_mock, patch(STATE_SENDER_UPDATE) as update_mock:
+        observer = StateObserver(hass, coe, state_sender, entity_list)
+        await observer._get_all_states()
 
         assert len(observer._states[TYPE_BINARY]) == 0
         assert len(observer._states[TYPE_SENSOR]) == 1
-        assert observer._states[TYPE_SENSOR][entity_list[0]]
+        assert observer._states[TYPE_SENSOR][entity_list["0"]]
 
-        get_mock.assert_called_with(entity_list[0])
+        get_mock.assert_called_with(entity_list["0"])
+
+        update_add_mock.assert_called_once_with(entity_list["0"], 1, "°C")
+        update_mock.assert_called_once()
 
 
 @pytest.mark.asyncio
@@ -148,18 +193,21 @@ async def test_observer_update_handler_update_same_state_analog(
     hass: HomeAssistant, domain: str
 ):
     """Test if the observer handles state changes states with analog same state."""
-    entity_list = [domain + ".test3"]
+    entity_list = {"0": "domain" + ".test3"}
 
-    with patch(STATE_AVAILABLE_PACKAGE, return_value="1"):
-        observer = StateObserver(hass, coe, entity_list)
-        new_state = State(entity_list[0], "1")
+    state = State(entity_list["0"], "1")
 
-        observer._states[TYPE_SENSOR] = {entity_list[0]: "1"}
+    with patch(STATE_AVAILABLE_PACKAGE, return_value=state), patch(
+        STATE_SENDER_UPDATE_ANALOG_PACKAGE
+    ) as sender_mock:
+        observer = StateObserver(hass, coe, state_sender, entity_list)
 
-        mock_state_change_event(hass, new_state, new_state)
+        observer._states[TYPE_SENSOR] = {entity_list["0"]: "1"}
+
+        mock_state_change_event(hass, state, state)
         await asyncio.sleep(0.1)
 
-        # TODO Assert send value function not called
+        sender_mock.assert_not_called()
 
 
 @pytest.mark.asyncio
@@ -168,15 +216,19 @@ async def test_observer_update_handler_update_same_state_digital(
     hass: HomeAssistant, domain: str
 ):
     """Test if the observer handles state changes states with digital same state."""
-    entity_list = [domain + ".test4"]
+    entity_list = {"0": domain + ".test4"}
 
-    with patch(STATE_AVAILABLE_PACKAGE, return_value="on"):
-        observer = StateObserver(hass, coe, entity_list)
-        new_state = State(entity_list[0], "on")
+    state = State(entity_list["0"], "on")
 
-        observer._states[TYPE_BINARY] = {entity_list[0]: "on"}
+    with patch(STATE_AVAILABLE_PACKAGE, return_value=state), patch(
+        STATE_SENDER_UPDATE_DIGITAL_PACKAGE
+    ) as sender_mock:
+        observer = StateObserver(hass, coe, state_sender, entity_list)
+        new_state = State(entity_list["0"], "on")
+
+        observer._states[TYPE_BINARY] = {entity_list["0"]: "on"}
 
         mock_state_change_event(hass, new_state, new_state)
         await asyncio.sleep(0.1)
 
-        # TODO Assert send value function not called
+        sender_mock.assert_not_called()

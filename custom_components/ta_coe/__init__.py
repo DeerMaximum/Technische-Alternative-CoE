@@ -22,6 +22,7 @@ from .const import (
     TYPE_SENSOR,
 )
 from .state_observer import StateObserver
+from .state_sender import StateSender
 
 PLATFORMS: list[str] = [Platform.SENSOR, Platform.BINARY_SENSOR]
 
@@ -43,7 +44,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     await coordinator.async_config_entry_first_refresh()
 
-    observer = StateObserver(hass, coe, entry.data.get(CONF_ENTITIES_TO_SEND, []))
+    sender = StateSender(entry.data.get(CONF_ENTITIES_TO_SEND, {}))
+    observer = StateObserver(
+        hass, coe, sender, entry.data.get(CONF_ENTITIES_TO_SEND, {})
+    )
 
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = {
         "coordinator": coordinator,
@@ -51,6 +55,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     }
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+
+    await observer.get_all_states()
 
     return True
 
