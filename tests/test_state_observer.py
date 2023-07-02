@@ -21,7 +21,7 @@ from tests import (
 )
 
 coe = CoE("")
-state_sender = StateSender()
+state_sender = StateSender(coe, {})
 
 
 @pytest.mark.asyncio
@@ -29,8 +29,14 @@ async def test_observer_receive_all_states_all_states(hass: HomeAssistant):
     """Test if the observer receives all states on get all states."""
     entity_list = {"0": "sensor.test9", "1": "binary_sensor.test"}
 
-    with patch(STATE_AVAILABLE_PACKAGE) as get_states_mock, patch(STATE_SENDER_UPDATE):
-        await StateObserver(hass, coe, state_sender, entity_list)._get_all_states()
+    with patch(STATE_AVAILABLE_PACKAGE) as get_states_mock, patch(
+        STATE_SENDER_UPDATE
+    ), patch(
+        STATE_SENDER_UPDATE_ANALOG_MANUEL_PACKAGE,
+    ), patch(
+        STATE_SENDER_UPDATE_DIGITAL_MANUEL_PACKAGE,
+    ):
+        await StateObserver(hass, coe, state_sender, entity_list).get_all_states()
 
         assert len(get_states_mock.call_args_list) == len(entity_list)
 
@@ -78,7 +84,7 @@ async def test_observer_update_handler_ignore_state_all_states(
         STATE_SENDER_UPDATE
     ) as update_mock:
         observer = StateObserver(hass, coe, state_sender, entity_list)
-        await observer._get_all_states()
+        await observer.get_all_states()
 
         assert len(observer._states[TYPE_BINARY]) == 0
         assert len(observer._states[TYPE_SENSOR]) == 0
@@ -124,7 +130,7 @@ async def test_observer_update_handler_update_digital_state_all_states(
         STATE_SENDER_UPDATE_DIGITAL_MANUEL_PACKAGE
     ) as update_add_mock, patch(STATE_SENDER_UPDATE) as update_mock:
         observer = StateObserver(hass, coe, state_sender, entity_list)
-        await observer._get_all_states()
+        await observer.get_all_states()
 
         assert len(observer._states[TYPE_BINARY]) == 1
         assert len(observer._states[TYPE_SENSOR]) == 0
@@ -175,7 +181,7 @@ async def test_observer_update_handler_update_analog_state_all_states(
         STATE_SENDER_UPDATE_ANALOG_MANUEL_PACKAGE
     ) as update_add_mock, patch(STATE_SENDER_UPDATE) as update_mock:
         observer = StateObserver(hass, coe, state_sender, entity_list)
-        await observer._get_all_states()
+        await observer.get_all_states()
 
         assert len(observer._states[TYPE_BINARY]) == 0
         assert len(observer._states[TYPE_SENSOR]) == 1

@@ -45,7 +45,7 @@ class StateObserver:
             and self._states[TYPE_SENSOR].get(state.entity_id) != state.state
         )
 
-    async def _get_all_states(self) -> None:
+    async def get_all_states(self) -> None:
         """Get all states from entities."""
         for entity_id in self._entity_list:
             state = self._hass.states.get(entity_id)

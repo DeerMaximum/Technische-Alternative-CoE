@@ -44,7 +44,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     await coordinator.async_config_entry_first_refresh()
 
-    sender = StateSender(entry.data.get(CONF_ENTITIES_TO_SEND, {}))
+    sender = StateSender(coe, entry.data.get(CONF_ENTITIES_TO_SEND, {}))
     observer = StateObserver(
         hass, coe, sender, entry.data.get(CONF_ENTITIES_TO_SEND, {})
     )
