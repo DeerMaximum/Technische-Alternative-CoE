@@ -3,9 +3,9 @@ from dataclasses import dataclass
 from typing import Any
 
 from ta_cmi import CoE, CoEChannel
-from ta_cmi.const import UNITS_EN, ChannelMode
+from ta_cmi.const import ChannelMode
 
-from custom_components.ta_coe.const import DIGITAL_DOMAINS
+from custom_components.ta_coe.const import _LOGGER, DIGITAL_DOMAINS
 
 
 @dataclass
@@ -28,7 +28,7 @@ class StateSender:
 
         self._init_digital_states()
         self._init_analog_states()
-        self.init_generate_id_mapping()
+        self._init_generate_id_mapping()
 
     @staticmethod
     def _is_domain_digital(entity_id: str) -> bool:
@@ -52,7 +52,7 @@ class StateSender:
                 self._analog_states[str(index)] = AnalogValue(0, "0")
                 index += 1
 
-    def init_generate_id_mapping(self) -> None:
+    def _init_generate_id_mapping(self) -> None:
         """Create the entity index mapping."""
         digital_index = 0
         analog_index = 0
@@ -66,6 +66,7 @@ class StateSender:
 
     def update_digital_manuel(self, entity_id: str, state: bool):
         """Update a digital state without sending update."""
+        _LOGGER.debug(f"Update digital value with out update {entity_id}: {state}")
         index = self._index_from_id[entity_id]
         self._digital_states[index] = state
 
@@ -91,6 +92,8 @@ class StateSender:
 
         page = self._build_digital_page()
 
+        _LOGGER.debug(f"Send digital update to server: {entity_id}")
+
         if index >= 15:
             await self._coe.send_digital_values(page[-16:], True)
         else:
@@ -98,7 +101,9 @@ class StateSender:
 
     def update_analog_manuel(self, entity_id: str, state: float, unit: str):
         """Update analog state without sending update."""
-        """Update a digital state without sending update."""
+        _LOGGER.debug(
+            f"Update analog value with out update {entity_id}: {state} {unit}"
+        )
         index = self._index_from_id[entity_id]
         self._analog_states[index] = AnalogValue(state, unit)
 
@@ -123,6 +128,8 @@ class StateSender:
 
         page = self._build_analog_page()
 
+        _LOGGER.debug(f"Send analog update to server: {entity_id}")
+
         page_nr = index // 4
         index_first = page_nr * 4
         index_second = (page_nr + 1) * 4
@@ -134,6 +141,8 @@ class StateSender:
 
     async def update(self):
         """Send all values to the server."""
+        _LOGGER.debug(f"Send all {len(self._entity_list)} values to server")
+
         analog_page = self._build_analog_page()
 
         for page_nr in range(8):

@@ -47,6 +47,8 @@ class StateObserver:
 
     async def get_all_states(self) -> None:
         """Get all states from entities."""
+        _LOGGER.debug("Update all states")
+
         for entity_id in self._entity_list:
             state = self._hass.states.get(entity_id)
             domain = entity_id[0 : entity_id.find(".")]

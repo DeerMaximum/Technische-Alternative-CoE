@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 import pytest
 from ta_cmi import CoE, CoEChannel
-from ta_cmi.const import UNITS_EN, ChannelMode
+from ta_cmi.const import ChannelMode
 
 from custom_components.ta_coe import StateSender
 from custom_components.ta_coe.const import ANALOG_DOMAINS, DIGITAL_DOMAINS
