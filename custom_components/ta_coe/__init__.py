@@ -21,6 +21,7 @@ from .const import (
     TYPE_BINARY,
     TYPE_SENSOR,
 )
+from .refresh_task import RefreshTask
 from .state_observer import StateObserver
 from .state_sender import StateSender
 
@@ -49,20 +50,29 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         hass, coe, sender, entry.data.get(CONF_ENTITIES_TO_SEND, {})
     )
 
+    task = RefreshTask(sender)
+
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = {
         "coordinator": coordinator,
         "observer": observer,
+        "task": task,
     }
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
     await observer.get_all_states()
 
+    await task.start()
+
     return True
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
+    task: RefreshTask = hass.data[DOMAIN][entry.entry_id]["task"]
+
+    await task.stop()
+
     return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
 
 

@@ -11,7 +11,7 @@ from homeassistant.helpers import entity_registry as er
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.ta_coe.const import DOMAIN
-from tests import COEAPI_PACKAGE, OBSERVER_GET_ALL_STATES
+from tests import COEAPI_PACKAGE, OBSERVER_GET_ALL_STATES, REFRESH_TASK_START_PACKAGE
 
 DUMMY_DEVICE_API_DATA: dict[str, Any] = {
     "digital": [{"value": True, "unit": 43}],
@@ -33,7 +33,7 @@ async def test_sensors(hass: HomeAssistant) -> None:
     """Test the creation and values of the sensors."""
     with patch(COEAPI_PACKAGE, return_value=DUMMY_DEVICE_API_DATA), patch(
         OBSERVER_GET_ALL_STATES
-    ) as observer_mock:
+    ) as observer_mock, patch(REFRESH_TASK_START_PACKAGE) as start_task_mock:
         conf_entry: MockConfigEntry = MockConfigEntry(
             domain=DOMAIN, title="CoE", data=ENTRY_DATA
         )
@@ -45,6 +45,7 @@ async def test_sensors(hass: HomeAssistant) -> None:
         await hass.async_block_till_done()
 
         observer_mock.assert_called_once()
+        start_task_mock.assert_called_once()
 
         assert conf_entry.state == ConfigEntryState.LOADED
 

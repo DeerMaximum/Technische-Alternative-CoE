@@ -22,3 +22,4 @@ STATE_SENDER_UPDATE = "custom_components.ta_coe.state_sender.StateSender.update"
 OBSERVER_GET_ALL_STATES = (
     "custom_components.ta_coe.state_observer.StateObserver.get_all_states"
 )
+REFRESH_TASK_START_PACKAGE = "custom_components.ta_coe.refresh_task.RefreshTask.start"
