@@ -139,7 +139,7 @@ async def test_step_user_with_addon_detected(hass: HomeAssistant) -> None:
             CONF_HOST: "http://a824d5a9-ta-coe:9000",
         }
 
-        api_mock.assert_called_once_with("http://a824d5a9-ta-coe:9000/")
+        api_mock.assert_called_once_with("http://a824d5a9-ta-coe:9000/receive")
 
 
 @pytest.mark.asyncio
