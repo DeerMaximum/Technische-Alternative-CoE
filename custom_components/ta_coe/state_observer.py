@@ -53,7 +53,7 @@ class StateObserver:
             state = self._hass.states.get(entity_id)
             domain = entity_id[0 : entity_id.find(".")]
 
-            if state is None or not self._is_state_valid(state):
+            if state is None or not self._is_state_valid(state.state):
                 continue
 
             if domain in ANALOG_DOMAINS:
