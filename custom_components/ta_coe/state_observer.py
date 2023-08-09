@@ -62,7 +62,7 @@ class StateObserver:
                 self._sender.update_analog_manuel(
                     entity_id,
                     state_value,
-                    state.attributes.get(ATTR_UNIT_OF_MEASUREMENT, ""),
+                    str(state.attributes.get(ATTR_UNIT_OF_MEASUREMENT, "")),
                 )
 
             if domain in DIGITAL_DOMAINS:
@@ -94,7 +94,7 @@ class StateObserver:
             await self._sender.update_analog(
                 new_state.entity_id,
                 state_value,
-                new_state.attributes.get(ATTR_UNIT_OF_MEASUREMENT, ""),
+                str(new_state.attributes.get(ATTR_UNIT_OF_MEASUREMENT, "")),
             )
 
         if new_state.domain in DIGITAL_DOMAINS:

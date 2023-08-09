@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from ta_cmi import CoE, CoEChannel
-from ta_cmi.const import ChannelMode
+from ta_cmi.const import UNITS_EN, ChannelMode
 
 from custom_components.ta_coe.const import _LOGGER, DIGITAL_DOMAINS
 
@@ -70,7 +70,7 @@ class StateSender:
 
     def update_digital_manuel(self, entity_id: str, state: bool):
         """Update a digital state without sending update."""
-        _LOGGER.debug(f"Update digital value with out update {entity_id}: {state}")
+        _LOGGER.debug(f"Update digital value without update {entity_id}: {state}")
         index = self._index_from_id[entity_id]
         self._digital_states[index] = state
 
@@ -105,16 +105,30 @@ class StateSender:
 
     def update_analog_manuel(self, entity_id: str, state: float, unit: str):
         """Update analog state without sending update."""
-        _LOGGER.debug(
-            f"Update analog value with out update {entity_id}: {state} {unit}"
-        )
+        _LOGGER.debug(f"Update analog value without update {entity_id}: {state} {unit}")
         index = self._index_from_id[entity_id]
         self._analog_states[index] = AnalogValue(state, unit)
+
+    @staticmethod
+    def _convert_unit_to_id(unit: str) -> str:
+        """Convert the unit to an id."""
+        unit_id: str = "0"
+        for key, value in UNITS_EN.items():
+            if unit == value:
+                unit_id = key
+                break
+
+        if unit_id == "1":
+            unit_id = "46"
+
+        return unit_id
 
     def _build_analog_page(self) -> list[CoEChannel]:
         """Build the analog page."""
         page = [
-            CoEChannel(ChannelMode.ANALOG, i, state.value, state.unit)
+            CoEChannel(
+                ChannelMode.ANALOG, i, state.value, self._convert_unit_to_id(state.unit)
+            )
             for i, state in enumerate(self._analog_states.values(), 0)
         ]
 

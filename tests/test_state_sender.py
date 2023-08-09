@@ -140,7 +140,7 @@ async def test_sender_analog_change_analog_page(page: int):
         )
 
         expected = [
-            CoEChannel(ChannelMode.ANALOG, 4 * (page - 1), value.value, value.unit)
+            CoEChannel(ChannelMode.ANALOG, 4 * (page - 1), value.value, "46")
         ] + [
             CoEChannel(ChannelMode.ANALOG, i + (4 * (page - 1)), 0, "0")
             for i in range(1, 4)
