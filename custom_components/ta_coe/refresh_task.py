@@ -38,4 +38,5 @@ class RefreshTask:
         _LOGGER.info("Refresh task started")
         while True:
             await asyncio.sleep(10 * 60)
-            await self._sender.update()
+            if self._sender.has_entities():
+                await self._sender.update()

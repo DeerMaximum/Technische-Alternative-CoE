@@ -30,6 +30,10 @@ class StateSender:
         self._init_analog_states()
         self._init_generate_id_mapping()
 
+    def has_entities(self) -> bool:
+        """Check if the sender has entities in the entity_list"""
+        return len(self._entity_list) > 0
+
     @staticmethod
     def _is_domain_digital(entity_id: str) -> bool:
         """Check if an entity domain is digital."""
