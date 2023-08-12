@@ -80,7 +80,9 @@ async def test_observer_update_handler_ignore_state_all_states(
     """Test if the observer handles state changes states that are ignored on get all states."""
     entity_list = {"0": "sensor.test"}
 
-    with patch(STATE_AVAILABLE_PACKAGE, return_value=state), patch(
+    new_state = State(entity_list["0"], state)
+
+    with patch(STATE_AVAILABLE_PACKAGE, return_value=new_state), patch(
         STATE_SENDER_UPDATE
     ) as update_mock:
         observer = StateObserver(hass, coe, state_sender, entity_list)
