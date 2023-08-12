@@ -6,6 +6,20 @@
         "data": {
           "host": "Base url of the server (http://IP:PORT)"
         }
+      },
+      "menu": {
+        "title": "Next step",
+        "menu_options": {
+          "send_values": "Provision of sensors via CoE",
+          "exit": "Finish wizard"
+        }
+      },
+      "send_values": {
+        "title": "Entities to send",
+        "data": {
+          "entities_to_send": "Entity id to send",
+          "next": "Add more entities"
+        }
       }
     },
     "abort": {
@@ -18,8 +32,29 @@
   },
   "options": {
     "step": {
-      "init": {
+      "init":{
         "title": "Options",
+        "menu_options": {
+          "add_send_values": "Add exposed sensors",
+          "change_send_values": "Change an exposed sensors",
+          "general": "General settings"
+        }
+      },
+      "add_send_values": {
+        "title": "Add sensor",
+        "data": {
+          "entities_to_send": "Entity id to send"
+        }
+      },
+      "change_send_values": {
+        "title": "Change sensors",
+        "data": {
+          "old_value": "ID to override",
+          "entities_to_send": "New ID"
+        }
+      },
+      "general": {
+        "title": "General",
         "data": {
           "scan_interval": "Update interval (minutes)"
         }

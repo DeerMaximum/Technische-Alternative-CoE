@@ -19,7 +19,9 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up entries."""
-    coordinator: CoEDataUpdateCoordinator = hass.data[DOMAIN][config_entry.entry_id]
+    coordinator: CoEDataUpdateCoordinator = hass.data[DOMAIN][config_entry.entry_id][
+        "coordinator"
+    ]
 
     entities: list[DeviceChannelBinary] = []
 

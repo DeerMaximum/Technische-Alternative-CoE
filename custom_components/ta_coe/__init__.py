@@ -14,12 +14,16 @@ from ta_cmi import ApiError, ChannelMode, CoE, CoEChannel
 
 from .const import (
     _LOGGER,
+    CONF_ENTITIES_TO_SEND,
     CONF_SCAN_INTERVAL,
     DOMAIN,
     SCAN_INTERVAL,
     TYPE_BINARY,
     TYPE_SENSOR,
 )
+from .refresh_task import RefreshTask
+from .state_observer import StateObserver
+from .state_sender import StateSender
 
 PLATFORMS: list[str] = [Platform.SENSOR, Platform.BINARY_SENSOR]
 
@@ -33,21 +37,42 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     if entry.data.get(CONF_SCAN_INTERVAL, None) is not None:
         update_interval = timedelta(minutes=entry.data.get(CONF_SCAN_INTERVAL))
 
-    coordinator = CoEDataUpdateCoordinator(hass, entry, host, update_interval)
+    coe = CoE(host, async_get_clientsession(hass))
+
+    coordinator = CoEDataUpdateCoordinator(hass, entry, coe, update_interval)
 
     entry.async_on_unload(entry.add_update_listener(_async_update_listener))
 
     await coordinator.async_config_entry_first_refresh()
 
-    hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator
+    sender = StateSender(coe, entry.data.get(CONF_ENTITIES_TO_SEND, {}))
+    observer = StateObserver(
+        hass, coe, sender, entry.data.get(CONF_ENTITIES_TO_SEND, {})
+    )
+
+    task = RefreshTask(sender)
+
+    hass.data.setdefault(DOMAIN, {})[entry.entry_id] = {
+        "coordinator": coordinator,
+        "observer": observer,
+        "task": task,
+    }
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+
+    await observer.get_all_states()
+
+    await task.start()
 
     return True
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
+    task: RefreshTask = hass.data[DOMAIN][entry.entry_id]["task"]
+
+    await task.stop()
+
     return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
 
 
@@ -70,14 +95,13 @@ class CoEDataUpdateCoordinator(DataUpdateCoordinator):
         self,
         hass: HomeAssistant,
         config_entry: ConfigEntry,
-        host: str,
+        coe: CoE,
         update_interval: timedelta,
     ) -> None:
         """Initialize."""
         self.config_entry = config_entry
 
-        self.host = host
-        self.coe = CoE(host, async_get_clientsession(hass))
+        self.coe = coe
 
         _LOGGER.debug("Used update interval: %s", update_interval)
 

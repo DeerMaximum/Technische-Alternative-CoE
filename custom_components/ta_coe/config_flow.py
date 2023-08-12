@@ -10,7 +10,7 @@ import voluptuous as vol
 from async_timeout import timeout
 from homeassistant import config_entries
 from homeassistant.const import CONF_HOST
-from homeassistant.core import callback
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from ta_cmi import ApiError, CoE
@@ -19,16 +19,29 @@ from .const import (
     _LOGGER,
     ADDON_DEFAULT_PORT,
     ADDON_HOSTNAME,
+    ALLOWED_DOMAINS,
+    CONF_ENTITIES_TO_SEND,
     CONF_SCAN_INTERVAL,
+    CONF_SLOT_COUNT,
     DOMAIN,
     SCAN_INTERVAL,
 )
+
+
+def validate_entity(hass: HomeAssistant, entity_id: str) -> bool:
+    """Validate an entity."""
+    return entity_id.startswith(ALLOWED_DOMAINS) and hass.states.get(entity_id)
 
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for Technische Alternative CoE."""
 
     VERSION = 1
+
+    override_data: dict[str, Any] = {}
+
+    def __init__(self):
+        self._config = self.override_data
 
     async def check_addon_available(self) -> bool:
         """Check if the CoE to HTTP addon is available."""
@@ -54,10 +67,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             return self.async_abort(reason="single_instance_allowed")
 
         if user_input is None and await self.check_addon_available():
-            return self.async_create_entry(
-                title="CoE",
-                data={CONF_HOST: f"http://{ADDON_HOSTNAME}:{ADDON_DEFAULT_PORT}"},
-            )
+            self._config = {CONF_HOST: f"http://{ADDON_HOSTNAME}:{ADDON_DEFAULT_PORT}"}
+            return await self.async_step_menu()
 
         if user_input is not None:
             if not user_input[CONF_HOST].startswith("http://"):
@@ -67,20 +78,71 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 coe: CoE = CoE(
                     user_input[CONF_HOST], async_get_clientsession(self.hass)
                 )
-                await coe.update()
-            except ApiError:
+                async with timeout(10):
+                    await coe.update()
+            except (ApiError, asyncio.TimeoutError):
                 errors["base"] = "cannot_connect"
             except Exception as err:  # pylint: disable=broad-except
                 _LOGGER.exception("Unexpected exception: %s", err)
                 errors["base"] = "unknown"
             else:
-                return self.async_create_entry(title="CoE", data=user_input)
+                self._config = user_input
+                return await self.async_step_menu()
 
         return self.async_show_form(
             step_id="user",
             data_schema=vol.Schema({vol.Required(CONF_HOST): cv.string}),
             errors=errors,
         )
+
+    async def async_step_menu(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
+        """Handle the menu step."""
+        return self.async_show_menu(
+            step_id="menu", menu_options=["send_values", "exit"]
+        )
+
+    async def async_step_send_values(self, user_input: dict[str, Any] | None = None):
+        """Handle the configuration of sensors send via CoE."""
+
+        errors: dict[str, Any] = {}
+
+        if user_input is not None:
+            new_id = user_input[CONF_ENTITIES_TO_SEND]
+            if validate_entity(self.hass, new_id):
+                if self._config.get(CONF_ENTITIES_TO_SEND, None) is None:
+                    self._config[CONF_ENTITIES_TO_SEND] = {}
+
+                if new_id not in self._config[CONF_ENTITIES_TO_SEND].values():
+                    index = self._config.get(CONF_SLOT_COUNT, 0)
+
+                    self._config[CONF_ENTITIES_TO_SEND][str(index)] = new_id
+                    self._config[CONF_SLOT_COUNT] = index + 1
+
+                    if user_input["next"]:
+                        return await self.async_step_send_values()
+
+                    return await self.async_step_exit()
+
+            errors["base"] = "invalid_entity"
+
+        return self.async_show_form(
+            step_id="send_values",
+            data_schema=vol.Schema(
+                {
+                    vol.Required(CONF_ENTITIES_TO_SEND): cv.string,
+                    vol.Required("next"): cv.boolean,
+                }
+            ),
+            errors=errors,
+        )
+
+    async def async_step_exit(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
+        """Exit the flow and save."""
+        return self.async_create_entry(title="CoE", data=self._config)
 
     @staticmethod
     @callback
@@ -120,6 +182,83 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
         """Handle options flow."""
+        return self.async_show_menu(
+            step_id="init",
+            menu_options=["general", "add_send_values", "change_send_values"],
+        )
+
+    async def async_step_add_send_values(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
+        """Handle options add sensors send via CoE."""
+
+        errors: dict[str, Any] = {}
+
+        if user_input is not None:
+            new_id = user_input[CONF_ENTITIES_TO_SEND]
+
+            if validate_entity(self.hass, user_input[CONF_ENTITIES_TO_SEND]):
+                if self.data.get(CONF_ENTITIES_TO_SEND, None) is None:
+                    self.data[CONF_ENTITIES_TO_SEND] = {}
+
+                if new_id not in self.data[CONF_ENTITIES_TO_SEND].values():
+                    index = self.data.get(CONF_SLOT_COUNT, 0)
+
+                    self.data[CONF_ENTITIES_TO_SEND][str(index)] = new_id
+                    self.data[CONF_SLOT_COUNT] = index + 1
+
+                    return self.async_create_entry(title="", data=self.data)
+
+            errors["base"] = "invalid_entity"
+
+        return self.async_show_form(
+            step_id="add_send_values",
+            data_schema=vol.Schema({vol.Required(CONF_ENTITIES_TO_SEND): cv.string}),
+            errors=errors,
+        )
+
+    async def async_step_change_send_values(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
+        """Handle options remove sensors send via CoE."""
+
+        errors: dict[str, Any] = {}
+
+        if user_input is not None:
+            new_id = user_input[CONF_ENTITIES_TO_SEND]
+            old_id = user_input["old_value"]
+
+            if (
+                old_id in self.data[CONF_ENTITIES_TO_SEND].values()
+                or new_id not in self.data[CONF_ENTITIES_TO_SEND].values()
+            ):
+                index = [
+                    k
+                    for k, v in self.data[CONF_ENTITIES_TO_SEND].items()
+                    if v == old_id
+                ][0]
+
+                self.data[CONF_ENTITIES_TO_SEND][index] = new_id
+
+                return self.async_create_entry(title="", data=self.data)
+
+            errors["base"] = "invalid_entity"
+
+        return self.async_show_form(
+            step_id="change_send_values",
+            data_schema=vol.Schema(
+                {
+                    vol.Required(CONF_ENTITIES_TO_SEND): cv.string,
+                    vol.Required("old_value"): cv.string,
+                }
+            ),
+            errors=errors,
+        )
+
+    async def async_step_general(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
+        """Handle the general options."""
 
         errors: dict[str, Any] = {}
 
@@ -129,7 +268,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             return self.async_create_entry(title="", data=self.data)
 
         return self.async_show_form(
-            step_id="init",
+            step_id="general",
             data_schema=get_schema(self.data),
             errors=errors,
         )

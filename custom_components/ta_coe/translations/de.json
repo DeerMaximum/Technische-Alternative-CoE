@@ -6,6 +6,20 @@
         "data": {
           "host": "Basis URL des Servers (http://IP:PORT)"
         }
+      },
+      "menu": {
+        "title": "Nächster Schritt",
+        "menu_options": {
+          "send_values": "Bereitstellung von Sensoren via C.M.I.",
+          "exit": "Einrichtung abschließen"
+        }
+      },
+      "send_values": {
+        "title": "Entitäten zu senden",
+        "data": {
+          "entities_to_send": "ID der Entität zum senden",
+          "next": "Weitere hinzufügen"
+        }
       }
     },
     "abort": {
@@ -18,8 +32,29 @@
   },
   "options": {
     "step": {
-      "init": {
+      "init":{
         "title": "Optionen",
+        "menu_options": {
+          "add_send_values": "CoE Sensoren hinzufügen",
+          "change_send_values": "CoE Sensor ändern",
+          "general": "Allgemeine Optionen"
+        }
+      },
+      "add_send_values": {
+        "title": "Sensor hinzufügen",
+        "data": {
+          "entities_to_send": "ID der Entität zum senden"
+        }
+      },
+      "change_send_values": {
+        "title": "Sensoren ändern",
+        "data": {
+          "old_value": "Alte ID",
+          "entities_to_send": "Neu ID"
+        }
+      },
+      "general": {
+        "title": "Allgemein",
         "data": {
           "scan_interval": "Aktualisierungsintervall (Minuten)"
         }
