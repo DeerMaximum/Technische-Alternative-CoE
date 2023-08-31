@@ -165,7 +165,7 @@ def get_schema(config: dict[str, Any]) -> vol.Schema:
         {
             vol.Required(
                 CONF_SCAN_INTERVAL, default=default_interval.seconds / 60
-            ): vol.All(int, vol.Range(min=1, max=60)),
+            ): vol.All(cv.positive_float, vol.Range(min=0.1, max=60.0)),
         }
     )
 
