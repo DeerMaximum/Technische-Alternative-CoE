@@ -20,8 +20,7 @@ from custom_components.ta_coe.const import (
     CONF_SLOT_COUNT,
     DOMAIN,
 )
-
-from . import (
+from tests import (
     COEAPI_PACKAGE,
     COEAPI_RAW_REQUEST_PACKAGE,
     SETUP_ENTRY_PACKAGE,

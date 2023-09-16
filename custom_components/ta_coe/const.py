@@ -24,6 +24,9 @@ ALLOWED_DOMAINS = ("sensor", "binary_sensor", "number", "input_boolean")
 DIGITAL_DOMAINS = ["binary_sensor", "input_boolean"]
 ANALOG_DOMAINS = ["sensor", "number"]
 
+ATTR_ANALOG_ORDER = "analog_order"
+ATTR_DIGITAL_ORDER = "digital_order"
+
 DEFAULT_DEVICE_CLASS_MAP: dict[str, SensorDeviceClass] = {
     "°C": SensorDeviceClass.TEMPERATURE,
     "K": SensorDeviceClass.TEMPERATURE,

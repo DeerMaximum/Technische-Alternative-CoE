@@ -11,19 +11,12 @@ from homeassistant.helpers import entity_registry as er
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.ta_coe.const import DOMAIN
-from tests import COEAPI_PACKAGE, OBSERVER_GET_ALL_STATES, REFRESH_TASK_START_PACKAGE
-
-DUMMY_DEVICE_API_DATA: dict[str, Any] = {
-    "digital": [{"value": True, "unit": 43}],
-    "analog": [
-        {"value": 34.4, "unit": 1},
-        {"value": 50, "unit": 11},
-        {"value": 60, "unit": 12},
-        {"value": 60, "unit": 19},
-    ],
-    "last_update_unix": 1680410064.03764,
-    "last_update": "2023-04-01T12:00:00",
-}
+from tests import (
+    COEAPI_PACKAGE,
+    DUMMY_DEVICE_API_DATA,
+    OBSERVER_GET_ALL_STATES,
+    REFRESH_TASK_START_PACKAGE,
+)
 
 ENTRY_DATA: dict[str, Any] = {CONF_HOST: "http://192.168.2.101"}
 
