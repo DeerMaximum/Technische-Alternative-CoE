@@ -75,7 +75,6 @@ class CoESendState(BinarySensorEntity):
 
         self._attr_name: str = "CoE: Send value state"
         self._attr_unique_id: str = "ta-coe-send-value-state"
-        self._attr_entity_registry_enabled_default = False
 
     @property
     def is_on(self) -> bool:
