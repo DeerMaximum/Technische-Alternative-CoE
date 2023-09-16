@@ -1,4 +1,5 @@
 """Tests for the Technische Alternative CoE integration."""
+from typing import Any
 
 COEAPI_PACKAGE = "ta_cmi.coe_api.CoEAPI.get_coe_data"
 COE_SEND_ANALOG_VALUES_PACKAGE = "ta_cmi.coe.CoE.send_analog_values"
@@ -23,3 +24,15 @@ OBSERVER_GET_ALL_STATES = (
     "custom_components.ta_coe.state_observer.StateObserver.get_all_states"
 )
 REFRESH_TASK_START_PACKAGE = "custom_components.ta_coe.refresh_task.RefreshTask.start"
+
+DUMMY_DEVICE_API_DATA: dict[str, Any] = {
+    "digital": [{"value": True, "unit": 43}],
+    "analog": [
+        {"value": 34.4, "unit": 1},
+        {"value": 50, "unit": 11},
+        {"value": 60, "unit": 12},
+        {"value": 60, "unit": 19},
+    ],
+    "last_update_unix": 1680410064.03764,
+    "last_update": "2023-04-01T12:00:00",
+}
