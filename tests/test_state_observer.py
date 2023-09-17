@@ -96,10 +96,10 @@ async def test_observer_update_handler_ignore_state_all_states(
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("domain", DIGITAL_DOMAINS)
-async def test_observer_update_handler_update_digital_state(
+async def test_observer_update_handler_update_digital_state_on(
     hass: HomeAssistant, domain: str
 ):
-    """Test if the observer handles state changes states of digital entities."""
+    """Test if the observer handles state changes states of digital entities when state is on."""
     entity_list = {"0": domain + ".test"}
 
     with patch(STATE_AVAILABLE_PACKAGE, return_value=None), patch(
@@ -116,6 +116,30 @@ async def test_observer_update_handler_update_digital_state(
         assert observer._states[TYPE_BINARY][entity_list["0"]]
 
         update_mock.assert_called_once_with(entity_list["0"], True)
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("domain", DIGITAL_DOMAINS)
+async def test_observer_update_handler_update_digital_state_off(
+    hass: HomeAssistant, domain: str
+):
+    """Test if the observer handles state changes states of digital entities when state is off."""
+    entity_list = {"0": domain + ".test"}
+
+    with patch(STATE_AVAILABLE_PACKAGE, return_value=None), patch(
+        STATE_SENDER_UPDATE_DIGITAL_PACKAGE
+    ) as update_mock:
+        observer = StateObserver(hass, coe, state_sender, entity_list)
+        new_state = State(entity_list["0"], "off")
+
+        mock_state_change_event(hass, new_state)
+        await asyncio.sleep(0.1)
+
+        assert len(observer._states[TYPE_BINARY]) == 1
+        assert len(observer._states[TYPE_SENSOR]) == 0
+        assert observer._states[TYPE_BINARY][entity_list["0"]] == False
+
+        update_mock.assert_called_once_with(entity_list["0"], False)
 
 
 @pytest.mark.asyncio

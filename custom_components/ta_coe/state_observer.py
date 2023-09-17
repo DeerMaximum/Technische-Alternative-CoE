@@ -1,7 +1,7 @@
 """CoE state observer to track state changes."""
 from typing import Any
 
-from homeassistant.const import ATTR_UNIT_OF_MEASUREMENT
+from homeassistant.const import ATTR_UNIT_OF_MEASUREMENT, STATE_ON
 from homeassistant.core import Event, HomeAssistant, State, callback
 from homeassistant.helpers.event import async_track_state_change_event
 from ta_cmi import CoE
@@ -66,7 +66,7 @@ class StateObserver:
                 )
 
             if domain in DIGITAL_DOMAINS:
-                state_value = bool(state.state)
+                state_value = state.state is STATE_ON
                 self._states[TYPE_BINARY][entity_id] = state_value
                 self._sender.update_digital_manuel(entity_id, state_value)
 
@@ -98,7 +98,7 @@ class StateObserver:
             )
 
         if new_state.domain in DIGITAL_DOMAINS:
-            state_value = bool(new_state.state)
+            state_value = new_state.state is STATE_ON
             self._states[TYPE_BINARY][new_state.entity_id] = state_value
 
             await self._sender.update_digital(new_state.entity_id, state_value)
