@@ -63,10 +63,11 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         """Handle the initial step."""
         errors: dict[str, Any] = {}
 
-        if self._async_current_entries():
-            return self.async_abort(reason="single_instance_allowed")
-
-        if user_input is None and await self.check_addon_available():
+        if (
+            user_input is None
+            and await self.check_addon_available()
+            and not self._async_current_entries()
+        ):
             self._config = {CONF_HOST: f"http://{ADDON_HOSTNAME}:{ADDON_DEFAULT_PORT}"}
             return await self.async_step_menu()
 

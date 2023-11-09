@@ -118,20 +118,24 @@ async def test_step_user(hass: HomeAssistant) -> None:
 
 
 @pytest.mark.asyncio
-async def test_user_only_one_instance(hass: HomeAssistant) -> None:
-    """Test starting a flow by user but integration was already configured."""
+async def test_user_addon_detection_only_first_instance(hass: HomeAssistant) -> None:
+    """Test starting a flow by user but integration was already configured and addon check is disabled."""
     conf_entry: MockConfigEntry = MockConfigEntry(
         domain=DOMAIN, title="CoE", data={CONF_HOST: "http://192.168.2.101"}
     )
 
     conf_entry.add_to_hass(hass)
 
-    result = await hass.config_entries.flow.async_init(
-        DOMAIN, context={"source": SOURCE_USER}
-    )
+    with patch(
+        COEAPI_RAW_REQUEST_PACKAGE,
+        return_value=DUMMY_DEVICE_API_DATA,
+    ):
+        result = await hass.config_entries.flow.async_init(
+            DOMAIN, context={"source": SOURCE_USER}
+        )
 
-    assert result["type"] == data_entry_flow.FlowResultType.ABORT
-    assert result["reason"] == "single_instance_allowed"
+        assert result["type"] == data_entry_flow.RESULT_TYPE_FORM
+        assert result["step_id"] == "user"
 
 
 @pytest.mark.asyncio
