@@ -22,6 +22,7 @@ from .const import (
     TYPE_BINARY,
     TYPE_SENSOR,
 )
+from .issues import check_coe_server_2x_issue
 from .refresh_task import RefreshTask
 from .state_observer import StateObserver
 from .state_sender import StateSender
@@ -31,6 +32,9 @@ PLATFORMS: list[str] = [Platform.SENSOR, Platform.BINARY_SENSOR]
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up platform from a ConfigEntry."""
+
+    check_coe_server_2x_issue(hass, entry)
+
     host: str = entry.data[CONF_HOST]
 
     update_interval: timedelta = SCAN_INTERVAL
@@ -40,7 +44,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     coe = CoE(host, async_get_clientsession(hass))
 
-    can_ids: list[int] = entry.data[CONF_CAN_IDS]
+    can_ids: list[int] = entry.data.get(CONF_CAN_IDS, [])
 
     coordinator = CoEDataUpdateCoordinator(hass, entry, coe, can_ids, update_interval)
 
