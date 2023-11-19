@@ -15,6 +15,7 @@ DOMAIN: str = "ta_coe"
 ADDON_HOSTNAME = "a824d5a9-ta-coe"
 ADDON_DEFAULT_PORT = 9000
 
+CONST_CAN_IDS = "can_ids"
 CONF_SCAN_INTERVAL = "scan_interval"
 CONF_ENTITIES_TO_SEND = "entities_to_send"
 CONF_SLOT_COUNT = "slot_count"

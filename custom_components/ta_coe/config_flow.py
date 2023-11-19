@@ -23,6 +23,7 @@ from .const import (
     CONF_ENTITIES_TO_SEND,
     CONF_SCAN_INTERVAL,
     CONF_SLOT_COUNT,
+    CONST_CAN_IDS,
     DOMAIN,
     SCAN_INTERVAL,
 )
@@ -31,6 +32,25 @@ from .const import (
 def validate_entity(hass: HomeAssistant, entity_id: str) -> bool:
     """Validate an entity."""
     return entity_id.startswith(ALLOWED_DOMAINS) and hass.states.get(entity_id)
+
+
+def split_can_ids(raw_ids: str) -> list[int]:
+    """Split string to can ids."""
+    string_ids = raw_ids.split(",")
+    can_ids: list[int] = []
+
+    for id_str in string_ids:
+        if not id_str.strip().isdigit():
+            raise CANIDError(id_str)
+
+        parsed_id = int(id_str)
+
+        if parsed_id <= 0 or parsed_id > 64:
+            raise CANIDError(id_str)
+
+        can_ids.append(parsed_id)
+
+    return can_ids
 
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -51,7 +71,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         )
         try:
             async with timeout(10):
-                await coe.update()
+                await coe.update(1)
         except (ApiError, asyncio.TimeoutError):
             return False
         else:
@@ -69,20 +89,23 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             and not self._async_current_entries()
         ):
             self._config = {CONF_HOST: f"http://{ADDON_HOSTNAME}:{ADDON_DEFAULT_PORT}"}
-            return await self.async_step_menu()
 
         if user_input is not None:
             if not user_input[CONF_HOST].startswith("http://"):
                 user_input[CONF_HOST] = "http://" + user_input[CONF_HOST]
 
             try:
+                user_input[CONST_CAN_IDS] = split_can_ids(user_input[CONST_CAN_IDS])
+
                 coe: CoE = CoE(
                     user_input[CONF_HOST], async_get_clientsession(self.hass)
                 )
                 async with timeout(10):
-                    await coe.update()
+                    await coe.update(user_input[CONST_CAN_IDS][0])
             except (ApiError, asyncio.TimeoutError):
                 errors["base"] = "cannot_connect"
+            except CANIDError:
+                errors["base"] = "invalid_can_id"
             except Exception as err:  # pylint: disable=broad-except
                 _LOGGER.exception("Unexpected exception: %s", err)
                 errors["base"] = "unknown"
@@ -92,7 +115,14 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         return self.async_show_form(
             step_id="user",
-            data_schema=vol.Schema({vol.Required(CONF_HOST): cv.string}),
+            data_schema=vol.Schema(
+                {
+                    vol.Required(
+                        CONF_HOST, default=self._config.get(CONF_HOST, "")
+                    ): cv.string,
+                    vol.Required(CONST_CAN_IDS): cv.string,
+                }
+            ),
             errors=errors,
         )
 
@@ -273,3 +303,12 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             data_schema=get_schema(self.data),
             errors=errors,
         )
+
+
+class CANIDError(Exception):
+    """Raised when invalid CAN-ID detected."""
+
+    def __init__(self, status: str) -> None:
+        """Initialize."""
+        super().__init__(status)
+        self.status = status

@@ -4,7 +4,8 @@
       "user": {
         "title": "Einrichtung des CoE zu HTTP Servers",
         "data": {
-          "host": "Basis URL des Servers (http://IP:PORT)"
+          "host": "Basis URL des Servers (http://IP:PORT)",
+          "can_ids": "Zu empfangende CAN-IDs (Durch Kommas getrennt)"
         }
       },
       "menu": {
@@ -27,6 +28,7 @@
     },
     "error": {
       "cannot_connect": "[%key:common::config_flow::error::cannot_connect%]",
+      "invalid_can_id": "Ungültige CAN-ID",
       "unknown": "[%key:common::config_flow::error::unknown%]"
     }
   },

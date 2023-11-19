@@ -4,7 +4,8 @@
       "user": {
         "title": "Set up CoE to HTTP Server",
         "data": {
-          "host": "Base url of the server (http://IP:PORT)"
+          "host": "Base url of the server (http://IP:PORT)",
+          "can_ids": "Target CAN-IDs (Comma separated)"
         }
       },
       "menu": {
@@ -27,6 +28,7 @@
     },
     "error": {
       "cannot_connect": "[%key:common::config_flow::error::cannot_connect%]",
+      "invalid_can_id": "Invalid CAN-ID",
       "unknown": "[%key:common::config_flow::error::unknown%]"
     }
   },
