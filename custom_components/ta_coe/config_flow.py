@@ -101,7 +101,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     user_input[CONF_HOST], async_get_clientsession(self.hass)
                 )
                 async with timeout(10):
-                    await coe.update(user_input[CONF_CAN_IDS][0])
+                    await coe.get_server_version()
             except (ApiError, asyncio.TimeoutError):
                 errors["base"] = "cannot_connect"
             except CANIDError:
