@@ -20,10 +20,10 @@ from .const import (
     ADDON_DEFAULT_PORT,
     ADDON_HOSTNAME,
     ALLOWED_DOMAINS,
+    CONF_CAN_IDS,
     CONF_ENTITIES_TO_SEND,
     CONF_SCAN_INTERVAL,
     CONF_SLOT_COUNT,
-    CONST_CAN_IDS,
     DOMAIN,
     SCAN_INTERVAL,
 )
@@ -95,13 +95,13 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 user_input[CONF_HOST] = "http://" + user_input[CONF_HOST]
 
             try:
-                user_input[CONST_CAN_IDS] = split_can_ids(user_input[CONST_CAN_IDS])
+                user_input[CONF_CAN_IDS] = split_can_ids(user_input[CONF_CAN_IDS])
 
                 coe: CoE = CoE(
                     user_input[CONF_HOST], async_get_clientsession(self.hass)
                 )
                 async with timeout(10):
-                    await coe.update(user_input[CONST_CAN_IDS][0])
+                    await coe.update(user_input[CONF_CAN_IDS][0])
             except (ApiError, asyncio.TimeoutError):
                 errors["base"] = "cannot_connect"
             except CANIDError:
@@ -120,7 +120,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     vol.Required(
                         CONF_HOST, default=self._config.get(CONF_HOST, "")
                     ): cv.string,
-                    vol.Required(CONST_CAN_IDS): cv.string,
+                    vol.Required(CONF_CAN_IDS): cv.string,
                 }
             ),
             errors=errors,
@@ -192,11 +192,14 @@ def get_schema(config: dict[str, Any]) -> vol.Schema:
     if config.get(CONF_SCAN_INTERVAL, None) is not None:
         default_interval = timedelta(minutes=config.get(CONF_SCAN_INTERVAL))
 
+    default_can_ids = ",".join(str(i) for i in config.get(CONF_CAN_IDS, []))
+
     return vol.Schema(
         {
             vol.Required(
                 CONF_SCAN_INTERVAL, default=default_interval.seconds / 60
             ): vol.All(cv.positive_float, vol.Range(min=0.1, max=60.0)),
+            vol.Required(CONF_CAN_IDS, default=default_can_ids): cv.string,
         }
     )
 
@@ -296,7 +299,12 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         if user_input is not None and not errors:
             self.data[CONF_SCAN_INTERVAL] = user_input[CONF_SCAN_INTERVAL]
 
-            return self.async_create_entry(title="", data=self.data)
+            try:
+                self.data[CONF_CAN_IDS] = split_can_ids(user_input[CONF_CAN_IDS])
+            except CANIDError:
+                errors["base"] = "invalid_can_id"
+            else:
+                return self.async_create_entry(title="", data=self.data)
 
         return self.async_show_form(
             step_id="general",

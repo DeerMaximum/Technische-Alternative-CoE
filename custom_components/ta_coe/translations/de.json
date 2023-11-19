@@ -58,12 +58,14 @@
       "general": {
         "title": "Allgemein",
         "data": {
-          "scan_interval": "Aktualisierungsintervall (Minuten)"
+          "scan_interval": "Aktualisierungsintervall (Minuten)",
+          "can_ids": "Zu empfangende CAN-IDs (Durch Kommas getrennt)"
         }
       }
     },
     "error": {
       "cannot_connect": "[%key:common::config_flow::error::cannot_connect%]",
+      "invalid_can_id": "Ungültige CAN-ID",
       "unknown": "[%key:common::config_flow::error::unknown%]"
     }
   }
