@@ -28,7 +28,7 @@ To apply changes from the CoE configuration, reload the integration.
 
 ## Configuration
 
-The integration automatically detects if the [Coe to HTTP add-on][CoEHttpAddon] is installed in the Home Assistant instance, in which case no further configuration is necessary.
+The integration automatically detects if the [Coe to HTTP add-on][CoEHttpAddon] is installed in the Home Assistant instance, in which case only providing a target CAN-ID is necessary.
 
 If an external server is used, the IP and PORT of this server must be specified during setup.
 
