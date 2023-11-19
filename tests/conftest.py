@@ -15,7 +15,7 @@ def auto_enable_custom_integrations(enable_custom_integrations):
 @pytest.fixture(scope="session", autouse=True)
 def patch_coe_server_check(request):
     """Patch the ta-cmi CoE server version check."""
-    patched = mock.patch(COE_VERSION_CHECK_PACKAGE)
+    patched = mock.patch(COE_VERSION_CHECK_PACKAGE, return_value=None)
     patched.__enter__()
 
     def unpatch():

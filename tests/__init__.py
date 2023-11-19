@@ -6,6 +6,7 @@ COE_SEND_ANALOG_VALUES_PACKAGE = "ta_cmi.coe.CoE.send_analog_values"
 COE_SEND_DIGITAL_VALUES_PACKAGE = "ta_cmi.coe.CoE.send_digital_values"
 COEAPI_RAW_REQUEST_PACKAGE = "ta_cmi.coe_api.CoEAPI._make_request_get"
 COE_VERSION_CHECK_PACKAGE = "ta_cmi.coe.CoEAPI.get_coe_version"
+COE_CHECK_VERSION_PACKAGE = "ta_cmi.coe.CoE.get_server_version"
 SETUP_ENTRY_PACKAGE = "custom_components.ta_coe.async_setup_entry"
 STATE_AVAILABLE_PACKAGE = "homeassistant.core.StateMachine.get"
 STATE_SENDER_UPDATE_DIGITAL_MANUEL_PACKAGE = (
