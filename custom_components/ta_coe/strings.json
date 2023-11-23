@@ -4,7 +4,8 @@
       "user": {
         "title": "Set up CoE to HTTP Server",
         "data": {
-          "host": "Base url of the server (http://IP:PORT)"
+          "host": "Base url of the server (http://IP:PORT)",
+          "can_ids": "Target CAN-IDs (Comma separated)"
         }
       },
       "menu": {
@@ -27,6 +28,7 @@
     },
     "error": {
       "cannot_connect": "[%key:common::config_flow::error::cannot_connect%]",
+      "invalid_can_id": "Invalid CAN-ID",
       "unknown": "[%key:common::config_flow::error::unknown%]"
     }
   },
@@ -56,13 +58,34 @@
       "general": {
         "title": "General",
         "data": {
-          "scan_interval": "Update interval (minutes)"
+          "scan_interval": "Update interval (minutes)",
+          "can_ids": "Target CAN-IDs (Comma separated)"
         }
       }
     },
     "error": {
       "cannot_connect": "[%key:common::config_flow::error::cannot_connect%]",
+      "invalid_can_id": "Invalid CAN-ID",
       "unknown": "[%key:common::config_flow::error::unknown%]"
+    }
+  },
+  "issues": {
+    "add_missing_can_id": {
+    "title": "Add missing CAN-ID",
+    "fix_flow": {
+      "step": {
+        "form": {
+            "title": "Add missing CAN-ID",
+            "description": "Add CAN IDs defined as targets in the CoE configuration.",
+            "data": {
+              "can_ids": "Target CAN-IDs (Comma separated)"
+            }
+        }
+      },
+      "error": {
+        "invalid_can_id": "Invalid CAN-ID"
+      }
+    }
     }
   }
 }

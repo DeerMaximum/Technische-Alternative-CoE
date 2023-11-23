@@ -29,9 +29,12 @@ async def async_setup_entry(
 
     entities: list[DeviceChannelSensor] = []
 
-    for index, _ in coordinator.data[TYPE_SENSOR].items():
-        channel: DeviceChannelSensor = DeviceChannelSensor(coordinator, index)
-        entities.append(channel)
+    for can_id in coordinator.data.keys():
+        for index, _ in coordinator.data[can_id][TYPE_SENSOR].items():
+            channel: DeviceChannelSensor = DeviceChannelSensor(
+                coordinator, can_id, index
+            )
+            entities.append(channel)
 
     async_add_entities(entities)
 
@@ -39,19 +42,24 @@ async def async_setup_entry(
 class DeviceChannelSensor(CoordinatorEntity, SensorEntity):
     """Representation of an CoE channel."""
 
-    def __init__(self, coordinator: CoEDataUpdateCoordinator, id: str) -> None:
+    def __init__(
+        self, coordinator: CoEDataUpdateCoordinator, can_id: int, channel_id: str
+    ) -> None:
         """Initialize."""
         super().__init__(coordinator)
-        self._id = id
+        self._id = channel_id
+        self._can_id = can_id
         self._coordinator = coordinator
 
-        self._attr_name: str = f"CoE Analog - {self._id}"
-        self._attr_unique_id: str = f"ta-coe-analog-{self._id}"
+        self._attr_name: str = f"CoE Analog - CAN{self._can_id} {self._id}"
+        self._attr_unique_id: str = f"ta-coe-analog-can{self._can_id}-{self._id}"
 
     @property
     def native_value(self) -> str:
         """Return the state of the sensor."""
-        channel_raw: dict[str, Any] = self._coordinator.data[TYPE_SENSOR][self._id]
+        channel_raw: dict[str, Any] = self._coordinator.data[self._can_id][TYPE_SENSOR][
+            self._id
+        ]
 
         value: str = channel_raw["value"]
 
@@ -61,7 +69,9 @@ class DeviceChannelSensor(CoordinatorEntity, SensorEntity):
     def native_unit_of_measurement(self) -> str:
         """Return the unit of measurement of this entity, if any."""
 
-        channel_raw: dict[str, Any] = self._coordinator.data[TYPE_SENSOR][self._id]
+        channel_raw: dict[str, Any] = self._coordinator.data[self._can_id][TYPE_SENSOR][
+            self._id
+        ]
 
         unit: str = channel_raw["unit"]
 
@@ -81,6 +91,8 @@ class DeviceChannelSensor(CoordinatorEntity, SensorEntity):
     @property
     def device_class(self) -> SensorDeviceClass | None:
         """Return the device class of this entity, if any."""
-        channel_raw: dict[str, Any] = self._coordinator.data[TYPE_SENSOR][self._id]
+        channel_raw: dict[str, Any] = self._coordinator.data[self._can_id][TYPE_SENSOR][
+            self._id
+        ]
 
         return DEFAULT_DEVICE_CLASS_MAP.get(channel_raw["unit"], None)

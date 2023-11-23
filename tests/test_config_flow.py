@@ -15,12 +15,15 @@ from ta_cmi import ApiError
 
 from custom_components.ta_coe.config_flow import ConfigFlow
 from custom_components.ta_coe.const import (
+    CONF_CAN_IDS,
     CONF_ENTITIES_TO_SEND,
     CONF_SCAN_INTERVAL,
     CONF_SLOT_COUNT,
     DOMAIN,
 )
 from tests import (
+    COE_CHECK_VERSION_PACKAGE,
+    COE_VERSION_CHECK_PACKAGE,
     COEAPI_PACKAGE,
     COEAPI_RAW_REQUEST_PACKAGE,
     SETUP_ENTRY_PACKAGE,
@@ -29,7 +32,7 @@ from tests import (
 
 DUMMY_HOST = "http://1.2.3.4"
 
-DUMMY_CONNECTION_DATA: dict[str, Any] = {CONF_HOST: DUMMY_HOST}
+DUMMY_CONNECTION_DATA: dict[str, Any] = {CONF_HOST: DUMMY_HOST, CONF_CAN_IDS: "19"}
 
 DUMMY_DEVICE_API_DATA: dict[str, Any] = {
     "digital": [{"value": True, "unit": 43}],
@@ -59,7 +62,7 @@ async def test_show_set_form(hass: HomeAssistant) -> None:
     """Test that the setup form is served."""
 
     with patch(
-        COEAPI_PACKAGE,
+        COE_VERSION_CHECK_PACKAGE,
         side_effect=ApiError("Could not connect to server"),
     ):
         result = await hass.config_entries.flow.async_init(
@@ -74,11 +77,13 @@ async def test_show_set_form(hass: HomeAssistant) -> None:
 async def test_step_user_connection_error(hass: HomeAssistant) -> None:
     """Test starting a flow by user but no connection found."""
     with patch(
-        COEAPI_PACKAGE,
+        COE_VERSION_CHECK_PACKAGE,
         side_effect=ApiError("Could not connect to server"),
     ):
         result = await hass.config_entries.flow.async_init(
-            DOMAIN, context={"source": SOURCE_USER}, data=DUMMY_CONNECTION_DATA
+            DOMAIN,
+            context={"source": SOURCE_USER},
+            data=deepcopy(DUMMY_CONNECTION_DATA),
         )
 
         assert result["type"] == data_entry_flow.RESULT_TYPE_FORM
@@ -90,11 +95,13 @@ async def test_step_user_connection_error(hass: HomeAssistant) -> None:
 async def test_step_user_unexpected_exception(hass: HomeAssistant) -> None:
     """Test starting a flow by user but with an unexpected exception."""
     with patch(
-        COEAPI_PACKAGE,
+        COE_CHECK_VERSION_PACKAGE,
         side_effect=Exception("DUMMY"),
     ):
         result = await hass.config_entries.flow.async_init(
-            DOMAIN, context={"source": SOURCE_USER}, data=DUMMY_CONNECTION_DATA
+            DOMAIN,
+            context={"source": SOURCE_USER},
+            data=deepcopy(DUMMY_CONNECTION_DATA),
         )
 
         assert result["type"] == data_entry_flow.RESULT_TYPE_FORM
@@ -105,12 +112,11 @@ async def test_step_user_unexpected_exception(hass: HomeAssistant) -> None:
 @pytest.mark.asyncio
 async def test_step_user(hass: HomeAssistant) -> None:
     """Test starting a flow by user with valid values."""
-    with patch(
-        COEAPI_PACKAGE,
-        return_value=DUMMY_DEVICE_API_DATA,
-    ):
+    with patch(COE_VERSION_CHECK_PACKAGE, return_value=None):
         result = await hass.config_entries.flow.async_init(
-            DOMAIN, context={"source": SOURCE_USER}, data=DUMMY_CONNECTION_DATA
+            DOMAIN,
+            context={"source": SOURCE_USER},
+            data=deepcopy(DUMMY_CONNECTION_DATA),
         )
 
         assert result["type"] == data_entry_flow.RESULT_TYPE_MENU
@@ -126,7 +132,7 @@ async def test_user_addon_detection_only_first_instance(hass: HomeAssistant) -> 
 
     conf_entry.add_to_hass(hass)
 
-    with patch(
+    with patch(COE_VERSION_CHECK_PACKAGE, return_value=None), patch(
         COEAPI_RAW_REQUEST_PACKAGE,
         return_value=DUMMY_DEVICE_API_DATA,
     ):
@@ -142,18 +148,15 @@ async def test_user_addon_detection_only_first_instance(hass: HomeAssistant) -> 
 async def test_step_user_with_addon_detected(hass: HomeAssistant) -> None:
     """Test starting a flow by user and addon is installed."""
 
-    with patch(
-        COEAPI_RAW_REQUEST_PACKAGE,
-        return_value=DUMMY_DEVICE_API_DATA,
-    ) as api_mock:
+    with patch(COE_VERSION_CHECK_PACKAGE, return_value=None) as api_mock:
         result = await hass.config_entries.flow.async_init(
             DOMAIN, context={"source": SOURCE_USER}
         )
 
-        assert result["type"] == data_entry_flow.RESULT_TYPE_MENU
-        assert result["step_id"] == "menu"
+        assert result["type"] == data_entry_flow.RESULT_TYPE_FORM
+        assert result["step_id"] == "user"
 
-        api_mock.assert_called_once_with("http://a824d5a9-ta-coe:9000/receive")
+        api_mock.assert_called_once()
 
 
 @pytest.mark.asyncio

@@ -14,6 +14,7 @@ from ta_cmi import ApiError, ChannelMode, CoE, CoEChannel
 
 from .const import (
     _LOGGER,
+    CONF_CAN_IDS,
     CONF_ENTITIES_TO_SEND,
     CONF_SCAN_INTERVAL,
     DOMAIN,
@@ -21,6 +22,7 @@ from .const import (
     TYPE_BINARY,
     TYPE_SENSOR,
 )
+from .issues import check_coe_server_2x_issue
 from .refresh_task import RefreshTask
 from .state_observer import StateObserver
 from .state_sender import StateSender
@@ -30,6 +32,9 @@ PLATFORMS: list[str] = [Platform.SENSOR, Platform.BINARY_SENSOR]
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up platform from a ConfigEntry."""
+
+    check_coe_server_2x_issue(hass, entry)
+
     host: str = entry.data[CONF_HOST]
 
     update_interval: timedelta = SCAN_INTERVAL
@@ -39,7 +44,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     coe = CoE(host, async_get_clientsession(hass))
 
-    coordinator = CoEDataUpdateCoordinator(hass, entry, coe, update_interval)
+    can_ids: list[int] = entry.data.get(CONF_CAN_IDS, [])
+
+    coordinator = CoEDataUpdateCoordinator(hass, entry, coe, can_ids, update_interval)
 
     entry.async_on_unload(entry.add_update_listener(_async_update_listener))
 
@@ -89,19 +96,21 @@ async def _async_update_listener(hass: HomeAssistant, entry: ConfigEntry) -> Non
 class CoEDataUpdateCoordinator(DataUpdateCoordinator):
     """Class to manage fetching CoE data."""
 
-    channel_count = 0
+    channel_count: dict[int, int] = {}
 
     def __init__(
         self,
         hass: HomeAssistant,
         config_entry: ConfigEntry,
         coe: CoE,
+        can_ids: list[int],
         update_interval: timedelta,
     ) -> None:
         """Initialize."""
         self.config_entry = config_entry
 
         self.coe = coe
+        self.can_ids = can_ids
 
         _LOGGER.debug("Used update interval: %s", update_interval)
 
@@ -137,36 +146,41 @@ class CoEDataUpdateCoordinator(DataUpdateCoordinator):
 
         return TYPE_BINARY
 
-    async def _check_new_channel(self, new_data: dict[str, Any]) -> None:
+    async def _check_new_channel(self, can_id: int, new_data: dict[str, Any]) -> None:
         """Check and reload if a new channel exists."""
         new_channel_count = len(new_data[TYPE_BINARY]) + len(new_data[TYPE_SENSOR])
 
-        if self.channel_count != new_channel_count and self.channel_count != 0:
+        if (
+            self.channel_count.get(can_id, 0) != new_channel_count
+            and self.channel_count.get(can_id, 0) != 0
+        ):
             _LOGGER.debug("New channels detected. Reload integration.")
             await self.hass.async_add_job(
                 self.hass.config_entries.async_reload(self.config_entry.entry_id)
             )
 
-        self.channel_count = new_channel_count
+        self.channel_count[can_id] = new_channel_count
 
-    async def _async_update_data(self) -> dict[str, Any]:
+    async def _async_update_data(self) -> dict[int, Any]:
         """Update data."""
         try:
-            return_data: dict[str, Any] = {TYPE_BINARY: {}, TYPE_SENSOR: {}}
-
+            return_data: dict[int, dict[str, Any]] = {}
             _LOGGER.debug("Try to update CoE")
 
-            await self.coe.update()
+            for can_id in self.can_ids:
+                return_data[can_id] = {TYPE_BINARY: {}, TYPE_SENSOR: {}}
 
-            for mode in ChannelMode:
-                for index, channel in self.coe.get_channels(mode).items():
-                    value, unit = self._format_input(channel)
-                    return_data[self._get_type(mode)][index] = {
-                        "value": value,
-                        "unit": unit,
-                    }
+                await self.coe.update(can_id)
 
-            await self._check_new_channel(return_data)
+                for mode in ChannelMode:
+                    for index, channel in self.coe.get_channels(can_id, mode).items():
+                        value, unit = self._format_input(channel)
+                        return_data[can_id][self._get_type(mode)][index] = {
+                            "value": value,
+                            "unit": unit,
+                        }
+
+                await self._check_new_channel(can_id, return_data[can_id])
 
             return return_data
         except ApiError as err:

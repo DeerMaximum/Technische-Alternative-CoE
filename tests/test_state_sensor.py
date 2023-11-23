@@ -9,7 +9,11 @@ from homeassistant.helpers import entity_registry as er
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.ta_coe import CONF_ENTITIES_TO_SEND, DOMAIN
-from custom_components.ta_coe.const import ATTR_ANALOG_ORDER, ATTR_DIGITAL_ORDER
+from custom_components.ta_coe.const import (
+    ATTR_ANALOG_ORDER,
+    ATTR_DIGITAL_ORDER,
+    CONF_CAN_IDS,
+)
 from tests import (
     COE_SEND_ANALOG_VALUES_PACKAGE,
     COE_SEND_DIGITAL_VALUES_PACKAGE,
@@ -21,6 +25,7 @@ from tests import (
 
 ENTRY_DATA: dict[str, Any] = {
     CONF_HOST: "http://192.168.2.101",
+    CONF_CAN_IDS: [1, 20],
     CONF_ENTITIES_TO_SEND: {
         1: "sensor.coe_analog_1",
         2: "binary_sensor.coe_digital_1",
@@ -29,7 +34,10 @@ ENTRY_DATA: dict[str, Any] = {
     },
 }
 
-ENTRY_DATA_NO_SENDING: dict[str, Any] = {CONF_HOST: "http://192.168.2.101"}
+ENTRY_DATA_NO_SENDING: dict[str, Any] = {
+    CONF_HOST: "http://192.168.2.101",
+    CONF_CAN_IDS: [1, 20],
+}
 
 ENTITY_ID_STATE_SENSOR = "binary_sensor.coe_send_value_state"
 
