@@ -49,13 +49,6 @@
           "entities_to_send": "ID der Entität zum senden"
         }
       },
-      "change_send_values": {
-        "title": "Sensoren ändern",
-        "data": {
-          "old_value": "Alte ID",
-          "entities_to_send": "Neu ID"
-        }
-      },
       "delete_send_values": {
         "title": "Sensoren löschen",
         "data": {

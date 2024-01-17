@@ -49,13 +49,6 @@
           "entities_to_send": "Entity id to send"
         }
       },
-      "change_send_values": {
-        "title": "Change sensors",
-        "data": {
-          "old_value": "ID to override",
-          "entities_to_send": "New ID"
-        }
-      },
       "delete_send_values": {
         "title": "Delete sensors",
         "data": {
