@@ -20,6 +20,10 @@ CONF_SCAN_INTERVAL = "scan_interval"
 CONF_ENTITIES_TO_SEND = "entities_to_send"
 CONF_SLOT_COUNT = "slot_count"
 
+FREE_SLOT_MARKER_ANALOGE = "--FREE_SLOT_MARKER_A--"
+FREE_SLOT_MARKER_DIGITAL = "--FREE_SLOT_MARKER_D--"
+FREE_SLOT_MARKERS = [FREE_SLOT_MARKER_ANALOGE, FREE_SLOT_MARKER_DIGITAL]
+
 ALLOWED_DOMAINS = ("sensor", "binary_sensor", "number", "input_boolean")
 
 DIGITAL_DOMAINS = ["binary_sensor", "input_boolean"]

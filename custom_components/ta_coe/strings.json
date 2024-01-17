@@ -38,7 +38,8 @@
         "title": "Options",
         "menu_options": {
           "add_send_values": "Add exposed sensors",
-          "change_send_values": "Change an exposed sensors",
+          "change_send_values": "Change an exposed sensor",
+          "delete_send_values": "Delete exposed sensors",
           "general": "General settings"
         }
       },
@@ -55,6 +56,12 @@
           "entities_to_send": "New ID"
         }
       },
+      "delete_send_values": {
+        "title": "Delete sensors",
+        "data": {
+          "entities_to_send": "Sensors to delete"
+        }
+      },
       "general": {
         "title": "General",
         "data": {
@@ -66,6 +73,7 @@
     "error": {
       "cannot_connect": "[%key:common::config_flow::error::cannot_connect%]",
       "invalid_can_id": "Invalid CAN-ID",
+      "invalid_entity" : "Invalid entity",
       "unknown": "[%key:common::config_flow::error::unknown%]"
     }
   },

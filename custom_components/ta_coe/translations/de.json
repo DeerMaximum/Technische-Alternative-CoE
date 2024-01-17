@@ -39,6 +39,7 @@
         "menu_options": {
           "add_send_values": "CoE Sensoren hinzufügen",
           "change_send_values": "CoE Sensor ändern",
+          "delete_send_values": "CoE Sensoren löschen",
           "general": "Allgemeine Optionen"
         }
       },
@@ -55,6 +56,12 @@
           "entities_to_send": "Neu ID"
         }
       },
+      "delete_send_values": {
+        "title": "Sensoren löschen",
+        "data": {
+          "entities_to_send": "Zu löschende Entitäten"
+        }
+      },
       "general": {
         "title": "Allgemein",
         "data": {
@@ -66,6 +73,7 @@
     "error": {
       "cannot_connect": "[%key:common::config_flow::error::cannot_connect%]",
       "invalid_can_id": "Ungültige CAN-ID",
+      "invalid_entity" : "Ungültige Entität",
       "unknown": "[%key:common::config_flow::error::unknown%]"
     }
   },

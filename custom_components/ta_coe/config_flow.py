@@ -24,7 +24,11 @@ from .const import (
     CONF_ENTITIES_TO_SEND,
     CONF_SCAN_INTERVAL,
     CONF_SLOT_COUNT,
+    DIGITAL_DOMAINS,
     DOMAIN,
+    FREE_SLOT_MARKER_ANALOGE,
+    FREE_SLOT_MARKER_DIGITAL,
+    FREE_SLOT_MARKERS,
     SCAN_INTERVAL,
 )
 
@@ -218,14 +222,34 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         """Handle options flow."""
         return self.async_show_menu(
             step_id="init",
-            menu_options=["general", "add_send_values", "change_send_values"],
+            menu_options=[
+                "general",
+                "add_send_values",
+                "change_send_values",
+                "delete_send_values",
+            ],
         )
+
+    def get_new_slot_index(self, is_digital: bool) -> tuple[int, bool]:
+        """Get the first index of an empty slot."""
+        search_marker = FREE_SLOT_MARKER_ANALOGE
+
+        if is_digital:
+            search_marker = FREE_SLOT_MARKER_DIGITAL
+
+        if search_marker in self.data[CONF_ENTITIES_TO_SEND].values():
+            index = list(self.data[CONF_ENTITIES_TO_SEND].keys())[
+                list(self.data[CONF_ENTITIES_TO_SEND].values()).index(search_marker)
+            ]
+            return index, False
+        else:
+            index = self.data.get(CONF_SLOT_COUNT, 0)
+            return index, True
 
     async def async_step_add_send_values(
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
         """Handle options add sensors send via CoE."""
-
         errors: dict[str, Any] = {}
 
         if user_input is not None:
@@ -236,10 +260,13 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                     self.data[CONF_ENTITIES_TO_SEND] = {}
 
                 if new_id not in self.data[CONF_ENTITIES_TO_SEND].values():
-                    index = self.data.get(CONF_SLOT_COUNT, 0)
+                    is_digital = new_id.split(".")[0] in DIGITAL_DOMAINS
+                    index, new_slot = self.get_new_slot_index(is_digital)
 
                     self.data[CONF_ENTITIES_TO_SEND][str(index)] = new_id
-                    self.data[CONF_SLOT_COUNT] = index + 1
+
+                    if new_slot:
+                        self.data[CONF_SLOT_COUNT] = index + 1
 
                     return self.async_create_entry(title="", data=self.data)
 
@@ -254,8 +281,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
     async def async_step_change_send_values(
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
-        """Handle options remove sensors send via CoE."""
-
+        """Handle options change sensors send via CoE."""
         errors: dict[str, Any] = {}
 
         if user_input is not None:
@@ -263,8 +289,12 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             old_id = user_input["old_value"]
 
             if (
-                old_id in self.data[CONF_ENTITIES_TO_SEND].values()
-                or new_id not in self.data[CONF_ENTITIES_TO_SEND].values()
+                (
+                    old_id in self.data[CONF_ENTITIES_TO_SEND].values()
+                    or new_id not in self.data[CONF_ENTITIES_TO_SEND].values()
+                )
+                and old_id not in FREE_SLOT_MARKERS
+                and new_id not in FREE_SLOT_MARKERS
             ):
                 index = [
                     k
@@ -284,6 +314,41 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                 {
                     vol.Required(CONF_ENTITIES_TO_SEND): cv.string,
                     vol.Required("old_value"): cv.string,
+                }
+            ),
+            errors=errors,
+        )
+
+    async def async_step_delete_send_values(self, user_input=None):
+        """Handle options remove sensors send via CoE."""
+        errors: dict[str, Any] = {}
+
+        if user_input is not None:
+            for index in user_input[CONF_ENTITIES_TO_SEND]:
+                marker = FREE_SLOT_MARKER_ANALOGE
+                if (
+                    self.data[CONF_ENTITIES_TO_SEND][index].split(".")[0]
+                    in DIGITAL_DOMAINS
+                ):
+                    marker = FREE_SLOT_MARKER_DIGITAL
+
+                self.data[CONF_ENTITIES_TO_SEND][index] = marker
+
+            return self.async_create_entry(title="", data=self.data)
+
+        entities_without_marker = {
+            key: value
+            for key, value in self.data.get(CONF_ENTITIES_TO_SEND, {}).items()
+            if value not in FREE_SLOT_MARKERS
+        }
+
+        return self.async_show_form(
+            step_id="delete_send_values",
+            data_schema=vol.Schema(
+                {
+                    vol.Required(CONF_ENTITIES_TO_SEND): cv.multi_select(
+                        entities_without_marker
+                    )
                 }
             ),
             errors=errors,

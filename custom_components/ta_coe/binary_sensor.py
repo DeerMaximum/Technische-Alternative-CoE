@@ -17,6 +17,8 @@ from .const import (
     CONF_ENTITIES_TO_SEND,
     DIGITAL_DOMAINS,
     DOMAIN,
+    FREE_SLOT_MARKER_ANALOGE,
+    FREE_SLOT_MARKER_DIGITAL,
     TYPE_BINARY,
 )
 
@@ -103,11 +105,15 @@ class CoESendState(BinarySensorEntity):
             if x.split(".")[0] in DIGITAL_DOMAINS:
                 digital[index] = x
                 index += 1
+            elif x == FREE_SLOT_MARKER_DIGITAL:
+                index += 1
 
         index = 1
         for x in self._entity.values():
             if x.split(".")[0] in ANALOG_DOMAINS:
                 analog[index] = x
+                index += 1
+            elif x == FREE_SLOT_MARKER_ANALOGE:
                 index += 1
 
         return {ATTR_ANALOG_ORDER: analog, ATTR_DIGITAL_ORDER: digital}
