@@ -13,6 +13,8 @@ from custom_components.ta_coe.const import (
     ATTR_ANALOG_ORDER,
     ATTR_DIGITAL_ORDER,
     CONF_CAN_IDS,
+    FREE_SLOT_MARKER_ANALOGE,
+    FREE_SLOT_MARKER_DIGITAL,
 )
 from tests import (
     COE_SEND_ANALOG_VALUES_PACKAGE,
@@ -27,8 +29,8 @@ ENTRY_DATA: dict[str, Any] = {
     CONF_HOST: "http://192.168.2.101",
     CONF_CAN_IDS: [1, 20],
     CONF_ENTITIES_TO_SEND: {
-        1: "sensor.coe_analog_1",
-        2: "binary_sensor.coe_digital_1",
+        1: FREE_SLOT_MARKER_ANALOGE,
+        2: FREE_SLOT_MARKER_DIGITAL,
         3: "sensor.coe_analog_2",
         4: "binary_sensor.coe_digital_2",
     },
@@ -103,11 +105,9 @@ async def test_state_sensor_on(hass: HomeAssistant) -> None:
         assert state_a1.state == STATE_ON
         assert state_a1.attributes.get("friendly_name") == "CoE: Send value state"
         assert state_a1.attributes.get(ATTR_ANALOG_ORDER) == {
-            1: ENTRY_DATA[CONF_ENTITIES_TO_SEND][1],
             2: ENTRY_DATA[CONF_ENTITIES_TO_SEND][3],
         }
         assert state_a1.attributes.get(ATTR_DIGITAL_ORDER) == {
-            1: ENTRY_DATA[CONF_ENTITIES_TO_SEND][2],
             2: ENTRY_DATA[CONF_ENTITIES_TO_SEND][4],
         }
 

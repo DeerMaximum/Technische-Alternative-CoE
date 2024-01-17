@@ -12,7 +12,9 @@ from custom_components.ta_coe import TYPE_BINARY, TYPE_SENSOR, StateObserver
 from custom_components.ta_coe.const import (
     ANALOG_DOMAINS,
     DIGITAL_DOMAINS,
-    FREE_SLOT_MARKER,
+    FREE_SLOT_MARKER_ANALOGE,
+    FREE_SLOT_MARKER_DIGITAL,
+    FREE_SLOT_MARKERS,
 )
 from custom_components.ta_coe.state_sender import StateSender
 from tests import (
@@ -56,7 +58,11 @@ async def test_observer_receive_all_states_all_states(hass: HomeAssistant):
 @pytest.mark.asyncio
 async def test_observer_receive_all_states_ignore_free_slot(hass: HomeAssistant):
     """Test if the observer ignores the free slot maker on get all states."""
-    entity_list = {"0": FREE_SLOT_MARKER, "1": "binary_sensor.test"}
+    entity_list = {
+        "0": FREE_SLOT_MARKER_ANALOGE,
+        "1": "binary_sensor.test",
+        "2": FREE_SLOT_MARKER_DIGITAL,
+    }
 
     with patch(STATE_AVAILABLE_PACKAGE) as get_states_mock, patch(
         STATE_SENDER_UPDATE
@@ -67,10 +73,10 @@ async def test_observer_receive_all_states_ignore_free_slot(hass: HomeAssistant)
     ):
         await StateObserver(hass, coe, state_sender, entity_list).get_all_states()
 
-        assert len(get_states_mock.call_args_list) == len(entity_list) - 1
+        assert len(get_states_mock.call_args_list) == len(entity_list) - 2
 
         for called_id in get_states_mock.call_args_list:
-            assert called_id.args[0] != FREE_SLOT_MARKER
+            assert called_id.args[0] not in FREE_SLOT_MARKERS
 
 
 @pytest.mark.asyncio
