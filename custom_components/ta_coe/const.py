@@ -24,10 +24,9 @@ FREE_SLOT_MARKER_ANALOGE = "--FREE_SLOT_MARKER_A--"
 FREE_SLOT_MARKER_DIGITAL = "--FREE_SLOT_MARKER_D--"
 FREE_SLOT_MARKERS = [FREE_SLOT_MARKER_ANALOGE, FREE_SLOT_MARKER_DIGITAL]
 
-ALLOWED_DOMAINS = ("sensor", "binary_sensor", "number", "input_boolean")
-
 DIGITAL_DOMAINS = ["binary_sensor", "input_boolean"]
-ANALOG_DOMAINS = ["sensor", "number"]
+ANALOG_DOMAINS = ["sensor", "number", "input_number"]
+ALLOWED_DOMAINS = tuple(DIGITAL_DOMAINS + ANALOG_DOMAINS)
 
 ATTR_ANALOG_ORDER = "analog_order"
 ATTR_DIGITAL_ORDER = "digital_order"
