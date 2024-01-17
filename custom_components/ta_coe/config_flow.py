@@ -225,7 +225,6 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             menu_options=[
                 "general",
                 "add_send_values",
-                "change_send_values",
                 "delete_send_values",
             ],
         )
@@ -275,47 +274,6 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         return self.async_show_form(
             step_id="add_send_values",
             data_schema=vol.Schema({vol.Required(CONF_ENTITIES_TO_SEND): cv.string}),
-            errors=errors,
-        )
-
-    async def async_step_change_send_values(
-        self, user_input: dict[str, Any] | None = None
-    ) -> FlowResult:
-        """Handle options change sensors send via CoE."""
-        errors: dict[str, Any] = {}
-
-        if user_input is not None:
-            new_id = user_input[CONF_ENTITIES_TO_SEND]
-            old_id = user_input["old_value"]
-
-            if (
-                (
-                    old_id in self.data[CONF_ENTITIES_TO_SEND].values()
-                    or new_id not in self.data[CONF_ENTITIES_TO_SEND].values()
-                )
-                and old_id not in FREE_SLOT_MARKERS
-                and new_id not in FREE_SLOT_MARKERS
-            ):
-                index = [
-                    k
-                    for k, v in self.data[CONF_ENTITIES_TO_SEND].items()
-                    if v == old_id
-                ][0]
-
-                self.data[CONF_ENTITIES_TO_SEND][index] = new_id
-
-                return self.async_create_entry(title="", data=self.data)
-
-            errors["base"] = "invalid_entity"
-
-        return self.async_show_form(
-            step_id="change_send_values",
-            data_schema=vol.Schema(
-                {
-                    vol.Required(CONF_ENTITIES_TO_SEND): cv.string,
-                    vol.Required("old_value"): cv.string,
-                }
-            ),
             errors=errors,
         )
 
