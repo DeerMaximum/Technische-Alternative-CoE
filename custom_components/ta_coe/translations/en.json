@@ -38,7 +38,8 @@
         "title": "Options",
         "menu_options": {
           "add_send_values": "Add exposed sensors",
-          "change_send_values": "Change an exposed sensors",
+          "change_send_values": "Change an exposed sensor",
+          "delete_send_values": "Delete exposed sensors",
           "general": "General settings"
         }
       },
@@ -53,6 +54,12 @@
         "data": {
           "old_value": "ID to override",
           "entities_to_send": "New ID"
+        }
+      },
+      "delete_send_values": {
+        "title": "Delete sensors",
+        "data": {
+          "entities_to_send": "Sensors to delete"
         }
       },
       "general": {

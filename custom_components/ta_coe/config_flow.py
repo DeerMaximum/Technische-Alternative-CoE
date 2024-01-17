@@ -25,6 +25,7 @@ from .const import (
     CONF_SCAN_INTERVAL,
     CONF_SLOT_COUNT,
     DOMAIN,
+    FREE_SLOT_MARKER,
     SCAN_INTERVAL,
 )
 
@@ -218,14 +219,18 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         """Handle options flow."""
         return self.async_show_menu(
             step_id="init",
-            menu_options=["general", "add_send_values", "change_send_values"],
+            menu_options=[
+                "general",
+                "add_send_values",
+                "change_send_values",
+                "delete_send_values",
+            ],
         )
 
     async def async_step_add_send_values(
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
         """Handle options add sensors send via CoE."""
-
         errors: dict[str, Any] = {}
 
         if user_input is not None:
@@ -254,8 +259,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
     async def async_step_change_send_values(
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
-        """Handle options remove sensors send via CoE."""
-
+        """Handle options change sensors send via CoE."""
         errors: dict[str, Any] = {}
 
         if user_input is not None:
@@ -284,6 +288,28 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                 {
                     vol.Required(CONF_ENTITIES_TO_SEND): cv.string,
                     vol.Required("old_value"): cv.string,
+                }
+            ),
+            errors=errors,
+        )
+
+    async def async_step_delete_send_values(self, user_input=None):
+        """Handle options remove sensors send via CoE."""
+        errors: dict[str, Any] = {}
+
+        if user_input is not None:
+            for index in user_input[CONF_ENTITIES_TO_SEND]:
+                self.data[CONF_ENTITIES_TO_SEND][index] = FREE_SLOT_MARKER
+
+            return self.async_create_entry(title="", data=self.data)
+
+        return self.async_show_form(
+            step_id="delete_send_values",
+            data_schema=vol.Schema(
+                {
+                    vol.Required(CONF_ENTITIES_TO_SEND): cv.multi_select(
+                        self.data.get(CONF_ENTITIES_TO_SEND, {})
+                    )
                 }
             ),
             errors=errors,
