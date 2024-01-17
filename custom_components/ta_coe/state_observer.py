@@ -6,7 +6,14 @@ from homeassistant.core import Event, HomeAssistant, State, callback
 from homeassistant.helpers.event import async_track_state_change_event
 from ta_cmi import CoE
 
-from .const import _LOGGER, ANALOG_DOMAINS, DIGITAL_DOMAINS, TYPE_BINARY, TYPE_SENSOR
+from .const import (
+    _LOGGER,
+    ANALOG_DOMAINS,
+    DIGITAL_DOMAINS,
+    FREE_SLOT_MARKER,
+    TYPE_BINARY,
+    TYPE_SENSOR,
+)
 from .state_sender import StateSender
 
 
@@ -50,6 +57,9 @@ class StateObserver:
         _LOGGER.debug("Update all states")
 
         for entity_id in self._entity_list:
+            if entity_id == FREE_SLOT_MARKER:
+                continue
+
             state = self._hass.states.get(entity_id)
             domain = entity_id[0 : entity_id.find(".")]
 

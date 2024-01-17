@@ -73,6 +73,7 @@
     "error": {
       "cannot_connect": "[%key:common::config_flow::error::cannot_connect%]",
       "invalid_can_id": "Invalid CAN-ID",
+      "invalid_entity" : "Invalid entity",
       "unknown": "[%key:common::config_flow::error::unknown%]"
     }
   },

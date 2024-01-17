@@ -269,7 +269,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             if (
                 old_id in self.data[CONF_ENTITIES_TO_SEND].values()
                 or new_id not in self.data[CONF_ENTITIES_TO_SEND].values()
-            ):
+            ) and old_id is not FREE_SLOT_MARKER:
                 index = [
                     k
                     for k, v in self.data[CONF_ENTITIES_TO_SEND].items()
@@ -303,12 +303,18 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 
             return self.async_create_entry(title="", data=self.data)
 
+        entities_without_marker = {
+            key: value
+            for key, value in self.data.get(CONF_ENTITIES_TO_SEND, {}).items()
+            if value != FREE_SLOT_MARKER
+        }
+
         return self.async_show_form(
             step_id="delete_send_values",
             data_schema=vol.Schema(
                 {
                     vol.Required(CONF_ENTITIES_TO_SEND): cv.multi_select(
-                        self.data.get(CONF_ENTITIES_TO_SEND, {})
+                        entities_without_marker
                     )
                 }
             ),
