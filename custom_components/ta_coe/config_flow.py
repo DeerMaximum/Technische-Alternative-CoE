@@ -227,6 +227,17 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             ],
         )
 
+    def get_new_slot_index(self) -> tuple[int, bool]:
+        """Get the first index of an empty slot."""
+        if FREE_SLOT_MARKER in self.data[CONF_ENTITIES_TO_SEND].values():
+            index = list(self.data[CONF_ENTITIES_TO_SEND]).keys()[
+                list(self.data[CONF_ENTITIES_TO_SEND].values()).index(FREE_SLOT_MARKER)
+            ]
+            return index, False
+        else:
+            index = self.data.get(CONF_SLOT_COUNT, 0)
+            return index, True
+
     async def async_step_add_send_values(
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
@@ -241,10 +252,12 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                     self.data[CONF_ENTITIES_TO_SEND] = {}
 
                 if new_id not in self.data[CONF_ENTITIES_TO_SEND].values():
-                    index = self.data.get(CONF_SLOT_COUNT, 0)
+                    index, used_slot = self.get_new_slot_index()
 
                     self.data[CONF_ENTITIES_TO_SEND][str(index)] = new_id
-                    self.data[CONF_SLOT_COUNT] = index + 1
+
+                    if not used_slot:
+                        self.data[CONF_SLOT_COUNT] = index + 1
 
                     return self.async_create_entry(title="", data=self.data)
 
