@@ -146,21 +146,6 @@ class CoEDataUpdateCoordinator(DataUpdateCoordinator):
 
         return TYPE_BINARY
 
-    async def _check_new_channel(self, can_id: int, new_data: dict[str, Any]) -> None:
-        """Check and reload if a new channel exists."""
-        new_channel_count = len(new_data[TYPE_BINARY]) + len(new_data[TYPE_SENSOR])
-
-        if (
-            self.channel_count.get(can_id, 0) != new_channel_count
-            and self.channel_count.get(can_id, 0) != 0
-        ):
-            _LOGGER.debug("New channels detected. Reload integration.")
-            await self.hass.async_add_job(
-                self.hass.config_entries.async_reload(self.config_entry.entry_id)
-            )
-
-        self.channel_count[can_id] = new_channel_count
-
     async def _async_update_data(self) -> dict[int, Any]:
         """Update data."""
         try:
@@ -179,8 +164,6 @@ class CoEDataUpdateCoordinator(DataUpdateCoordinator):
                             "value": value,
                             "unit": unit,
                         }
-
-                await self._check_new_channel(can_id, return_data[can_id])
 
             return return_data
         except ApiError as err:
