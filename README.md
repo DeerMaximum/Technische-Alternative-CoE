@@ -32,6 +32,10 @@ The integration automatically detects if the [Coe to HTTP add-on][CoEHttpAddon] 
 
 If an external server is used, the IP and PORT of this server must be specified during setup.
 
+### Receive values
+
+New channels are automatically recognized when the integration is reloaded.
+
 ### Send values
 You can configure the entities to be sent to the C.M.I. after the initial setup. 
 The values are transmitted on change and every 10 minutes.
