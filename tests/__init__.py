@@ -9,19 +9,19 @@ COE_VERSION_CHECK_PACKAGE = "ta_cmi.coe.CoEAPI.get_coe_version"
 COE_CHECK_VERSION_PACKAGE = "ta_cmi.coe.CoE.get_server_version"
 SETUP_ENTRY_PACKAGE = "custom_components.ta_coe.async_setup_entry"
 STATE_AVAILABLE_PACKAGE = "homeassistant.core.StateMachine.get"
-STATE_SENDER_UPDATE_DIGITAL_MANUEL_PACKAGE = (
-    "custom_components.ta_coe.state_sender.StateSender.update_digital_manuel"
+STATE_SENDER_V1_UPDATE_DIGITAL_MANUEL_PACKAGE = (
+    "custom_components.ta_coe.state_sender_v1.StateSenderV1.update_digital_manuel"
 )
-STATE_SENDER_UPDATE_ANALOG_MANUEL_PACKAGE = (
-    "custom_components.ta_coe.state_sender.StateSender.update_analog_manuel"
+STATE_SENDER_V1_UPDATE_ANALOG_MANUEL_PACKAGE = (
+    "custom_components.ta_coe.state_sender_v1.StateSenderV1.update_analog_manuel"
 )
-STATE_SENDER_UPDATE_DIGITAL_PACKAGE = (
-    "custom_components.ta_coe.state_sender.StateSender.update_digital"
+STATE_SENDER_V1_UPDATE_DIGITAL_PACKAGE = (
+    "custom_components.ta_coe.state_sender_v1.StateSenderV1.update_digital"
 )
-STATE_SENDER_UPDATE_ANALOG_PACKAGE = (
-    "custom_components.ta_coe.state_sender.StateSender.update_analog"
+STATE_SENDER_V1_UPDATE_ANALOG_PACKAGE = (
+    "custom_components.ta_coe.state_sender_v1.StateSenderV1.update_analog"
 )
-STATE_SENDER_UPDATE = "custom_components.ta_coe.state_sender.StateSender.update"
+STATE_SENDER_V1_UPDATE = "custom_components.ta_coe.state_sender_v1.StateSenderV1.update"
 OBSERVER_GET_ALL_STATES = (
     "custom_components.ta_coe.state_observer.StateObserver.get_all_states"
 )
