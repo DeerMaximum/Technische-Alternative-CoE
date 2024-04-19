@@ -1,7 +1,18 @@
+"""CoE state sender base."""
 from abc import ABCMeta, abstractmethod
+from dataclasses import dataclass
 from typing import Any
 
 from ta_cmi import CoE
+from ta_cmi.const import UNITS_EN
+
+from custom_components.ta_coe.const import _LOGGER, DIGITAL_DOMAINS
+
+
+@dataclass
+class AnalogValue:
+    value: float
+    unit: str
 
 
 class StateSender(metaclass=ABCMeta):
@@ -12,21 +23,65 @@ class StateSender(metaclass=ABCMeta):
         self._coe = coe
 
         self._entity_list = entity_list
+        self._index_from_id: dict[str, str] = {}
 
-    @abstractmethod
-    def update_digital_manuel(self, entity_id: str, state: bool) -> None:
+        self._digital_states: dict[str, bool] = {}
+        self._analog_states: dict[str, AnalogValue] = {}
+
+        self._init_generate_id_mapping()
+
+    def _init_generate_id_mapping(self) -> None:
+        """Create the entity index mapping."""
+        digital_index = 0
+        analog_index = 0
+        for entity_id in self._entity_list.values():
+            if self._is_domain_digital(entity_id):
+                self._index_from_id[entity_id] = str(digital_index)
+                digital_index += 1
+            else:
+                self._index_from_id[entity_id] = str(analog_index)
+                analog_index += 1
+
+    @staticmethod
+    def _is_domain_digital(entity_id: str) -> bool:
+        """Check if an entity domain is digital."""
+        domain = entity_id[0 : entity_id.find(".")]
+        return domain in DIGITAL_DOMAINS
+
+    @staticmethod
+    def _convert_unit_to_id(unit: str) -> str:
+        """Convert the unit to an id."""
+        unit_id: str = "0"
+        for key, value in UNITS_EN.items():
+            if unit == value:
+                unit_id = key
+                break
+
+        if unit_id == "1":
+            unit_id = "46"
+
+        return unit_id
+
+    def has_entities(self) -> bool:
+        """Check if the sender has entities in the entity_list"""
+        return len(self._entity_list) > 0
+
+    def update_digital_manuel(self, entity_id: str, state: bool):
         """Update a digital state without sending update."""
-        raise NotImplementedError("Method update_digital_manuel is not implemented")
+        _LOGGER.debug(f"Update digital value without update {entity_id}: {state}")
+        index = self._index_from_id[entity_id]
+        self._digital_states[index] = state
 
     @abstractmethod
     async def update_digital(self, entity_id: str, state: bool) -> None:
         """Update a digital state with sending update."""
         raise NotImplementedError("Method update_digital is not implemented")
 
-    @abstractmethod
-    def update_analog_manuel(self, entity_id: str, state: float, unit: str) -> None:
+    def update_analog_manuel(self, entity_id: str, state: float, unit: str):
         """Update analog state without sending update."""
-        raise NotImplementedError("Method update_analog_manuel is not implemented")
+        _LOGGER.debug(f"Update analog value without update {entity_id}: {state} {unit}")
+        index = self._index_from_id[entity_id]
+        self._analog_states[index] = AnalogValue(state, unit)
 
     @abstractmethod
     async def update_analog(self, entity_id: str, state: float, unit: str) -> None:
