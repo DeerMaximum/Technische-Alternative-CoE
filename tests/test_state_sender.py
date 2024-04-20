@@ -1,30 +1,11 @@
 """Test the Technische Alternative CoE state sender base."""
-from typing import Any
 
 from ta_cmi import CoE
 
 from custom_components.ta_coe.const import DIGITAL_DOMAINS
-from custom_components.ta_coe.state_sender import StateSender
-from tests import create_dummy_ids
+from tests import StubStateSender, create_dummy_ids
 
 coe = CoE("")
-
-
-class StubStateSender(StateSender):
-    def __init__(self, coe_intern: CoE, entity_list: dict[str, Any]):
-        super().__init__(coe_intern, entity_list)
-
-    async def update_digital(self, entity_id: str, state: bool) -> None:
-        """Update a digital state with sending update."""
-        pass
-
-    async def update_analog(self, entity_id: str, state: float, unit: str) -> None:
-        """Update an analog state with sending update."""
-        pass
-
-    async def update(self) -> None:
-        """Send all values to the server."""
-        pass
 
 
 def test_sender_init_create_map_entity_id_to_index():

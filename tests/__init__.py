@@ -1,6 +1,10 @@
 """Tests for the Technische Alternative CoE integration."""
 from typing import Any
 
+from ta_cmi import CoE
+
+from custom_components.ta_coe import StateSender
+
 COEAPI_PACKAGE = "ta_cmi.coe_api.CoEAPI.get_coe_data"
 COE_SEND_ANALOG_VALUES_PACKAGE = "ta_cmi.coe.CoE.send_analog_values"
 COE_SEND_DIGITAL_VALUES_PACKAGE = "ta_cmi.coe.CoE.send_digital_values"
@@ -8,9 +12,18 @@ COE_SEND_ANALOG_VALUES_V2_PACKAGE = "ta_cmi.coe.CoE.send_analog_values_v2"
 COE_SEND_DIGITAL_VALUES_V2_PACKAGE = "ta_cmi.coe.CoE.send_digital_values_v2"
 COEAPI_RAW_REQUEST_PACKAGE = "ta_cmi.coe_api.CoEAPI._make_request_get"
 COE_VERSION_CHECK_PACKAGE = "ta_cmi.coe.CoEAPI.get_coe_version"
-COE_CHECK_VERSION_PACKAGE = "ta_cmi.coe.CoE.get_server_version"
+COE_CHECK_SERVER_VERSION_PACKAGE = "ta_cmi.coe.CoE.get_server_config"
 SETUP_ENTRY_PACKAGE = "custom_components.ta_coe.async_setup_entry"
 STATE_AVAILABLE_PACKAGE = "homeassistant.core.StateMachine.get"
+STATE_SENDER_UPDATE_DIGITAL_MANUEL_PACKAGE = (
+    "custom_components.ta_coe.state_sender.StateSender.update_digital_manuel"
+)
+STATE_SENDER_UPDATE_ANALOG_MANUEL_PACKAGE = (
+    "custom_components.ta_coe.state_sender.StateSender.update_analog_manuel"
+)
+STATE_SENDER_STUB_UPDATE_DIGITAL_PACKAGE = "tests.StubStateSender.update_digital"
+STATE_SENDER_STUB_UPDATE_ANALOG_PACKAGE = "tests.StubStateSender.update_analog"
+STATE_SENDER_STUB_UPDATE = "tests.StubStateSender.update"
 STATE_SENDER_V1_UPDATE_DIGITAL_MANUEL_PACKAGE = (
     "custom_components.ta_coe.state_sender_v1.StateSenderV1.update_digital_manuel"
 )
@@ -63,3 +76,20 @@ def create_dummy_ids(domain: str, count: int) -> dict[str, Any]:
         dummy_data[str(i)] = f"{domain}.{i}"
 
     return dummy_data
+
+
+class StubStateSender(StateSender):
+    def __init__(self, coe_intern: CoE, entity_list: dict[str, Any]):
+        super().__init__(coe_intern, entity_list)
+
+    async def update_digital(self, entity_id: str, state: bool) -> None:
+        """Update a digital state with sending update."""
+        pass
+
+    async def update_analog(self, entity_id: str, state: float, unit: str) -> None:
+        """Update an analog state with sending update."""
+        pass
+
+    async def update(self) -> None:
+        """Send all values to the server."""
+        pass

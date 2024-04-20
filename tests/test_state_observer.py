@@ -16,18 +16,20 @@ from custom_components.ta_coe.const import (
     FREE_SLOT_MARKER_DIGITAL,
     FREE_SLOT_MARKERS,
 )
-from custom_components.ta_coe.state_sender_v1 import StateSenderV1
 from tests import (
     STATE_AVAILABLE_PACKAGE,
-    STATE_SENDER_V1_UPDATE,
-    STATE_SENDER_V1_UPDATE_ANALOG_MANUEL_PACKAGE,
+    STATE_SENDER_STUB_UPDATE,
+    STATE_SENDER_STUB_UPDATE_ANALOG_PACKAGE,
+    STATE_SENDER_STUB_UPDATE_DIGITAL_PACKAGE,
+    STATE_SENDER_UPDATE_ANALOG_MANUEL_PACKAGE,
+    STATE_SENDER_UPDATE_DIGITAL_MANUEL_PACKAGE,
     STATE_SENDER_V1_UPDATE_ANALOG_PACKAGE,
-    STATE_SENDER_V1_UPDATE_DIGITAL_MANUEL_PACKAGE,
     STATE_SENDER_V1_UPDATE_DIGITAL_PACKAGE,
+    StubStateSender,
 )
 
 coe = CoE("")
-state_sender = StateSenderV1(coe, {})
+state_sender = StubStateSender(coe, {})
 
 
 @pytest.mark.asyncio
@@ -36,11 +38,9 @@ async def test_observer_receive_all_states_all_states(hass: HomeAssistant):
     entity_list = {"0": "sensor.test9", "1": "binary_sensor.test"}
 
     with patch(STATE_AVAILABLE_PACKAGE) as get_states_mock, patch(
-        STATE_SENDER_V1_UPDATE
+        STATE_SENDER_UPDATE_ANALOG_MANUEL_PACKAGE,
     ), patch(
-        STATE_SENDER_V1_UPDATE_ANALOG_MANUEL_PACKAGE,
-    ), patch(
-        STATE_SENDER_V1_UPDATE_DIGITAL_MANUEL_PACKAGE,
+        STATE_SENDER_UPDATE_DIGITAL_MANUEL_PACKAGE,
     ):
         await StateObserver(hass, coe, state_sender, entity_list).get_all_states()
 
@@ -65,11 +65,9 @@ async def test_observer_receive_all_states_ignore_free_slot(hass: HomeAssistant)
     }
 
     with patch(STATE_AVAILABLE_PACKAGE) as get_states_mock, patch(
-        STATE_SENDER_V1_UPDATE
+        STATE_SENDER_UPDATE_ANALOG_MANUEL_PACKAGE,
     ), patch(
-        STATE_SENDER_V1_UPDATE_ANALOG_MANUEL_PACKAGE,
-    ), patch(
-        STATE_SENDER_V1_UPDATE_DIGITAL_MANUEL_PACKAGE,
+        STATE_SENDER_UPDATE_DIGITAL_MANUEL_PACKAGE,
     ):
         await StateObserver(hass, coe, state_sender, entity_list).get_all_states()
 
@@ -113,7 +111,7 @@ async def test_observer_update_handler_ignore_state_all_states(
     new_state = State(entity_list["0"], state)
 
     with patch(STATE_AVAILABLE_PACKAGE, return_value=new_state), patch(
-        STATE_SENDER_V1_UPDATE
+        STATE_SENDER_STUB_UPDATE
     ) as update_mock:
         observer = StateObserver(hass, coe, state_sender, entity_list)
         await observer.get_all_states()
@@ -133,7 +131,7 @@ async def test_observer_update_handler_update_digital_state_on(
     entity_list = {"0": domain + ".test"}
 
     with patch(STATE_AVAILABLE_PACKAGE, return_value=None), patch(
-        STATE_SENDER_V1_UPDATE_DIGITAL_PACKAGE
+        STATE_SENDER_STUB_UPDATE_DIGITAL_PACKAGE
     ) as update_mock:
         observer = StateObserver(hass, coe, state_sender, entity_list)
         new_state = State(entity_list["0"], "on")
@@ -157,7 +155,7 @@ async def test_observer_update_handler_update_digital_state_off(
     entity_list = {"0": domain + ".test"}
 
     with patch(STATE_AVAILABLE_PACKAGE, return_value=None), patch(
-        STATE_SENDER_V1_UPDATE_DIGITAL_PACKAGE
+        STATE_SENDER_STUB_UPDATE_DIGITAL_PACKAGE
     ) as update_mock:
         observer = StateObserver(hass, coe, state_sender, entity_list)
         new_state = State(entity_list["0"], "off")
@@ -183,8 +181,8 @@ async def test_observer_update_handler_update_digital_state_all_states(
     state = State(entity_list["0"], "on")
 
     with patch(STATE_AVAILABLE_PACKAGE, return_value=state) as get_mock, patch(
-        STATE_SENDER_V1_UPDATE_DIGITAL_MANUEL_PACKAGE
-    ) as update_add_mock, patch(STATE_SENDER_V1_UPDATE) as update_mock:
+        STATE_SENDER_UPDATE_DIGITAL_MANUEL_PACKAGE
+    ) as update_add_mock, patch(STATE_SENDER_STUB_UPDATE) as update_mock:
         observer = StateObserver(hass, coe, state_sender, entity_list)
         await observer.get_all_states()
 
@@ -207,7 +205,7 @@ async def test_observer_update_handler_update_analog_state(
     entity_list = {"0": domain + ".test2"}
 
     with patch(STATE_AVAILABLE_PACKAGE, return_value=None), patch(
-        STATE_SENDER_V1_UPDATE_ANALOG_PACKAGE
+        STATE_SENDER_STUB_UPDATE_ANALOG_PACKAGE
     ) as update_mock:
         observer = StateObserver(hass, coe, state_sender, entity_list)
         new_state = State(
@@ -234,8 +232,8 @@ async def test_observer_update_handler_update_analog_state_all_states(
     state = State(entity_list["0"], "1", attributes={ATTR_UNIT_OF_MEASUREMENT: "°C"})
 
     with patch(STATE_AVAILABLE_PACKAGE, return_value=state) as get_mock, patch(
-        STATE_SENDER_V1_UPDATE_ANALOG_MANUEL_PACKAGE
-    ) as update_add_mock, patch(STATE_SENDER_V1_UPDATE) as update_mock:
+        STATE_SENDER_UPDATE_ANALOG_MANUEL_PACKAGE
+    ) as update_add_mock, patch(STATE_SENDER_STUB_UPDATE) as update_mock:
         observer = StateObserver(hass, coe, state_sender, entity_list)
         await observer.get_all_states()
 
@@ -260,7 +258,7 @@ async def test_observer_update_handler_update_same_state_analog(
     state = State(entity_list["0"], "1")
 
     with patch(STATE_AVAILABLE_PACKAGE, return_value=state), patch(
-        STATE_SENDER_V1_UPDATE_ANALOG_PACKAGE
+        STATE_SENDER_UPDATE_ANALOG_MANUEL_PACKAGE
     ) as sender_mock:
         observer = StateObserver(hass, coe, state_sender, entity_list)
 
@@ -283,7 +281,7 @@ async def test_observer_update_handler_update_same_state_digital(
     state = State(entity_list["0"], "on")
 
     with patch(STATE_AVAILABLE_PACKAGE, return_value=state), patch(
-        STATE_SENDER_V1_UPDATE_DIGITAL_PACKAGE
+        STATE_SENDER_STUB_UPDATE_DIGITAL_PACKAGE
     ) as sender_mock:
         observer = StateObserver(hass, coe, state_sender, entity_list)
         new_state = State(entity_list["0"], "on")

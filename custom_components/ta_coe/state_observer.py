@@ -14,7 +14,7 @@ from .const import (
     TYPE_BINARY,
     TYPE_SENSOR,
 )
-from .state_sender_v1 import StateSenderV1
+from .state_sender import StateSender
 
 
 class StateObserver:
@@ -24,7 +24,7 @@ class StateObserver:
         self,
         hass: HomeAssistant,
         coe: CoE,
-        sender: StateSenderV1,
+        sender: StateSender,
         entity_list: dict[str, Any],
     ):
         """Initialize."""

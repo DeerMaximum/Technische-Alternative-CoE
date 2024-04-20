@@ -9,9 +9,11 @@ from homeassistant.const import CONF_HOST, STATE_ON
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 from pytest_homeassistant_custom_component.common import MockConfigEntry
+from ta_cmi import CoEServerConfig
 
 from custom_components.ta_coe.const import CONF_CAN_IDS, DOMAIN
 from tests import (
+    COE_CHECK_SERVER_VERSION_PACKAGE,
     COE_VERSION_CHECK_PACKAGE,
     COEAPI_PACKAGE,
     DUMMY_DEVICE_API_DATA,
@@ -21,6 +23,8 @@ from tests import (
 
 ENTRY_DATA: dict[str, Any] = {CONF_HOST: "http://192.168.2.101", CONF_CAN_IDS: [1, 20]}
 
+server_config = CoEServerConfig(coe_version=1)
+
 
 @pytest.mark.asyncio
 async def test_sensors(hass: HomeAssistant) -> None:
@@ -29,6 +33,8 @@ async def test_sensors(hass: HomeAssistant) -> None:
         OBSERVER_GET_ALL_STATES
     ) as observer_mock, patch(REFRESH_TASK_START_PACKAGE) as start_task_mock, patch(
         COE_VERSION_CHECK_PACKAGE, return_value=None
+    ), patch(
+        COE_CHECK_SERVER_VERSION_PACKAGE, return_value=server_config
     ):
         conf_entry: MockConfigEntry = MockConfigEntry(
             domain=DOMAIN, title="CoE", data=ENTRY_DATA
