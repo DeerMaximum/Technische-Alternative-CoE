@@ -72,5 +72,8 @@ class StateSenderV2(StateSender):
             for index, value in self._digital_states.items()
         ]
 
-        await self._coe.send_analog_values_v2(analog_channels)
-        await self._coe.send_digital_values_v2(digital_channels)
+        if len(analog_channels) != 0:
+            await self._coe.send_analog_values_v2(analog_channels)
+
+        if len(digital_channels) != 0:
+            await self._coe.send_digital_values_v2(digital_channels)
