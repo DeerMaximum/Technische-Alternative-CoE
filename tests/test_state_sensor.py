@@ -66,8 +66,8 @@ async def test_state_sensor_off(hass: HomeAssistant) -> None:
         await hass.config_entries.async_setup(conf_entry.entry_id)
         await hass.async_block_till_done()
 
-        observer_mock.assert_called_once()
-        start_task_mock.assert_called_once()
+        observer_mock.assert_not_called()
+        start_task_mock.assert_not_called()
 
         assert conf_entry.state == ConfigEntryState.LOADED
 

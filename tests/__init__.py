@@ -3,7 +3,7 @@ from typing import Any
 
 from ta_cmi import CoE
 
-from custom_components.ta_coe import StateSender
+from custom_components.ta_coe.state_sender import StateSender
 
 COEAPI_PACKAGE = "ta_cmi.coe_api.CoEAPI.get_coe_data"
 COE_SEND_ANALOG_VALUES_PACKAGE = "ta_cmi.coe.CoE.send_analog_values"

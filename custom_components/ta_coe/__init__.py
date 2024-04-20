@@ -79,9 +79,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
-    await observer.get_all_states()
-
-    await task.start()
+    if len(entry.data.get(CONF_ENTITIES_TO_SEND, {})) > 0:
+        await observer.get_all_states()
+        await task.start()
 
     return True
 
