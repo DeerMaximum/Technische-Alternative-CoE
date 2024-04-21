@@ -22,9 +22,7 @@ from custom_components.ta_coe.const import (
     DOMAIN,
 )
 from tests import (
-    COE_CHECK_VERSION_PACKAGE,
     COE_VERSION_CHECK_PACKAGE,
-    COEAPI_PACKAGE,
     COEAPI_RAW_REQUEST_PACKAGE,
     SETUP_ENTRY_PACKAGE,
     STATE_AVAILABLE_PACKAGE,
@@ -95,7 +93,7 @@ async def test_step_user_connection_error(hass: HomeAssistant) -> None:
 async def test_step_user_unexpected_exception(hass: HomeAssistant) -> None:
     """Test starting a flow by user but with an unexpected exception."""
     with patch(
-        COE_CHECK_VERSION_PACKAGE,
+        COE_VERSION_CHECK_PACKAGE,
         side_effect=Exception("DUMMY"),
     ):
         result = await hass.config_entries.flow.async_init(

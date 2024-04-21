@@ -26,6 +26,8 @@ from .issues import check_coe_server_2x_issue
 from .refresh_task import RefreshTask
 from .state_observer import StateObserver
 from .state_sender import StateSender
+from .state_sender_v1 import StateSenderV1
+from .state_sender_v2 import StateSenderV2
 
 PLATFORMS: list[str] = [Platform.SENSOR, Platform.BINARY_SENSOR]
 
@@ -52,7 +54,17 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     await coordinator.async_config_entry_first_refresh()
 
-    sender = StateSender(coe, entry.data.get(CONF_ENTITIES_TO_SEND, {}))
+    server_config = await coe.get_server_config()
+
+    _LOGGER.debug(f"CoE server config: Version={server_config.coe_version}")
+
+    sender: StateSender
+
+    if server_config.coe_version == 1:
+        sender = StateSenderV1(coe, entry.data.get(CONF_ENTITIES_TO_SEND, {}))
+    else:
+        sender = StateSenderV2(coe, entry.data.get(CONF_ENTITIES_TO_SEND, {}))
+
     observer = StateObserver(
         hass, coe, sender, entry.data.get(CONF_ENTITIES_TO_SEND, {})
     )
@@ -67,9 +79,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
-    await observer.get_all_states()
-
-    await task.start()
+    if len(entry.data.get(CONF_ENTITIES_TO_SEND, {})) > 0:
+        await observer.get_all_states()
+        await task.start()
 
     return True
 

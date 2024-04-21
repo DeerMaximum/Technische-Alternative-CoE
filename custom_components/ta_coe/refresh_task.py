@@ -3,13 +3,12 @@ import asyncio
 from contextlib import suppress
 
 from .const import _LOGGER
-from .state_sender import StateSender
 
 
 class RefreshTask:
     """Handle the refresh of values to the CoE server."""
 
-    def __init__(self, sender: StateSender):
+    def __init__(self, sender):
         """Initialize."""
         self._sender = sender
         self.is_started = False

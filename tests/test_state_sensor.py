@@ -7,6 +7,7 @@ from homeassistant.const import CONF_HOST, STATE_OFF, STATE_ON
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 from pytest_homeassistant_custom_component.common import MockConfigEntry
+from ta_cmi import CoEServerConfig
 
 from custom_components.ta_coe import CONF_ENTITIES_TO_SEND, DOMAIN
 from custom_components.ta_coe.const import (
@@ -17,6 +18,7 @@ from custom_components.ta_coe.const import (
     FREE_SLOT_MARKER_DIGITAL,
 )
 from tests import (
+    COE_CHECK_SERVER_VERSION_PACKAGE,
     COE_SEND_ANALOG_VALUES_PACKAGE,
     COE_SEND_DIGITAL_VALUES_PACKAGE,
     COEAPI_PACKAGE,
@@ -43,13 +45,17 @@ ENTRY_DATA_NO_SENDING: dict[str, Any] = {
 
 ENTITY_ID_STATE_SENSOR = "binary_sensor.coe_send_value_state"
 
+server_config = CoEServerConfig(coe_version=2)
+
 
 @pytest.mark.asyncio
 async def test_state_sensor_off(hass: HomeAssistant) -> None:
     """Test the creation and values of the state sensors when no values are send."""
     with patch(COEAPI_PACKAGE, return_value=DUMMY_DEVICE_API_DATA), patch(
         OBSERVER_GET_ALL_STATES
-    ) as observer_mock, patch(REFRESH_TASK_START_PACKAGE) as start_task_mock:
+    ) as observer_mock, patch(REFRESH_TASK_START_PACKAGE) as start_task_mock, patch(
+        COE_CHECK_SERVER_VERSION_PACKAGE, return_value=server_config
+    ):
         conf_entry: MockConfigEntry = MockConfigEntry(
             domain=DOMAIN, title="CoE", data=ENTRY_DATA_NO_SENDING
         )
@@ -60,8 +66,8 @@ async def test_state_sensor_off(hass: HomeAssistant) -> None:
         await hass.config_entries.async_setup(conf_entry.entry_id)
         await hass.async_block_till_done()
 
-        observer_mock.assert_called_once()
-        start_task_mock.assert_called_once()
+        observer_mock.assert_not_called()
+        start_task_mock.assert_not_called()
 
         assert conf_entry.state == ConfigEntryState.LOADED
 
@@ -83,7 +89,9 @@ async def test_state_sensor_on(hass: HomeAssistant) -> None:
         OBSERVER_GET_ALL_STATES
     ) as observer_mock, patch(
         REFRESH_TASK_START_PACKAGE
-    ) as start_task_mock:
+    ) as start_task_mock, patch(
+        COE_CHECK_SERVER_VERSION_PACKAGE, return_value=server_config
+    ):
         conf_entry: MockConfigEntry = MockConfigEntry(
             domain=DOMAIN, title="CoE", data=ENTRY_DATA
         )
