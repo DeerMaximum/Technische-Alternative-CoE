@@ -11,6 +11,8 @@ To apply changes from the CoE configuration, reload the integration.
 > **Note**
 > This integration requires the [Coe to HTTP add-on][CoEHttpAddon].
 
+> When using CoE V2, scaling errors may occur as a new system is used to scale the values.
+> In the case of such an error, please create a ticket.
 
 {% if not installed %}
 ## Installation
