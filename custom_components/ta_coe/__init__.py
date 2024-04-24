@@ -100,7 +100,7 @@ async def _async_update_listener(hass: HomeAssistant, entry: ConfigEntry) -> Non
     config = dict(entry.data)
     if entry.options:
         config.update(entry.options)
-        entry.data = MappingProxyType(config)
+        hass.config_entries.async_update_entry(entry, data=config)
 
     await hass.config_entries.async_reload(entry.entry_id)
 
