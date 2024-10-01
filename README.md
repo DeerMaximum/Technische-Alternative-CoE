@@ -30,7 +30,9 @@ To apply changes from the CoE configuration, reload the integration.
 
 ## Configuration
 
-The integration automatically detects if the [Coe to HTTP add-on][CoEHttpAddon] is installed in the Home Assistant instance, in which case only providing a target CAN-ID is necessary.
+The integration automatically detects if the [Coe to HTTP add-on][CoEHttpAddon] is installed in the Home Assistant instance, in which case only providing a target CAN-ID is necessary. 
+To configure CoE on your C.M.I., follow [these](https://wiki.fhem.de/wiki/CanOverEthernet) instructions (German). The CAN-ID that you must provide is the same one configured under point six in the *Konfigurieren des CMI* section
+ 
 
 If an external server is used, the IP and PORT of this server must be specified during setup.
 
