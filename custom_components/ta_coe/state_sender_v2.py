@@ -2,6 +2,7 @@
 from typing import Any
 
 from ta_cmi import ChannelMode, CoE, CoEChannel
+from ta_cmi.const import UNITS_EN
 
 from custom_components.ta_coe.const import _LOGGER
 from custom_components.ta_coe.state_sender import StateSender
@@ -15,6 +16,20 @@ class StateSenderV2(StateSender):
     def __init__(self, coe: CoE, entity_list: dict[str, Any]):
         """Initialize."""
         super().__init__(coe, entity_list)
+
+    @staticmethod
+    def _convert_unit_to_id(unit: str) -> str:
+        """Convert the unit to an id."""
+        unit_id: str = "0"
+        for key, value in UNITS_EN.items():
+            if unit == value:
+                unit_id = key
+                break
+
+        if unit_id == "46":
+            unit_id = "1"
+
+        return unit_id
 
     async def update_digital(self, entity_id: str, state: bool):
         """Update a digital state with sending update."""
