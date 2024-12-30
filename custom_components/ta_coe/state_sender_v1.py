@@ -2,7 +2,7 @@
 from typing import Any
 
 from ta_cmi import CoE, CoEChannel
-from ta_cmi.const import ChannelMode
+from ta_cmi.const import UNITS_EN, ChannelMode
 
 from custom_components.ta_coe.const import _LOGGER
 from custom_components.ta_coe.state_sender import AnalogValue, StateSender
@@ -33,6 +33,20 @@ class StateSenderV1(StateSender):
             if not self._is_domain_digital(entity_id):
                 self._analog_states[str(index)] = AnalogValue(0, "0")
                 index += 1
+
+    @staticmethod
+    def _convert_unit_to_id(unit: str) -> str:
+        """Convert the unit to an id."""
+        unit_id: str = "0"
+        for key, value in UNITS_EN.items():
+            if unit == value:
+                unit_id = key
+                break
+
+        if unit_id == "1":
+            unit_id = "46"
+
+        return unit_id
 
     def _build_digital_page(self):
         """Build the digital page."""

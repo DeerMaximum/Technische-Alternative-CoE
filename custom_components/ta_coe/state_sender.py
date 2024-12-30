@@ -4,7 +4,6 @@ from dataclasses import dataclass
 from typing import Any
 
 from ta_cmi import CoE
-from ta_cmi.const import UNITS_EN
 
 from custom_components.ta_coe.const import _LOGGER, DIGITAL_DOMAINS
 
@@ -47,20 +46,6 @@ class StateSender(metaclass=ABCMeta):
         """Check if an entity domain is digital."""
         domain = entity_id[0 : entity_id.find(".")]
         return domain in DIGITAL_DOMAINS
-
-    @staticmethod
-    def _convert_unit_to_id(unit: str) -> str:
-        """Convert the unit to an id."""
-        unit_id: str = "0"
-        for key, value in UNITS_EN.items():
-            if unit == value:
-                unit_id = key
-                break
-
-        if unit_id == "1":
-            unit_id = "46"
-
-        return unit_id
 
     def has_entities(self) -> bool:
         """Check if the sender has entities in the entity_list"""
