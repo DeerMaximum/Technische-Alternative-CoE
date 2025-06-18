@@ -1,0 +1,50 @@
+[project]
+name = "ta-coe"
+version = "1.5.3"
+description = "The integration polls the digital and analog data from a C.M.I. via the CanOverEthernet(CoE) interface"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [
+    { name = "DeerMaximum", email = "git983456@parabelmail.de" },
+]
+maintainers = [
+    { name = "DeerMaximum", email = "git983456@parabelmail.de" },
+]
+requires-python = ">=3.13.2"
+keywords = [
+    "homeassistant",
+    "c.m.i.",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.13",
+]
+dependencies = [
+    "ta-cmi==3.3.1",
+]
+
+[project.urls]
+homepage = "https://github.com/DeerMaximum/Technische-Alternative-CoE"
+repository = "https://github.com/DeerMaximum/Technische-Alternative-CoE"
+
+[dependency-groups]
+dev = [
+    "aiohttp_cors",
+    "pytest-homeassistant-custom-component==0.13.252",
+    "async_timeout~=5.0.1"
+]
+lint = [
+    "ruff>=0.12.0"
+]
+
+[tool.ruff]
+preview = true
+
+[tool.ruff.lint.isort]
+case-sensitive = true
+
+[tool.uv]
+default-groups = "all"
