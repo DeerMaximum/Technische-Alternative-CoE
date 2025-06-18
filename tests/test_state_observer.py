@@ -165,7 +165,7 @@ async def test_observer_update_handler_update_digital_state_off(
 
         assert len(observer._states[TYPE_BINARY]) == 1
         assert len(observer._states[TYPE_SENSOR]) == 0
-        assert observer._states[TYPE_BINARY][entity_list["0"]] == False
+        assert not observer._states[TYPE_BINARY][entity_list["0"]]
 
         update_mock.assert_called_once_with(entity_list["0"], False)
 

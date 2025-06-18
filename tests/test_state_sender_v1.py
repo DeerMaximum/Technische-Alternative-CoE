@@ -26,7 +26,7 @@ def test_sender_init_create_digital_pages():
     assert len(sender._digital_states) == count
 
     for i in range(0, count):
-        assert sender._digital_states[str(i)] == False
+        assert not sender._digital_states[str(i)]
 
 
 def test_sender_init_create_analog_pages():
