@@ -6,10 +6,10 @@ from typing import Any
 from unittest.mock import patch
 
 import pytest
-from homeassistant import data_entry_flow
 from homeassistant.config_entries import SOURCE_USER
 from homeassistant.const import CONF_HOST
 from homeassistant.core import HomeAssistant
+from homeassistant.data_entry_flow import FlowResultType
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 from ta_cmi import ApiError
 
@@ -67,7 +67,7 @@ async def test_show_set_form(hass: HomeAssistant) -> None:
             DOMAIN, context={"source": SOURCE_USER}
         )
 
-        assert result["type"] == data_entry_flow.RESULT_TYPE_FORM
+        assert result["type"] == FlowResultType.FORM
         assert result["step_id"] == "user"
 
 
@@ -84,7 +84,7 @@ async def test_step_user_connection_error(hass: HomeAssistant) -> None:
             data=deepcopy(DUMMY_CONNECTION_DATA),
         )
 
-        assert result["type"] == data_entry_flow.RESULT_TYPE_FORM
+        assert result["type"] == FlowResultType.FORM
         assert result["step_id"] == "user"
         assert result["errors"] == {"base": "cannot_connect"}
 
@@ -102,7 +102,7 @@ async def test_step_user_unexpected_exception(hass: HomeAssistant) -> None:
             data=deepcopy(DUMMY_CONNECTION_DATA),
         )
 
-        assert result["type"] == data_entry_flow.RESULT_TYPE_FORM
+        assert result["type"] == FlowResultType.FORM
         assert result["step_id"] == "user"
         assert result["errors"] == {"base": "unknown"}
 
@@ -117,7 +117,7 @@ async def test_step_user(hass: HomeAssistant) -> None:
             data=deepcopy(DUMMY_CONNECTION_DATA),
         )
 
-        assert result["type"] == data_entry_flow.RESULT_TYPE_MENU
+        assert result["type"] == FlowResultType.MENU
         assert result["step_id"] == "menu"
 
 
@@ -138,7 +138,7 @@ async def test_user_addon_detection_only_first_instance(hass: HomeAssistant) -> 
             DOMAIN, context={"source": SOURCE_USER}
         )
 
-        assert result["type"] == data_entry_flow.RESULT_TYPE_FORM
+        assert result["type"] == FlowResultType.FORM
         assert result["step_id"] == "user"
 
 
@@ -146,12 +146,15 @@ async def test_user_addon_detection_only_first_instance(hass: HomeAssistant) -> 
 async def test_step_user_with_addon_detected(hass: HomeAssistant) -> None:
     """Test starting a flow by user and addon is installed."""
 
-    with patch(COE_VERSION_CHECK_PACKAGE, return_value=None) as api_mock:
+    with patch(COE_VERSION_CHECK_PACKAGE, return_value=None) as api_mock, patch(
+        COEAPI_RAW_REQUEST_PACKAGE,
+        return_value=DUMMY_DEVICE_API_DATA,
+    ):
         result = await hass.config_entries.flow.async_init(
             DOMAIN, context={"source": SOURCE_USER}
         )
 
-        assert result["type"] == data_entry_flow.RESULT_TYPE_FORM
+        assert result["type"] == FlowResultType.FORM
         assert result["step_id"] == "user"
 
         api_mock.assert_called_once()
@@ -165,7 +168,7 @@ async def test_step_menu_show(hass: HomeAssistant) -> None:
         DOMAIN, context={"source": "menu"}
     )
 
-    assert result["type"] == data_entry_flow.RESULT_TYPE_MENU
+    assert result["type"] == FlowResultType.MENU
     assert result["step_id"] == "menu"
 
 
@@ -180,7 +183,7 @@ async def test_step_exit(hass: HomeAssistant) -> None:
             DOMAIN, context={"source": "exit"}, data=DUMMY_CONNECTION_DATA
         )
 
-        assert result["type"] == data_entry_flow.RESULT_TYPE_CREATE_ENTRY
+        assert result["type"] == FlowResultType.CREATE_ENTRY
         assert result["title"] == "CoE"
         assert result["data"] == DUMMY_CONNECTION_DATA
 
@@ -193,7 +196,7 @@ async def test_step_send_values_show(hass: HomeAssistant) -> None:
         DOMAIN, context={"source": "send_values"}
     )
 
-    assert result["type"] == data_entry_flow.RESULT_TYPE_FORM
+    assert result["type"] == FlowResultType.FORM
     assert result["step_id"] == "send_values"
 
 
@@ -211,7 +214,7 @@ async def test_step_send_values_valid_input(hass: HomeAssistant) -> None:
             data={CONF_ENTITIES_TO_SEND: test_id, "next": False},
         )
 
-        assert result["type"] == data_entry_flow.RESULT_TYPE_CREATE_ENTRY
+        assert result["type"] == FlowResultType.CREATE_ENTRY
         assert result["title"] == "CoE"
         assert result["data"] == {
             **DUMMY_CONNECTION_DATA,
@@ -232,7 +235,7 @@ async def test_step_send_values_invalid_input_wrong_domain(hass: HomeAssistant) 
         data={CONF_ENTITIES_TO_SEND: "climate.test", "next": False},
     )
 
-    assert result["type"] == data_entry_flow.RESULT_TYPE_FORM
+    assert result["type"] == FlowResultType.FORM
     assert result["step_id"] == "send_values"
     assert result["errors"] == {"base": "invalid_entity"}
 
@@ -248,7 +251,7 @@ async def test_step_send_values_invalid_input_wrong_entity(hass: HomeAssistant) 
             data={CONF_ENTITIES_TO_SEND: "sensor.foo", "next": False},
         )
 
-        assert result["type"] == data_entry_flow.RESULT_TYPE_FORM
+        assert result["type"] == FlowResultType.FORM
         assert result["step_id"] == "send_values"
         assert result["errors"] == {"base": "invalid_entity"}
 
@@ -266,7 +269,7 @@ async def test_step_send_values_next_step_show(hass: HomeAssistant) -> None:
             data={CONF_ENTITIES_TO_SEND: "sensor.test1", "next": True},
         )
 
-        assert result["type"] == data_entry_flow.RESULT_TYPE_FORM
+        assert result["type"] == FlowResultType.FORM
         assert result["step_id"] == "send_values"
         assert result["errors"] == {}
 
@@ -293,7 +296,7 @@ async def test_step_send_values_next_step_finish(hass: HomeAssistant) -> None:
             data={CONF_ENTITIES_TO_SEND: test_id2, "next": False},
         )
 
-        assert result["type"] == data_entry_flow.RESULT_TYPE_CREATE_ENTRY
+        assert result["type"] == FlowResultType.CREATE_ENTRY
         assert result["title"] == "CoE"
         assert result["data"][CONF_HOST] == DUMMY_HOST
         assert result["data"][CONF_SLOT_COUNT] == 2
