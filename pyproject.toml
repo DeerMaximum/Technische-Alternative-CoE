@@ -1,6 +1,6 @@
 [project]
 name = "ta-coe"
-version = "1.5.3"
+version = "1.5.4"
 description = "The integration polls the digital and analog data from a C.M.I. via the CanOverEthernet(CoE) interface"
 readme = "README.md"
 license = "MIT"
