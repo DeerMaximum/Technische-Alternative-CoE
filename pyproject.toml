@@ -33,7 +33,7 @@ repository = "https://github.com/DeerMaximum/Technische-Alternative-CoE"
 [dependency-groups]
 dev = [
     "aiohttp_cors~=0.8.1",
-    "pytest-homeassistant-custom-component==0.13.301",
+    "pytest-homeassistant-custom-component==0.13.308",
     "async_timeout~=5.0.1"
 ]
 lint = [
