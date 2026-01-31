@@ -21,14 +21,8 @@ from .const import (
     ADDON_HOSTNAME,
     ALLOWED_DOMAINS,
     CONF_CAN_IDS,
-    CONF_ENTITIES_TO_SEND,
     CONF_SCAN_INTERVAL,
-    CONF_SLOT_COUNT,
-    DIGITAL_DOMAINS,
     DOMAIN,
-    FREE_SLOT_MARKER_ANALOGE,
-    FREE_SLOT_MARKER_DIGITAL,
-    FREE_SLOT_MARKERS,
     SCAN_INTERVAL,
 )
 
@@ -115,7 +109,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 errors["base"] = "unknown"
             else:
                 self._config = user_input
-                return await self.async_step_menu()
+                return self.async_create_entry(title="CoE", data=self._config)
 
         return self.async_show_form(
             step_id="user",
@@ -129,55 +123,6 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             ),
             errors=errors,
         )
-
-    async def async_step_menu(
-        self, user_input: dict[str, Any] | None = None
-    ) -> FlowResult:
-        """Handle the menu step."""
-        return self.async_show_menu(
-            step_id="menu", menu_options=["send_values", "exit"]
-        )
-
-    async def async_step_send_values(self, user_input: dict[str, Any] | None = None):
-        """Handle the configuration of sensors send via CoE."""
-
-        errors: dict[str, Any] = {}
-
-        if user_input is not None:
-            new_id = user_input[CONF_ENTITIES_TO_SEND]
-            if validate_entity(self.hass, new_id):
-                if self._config.get(CONF_ENTITIES_TO_SEND, None) is None:
-                    self._config[CONF_ENTITIES_TO_SEND] = {}
-
-                if new_id not in self._config[CONF_ENTITIES_TO_SEND].values():
-                    index = self._config.get(CONF_SLOT_COUNT, 0)
-
-                    self._config[CONF_ENTITIES_TO_SEND][str(index)] = new_id
-                    self._config[CONF_SLOT_COUNT] = index + 1
-
-                    if user_input["next"]:
-                        return await self.async_step_send_values()
-
-                    return await self.async_step_exit()
-
-            errors["base"] = "invalid_entity"
-
-        return self.async_show_form(
-            step_id="send_values",
-            data_schema=vol.Schema(
-                {
-                    vol.Required(CONF_ENTITIES_TO_SEND): cv.string,
-                    vol.Required("next"): cv.boolean,
-                }
-            ),
-            errors=errors,
-        )
-
-    async def async_step_exit(
-        self, user_input: dict[str, Any] | None = None
-    ) -> FlowResult:
-        """Exit the flow and save."""
-        return self.async_create_entry(title="CoE", data=self._config)
 
     @staticmethod
     @callback
@@ -219,103 +164,6 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
         """Handle options flow."""
-        return self.async_show_menu(
-            step_id="init",
-            menu_options=[
-                "general",
-                "add_send_values",
-                "delete_send_values",
-            ],
-        )
-
-    def get_new_slot_index(self, is_digital: bool) -> tuple[int, bool]:
-        """Get the first index of an empty slot."""
-        search_marker = FREE_SLOT_MARKER_ANALOGE
-
-        if is_digital:
-            search_marker = FREE_SLOT_MARKER_DIGITAL
-
-        if search_marker in self.data[CONF_ENTITIES_TO_SEND].values():
-            index = list(self.data[CONF_ENTITIES_TO_SEND].keys())[
-                list(self.data[CONF_ENTITIES_TO_SEND].values()).index(search_marker)
-            ]
-            return index, False
-        else:
-            index = self.data.get(CONF_SLOT_COUNT, 0)
-            return index, True
-
-    async def async_step_add_send_values(
-        self, user_input: dict[str, Any] | None = None
-    ) -> FlowResult:
-        """Handle options add sensors send via CoE."""
-        errors: dict[str, Any] = {}
-
-        if user_input is not None:
-            new_id = user_input[CONF_ENTITIES_TO_SEND]
-
-            if validate_entity(self.hass, user_input[CONF_ENTITIES_TO_SEND]):
-                if self.data.get(CONF_ENTITIES_TO_SEND, None) is None:
-                    self.data[CONF_ENTITIES_TO_SEND] = {}
-
-                if new_id not in self.data[CONF_ENTITIES_TO_SEND].values():
-                    is_digital = new_id.split(".")[0] in DIGITAL_DOMAINS
-                    index, new_slot = self.get_new_slot_index(is_digital)
-
-                    self.data[CONF_ENTITIES_TO_SEND][str(index)] = new_id
-
-                    if new_slot:
-                        self.data[CONF_SLOT_COUNT] = index + 1
-
-                    return self.async_create_entry(title="", data=self.data)
-
-            errors["base"] = "invalid_entity"
-
-        return self.async_show_form(
-            step_id="add_send_values",
-            data_schema=vol.Schema({vol.Required(CONF_ENTITIES_TO_SEND): cv.string}),
-            errors=errors,
-        )
-
-    async def async_step_delete_send_values(self, user_input=None):
-        """Handle options remove sensors send via CoE."""
-        errors: dict[str, Any] = {}
-
-        if user_input is not None:
-            for index in user_input[CONF_ENTITIES_TO_SEND]:
-                marker = FREE_SLOT_MARKER_ANALOGE
-                if (
-                    self.data[CONF_ENTITIES_TO_SEND][index].split(".")[0]
-                    in DIGITAL_DOMAINS
-                ):
-                    marker = FREE_SLOT_MARKER_DIGITAL
-
-                self.data[CONF_ENTITIES_TO_SEND][index] = marker
-
-            return self.async_create_entry(title="", data=self.data)
-
-        entities_without_marker = {
-            key: value
-            for key, value in self.data.get(CONF_ENTITIES_TO_SEND, {}).items()
-            if value not in FREE_SLOT_MARKERS
-        }
-
-        return self.async_show_form(
-            step_id="delete_send_values",
-            data_schema=vol.Schema(
-                {
-                    vol.Required(CONF_ENTITIES_TO_SEND): cv.multi_select(
-                        entities_without_marker
-                    )
-                }
-            ),
-            errors=errors,
-        )
-
-    async def async_step_general(
-        self, user_input: dict[str, Any] | None = None
-    ) -> FlowResult:
-        """Handle the general options."""
-
         errors: dict[str, Any] = {}
 
         if user_input is not None and not errors:
