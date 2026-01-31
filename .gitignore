@@ -28,3 +28,4 @@ tts
 scenes.yaml
 scripts.yaml
 secrets.yaml
+.ha_run.lock
