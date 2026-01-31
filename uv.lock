@@ -2,8 +2,8 @@ version = 1
 revision = 3
 requires-python = ">=3.13.2"
 resolution-markers = [
-    "python_full_version >= '3.14.0'",
-    "python_full_version < '3.14.0'",
+    "python_full_version >= '3.14'",
+    "python_full_version < '3.14'",
 ]
 
 [[package]]
@@ -446,8 +446,8 @@ name = "bleak-retry-connector"
 version = "3.10.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "bleak", marker = "python_full_version < '3.14.0'" },
-    { name = "bluetooth-adapters", marker = "python_full_version < '3.14.0' and sys_platform == 'linux'" },
+    { name = "bleak", marker = "python_full_version < '3.14'" },
+    { name = "bluetooth-adapters", marker = "python_full_version < '3.14' and sys_platform == 'linux'" },
     { name = "dbus-fast", marker = "sys_platform == 'linux'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/d3/da/a93aafb69ce5672ab3b3ba3b80516ed36c0292821c47ec740c497d43b38c/bleak_retry_connector-3.10.0.tar.gz", hash = "sha256:a95172bd56d2af677fb9e250291cde8c70d8f72381d423f64e48c828dffbc93b", size = 15923, upload-time = "2025-04-01T19:26:48.068Z" }
@@ -868,11 +868,11 @@ wheels = [
 
 [[package]]
 name = "filelock"
-version = "3.20.1"
+version = "3.20.3"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/a7/23/ce7a1126827cedeb958fc043d61745754464eb56c5937c35bbf2b8e26f34/filelock-3.20.1.tar.gz", hash = "sha256:b8360948b351b80f420878d8516519a2204b07aefcdcfd24912a5d33127f188c", size = 19476, upload-time = "2025-12-15T23:54:28.027Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/1d/65/ce7f1b70157833bf3cb851b556a37d4547ceafc158aa9b34b36782f23696/filelock-3.20.3.tar.gz", hash = "sha256:18c57ee915c7ec61cff0ecf7f0f869936c7c30191bb0cf406f1341778d0834e1", size = 19485, upload-time = "2026-01-09T17:55:05.421Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/e3/7f/a1a97644e39e7316d850784c642093c99df1290a460df4ede27659056834/filelock-3.20.1-py3-none-any.whl", hash = "sha256:15d9e9a67306188a44baa72f569d2bfd803076269365fdea0934385da4dc361a", size = 16666, upload-time = "2025-12-15T23:54:26.874Z" },
+    { url = "https://files.pythonhosted.org/packages/b5/36/7fb70f04bf00bc646cd5bb45aa9eddb15e19437a28b8fb2b4a5249fac770/filelock-3.20.3-py3-none-any.whl", hash = "sha256:4b0dda527ee31078689fc205ec4f1c1bf7d56cf88b6dc9426c4f230e46c2dce1", size = 16701, upload-time = "2026-01-09T17:55:04.334Z" },
 ]
 
 [[package]]
@@ -1101,8 +1101,8 @@ dependencies = [
     { name = "cryptography" },
     { name = "grpcio" },
     { name = "josepy" },
-    { name = "litellm", version = "1.80.11", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14.0'" },
-    { name = "litellm", version = "1.81.5", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.14.0'" },
+    { name = "litellm", version = "1.80.11", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14'" },
+    { name = "litellm", version = "1.81.5", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.14'" },
     { name = "pycognito" },
     { name = "pyjwt" },
     { name = "sentence-stream" },
@@ -1434,22 +1434,22 @@ name = "litellm"
 version = "1.80.11"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
-    "python_full_version >= '3.14.0'",
+    "python_full_version >= '3.14'",
 ]
 dependencies = [
-    { name = "aiohttp", marker = "python_full_version >= '3.14.0'" },
-    { name = "click", marker = "python_full_version >= '3.14.0'" },
-    { name = "fastuuid", marker = "python_full_version >= '3.14.0'" },
-    { name = "grpcio", marker = "python_full_version >= '3.14.0'" },
-    { name = "httpx", marker = "python_full_version >= '3.14.0'" },
-    { name = "importlib-metadata", marker = "python_full_version >= '3.14.0'" },
-    { name = "jinja2", marker = "python_full_version >= '3.14.0'" },
-    { name = "jsonschema", marker = "python_full_version >= '3.14.0'" },
-    { name = "openai", marker = "python_full_version >= '3.14.0'" },
-    { name = "pydantic", marker = "python_full_version >= '3.14.0'" },
-    { name = "python-dotenv", marker = "python_full_version >= '3.14.0'" },
-    { name = "tiktoken", marker = "python_full_version >= '3.14.0'" },
-    { name = "tokenizers", marker = "python_full_version >= '3.14.0'" },
+    { name = "aiohttp", marker = "python_full_version >= '3.14'" },
+    { name = "click", marker = "python_full_version >= '3.14'" },
+    { name = "fastuuid", marker = "python_full_version >= '3.14'" },
+    { name = "grpcio", marker = "python_full_version >= '3.14'" },
+    { name = "httpx", marker = "python_full_version >= '3.14'" },
+    { name = "importlib-metadata", marker = "python_full_version >= '3.14'" },
+    { name = "jinja2", marker = "python_full_version >= '3.14'" },
+    { name = "jsonschema", marker = "python_full_version >= '3.14'" },
+    { name = "openai", marker = "python_full_version >= '3.14'" },
+    { name = "pydantic", marker = "python_full_version >= '3.14'" },
+    { name = "python-dotenv", marker = "python_full_version >= '3.14'" },
+    { name = "tiktoken", marker = "python_full_version >= '3.14'" },
+    { name = "tokenizers", marker = "python_full_version >= '3.14'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/55/47/be6cd7b356418ca8bef3b843507940ce77b76ef2dfe515f2b4ba9b461ff0/litellm-1.80.11.tar.gz", hash = "sha256:c9fc63e7acb6360363238fe291bcff1488c59ff66020416d8376c0ee56414a19", size = 13189510, upload-time = "2025-12-22T12:47:29.181Z" }
 wheels = [
@@ -1461,21 +1461,21 @@ name = "litellm"
 version = "1.81.5"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
-    "python_full_version < '3.14.0'",
+    "python_full_version < '3.14'",
 ]
 dependencies = [
-    { name = "aiohttp", marker = "python_full_version < '3.14.0'" },
-    { name = "click", marker = "python_full_version < '3.14.0'" },
-    { name = "fastuuid", marker = "python_full_version < '3.14.0'" },
-    { name = "httpx", marker = "python_full_version < '3.14.0'" },
-    { name = "importlib-metadata", marker = "python_full_version < '3.14.0'" },
-    { name = "jinja2", marker = "python_full_version < '3.14.0'" },
-    { name = "jsonschema", marker = "python_full_version < '3.14.0'" },
-    { name = "openai", marker = "python_full_version < '3.14.0'" },
-    { name = "pydantic", marker = "python_full_version < '3.14.0'" },
-    { name = "python-dotenv", marker = "python_full_version < '3.14.0'" },
-    { name = "tiktoken", marker = "python_full_version < '3.14.0'" },
-    { name = "tokenizers", marker = "python_full_version < '3.14.0'" },
+    { name = "aiohttp", marker = "python_full_version < '3.14'" },
+    { name = "click", marker = "python_full_version < '3.14'" },
+    { name = "fastuuid", marker = "python_full_version < '3.14'" },
+    { name = "httpx", marker = "python_full_version < '3.14'" },
+    { name = "importlib-metadata", marker = "python_full_version < '3.14'" },
+    { name = "jinja2", marker = "python_full_version < '3.14'" },
+    { name = "jsonschema", marker = "python_full_version < '3.14'" },
+    { name = "openai", marker = "python_full_version < '3.14'" },
+    { name = "pydantic", marker = "python_full_version < '3.14'" },
+    { name = "python-dotenv", marker = "python_full_version < '3.14'" },
+    { name = "tiktoken", marker = "python_full_version < '3.14'" },
+    { name = "tokenizers", marker = "python_full_version < '3.14'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/38/f4/c109bc5504520baa7b96a910b619d1b1b5af6cb5c28053e53adfed83e3ab/litellm-1.81.5.tar.gz", hash = "sha256:599994651cbb64b8ee7cd3b4979275139afc6e426bdd4aa840a61121bb3b04c9", size = 13615436, upload-time = "2026-01-29T01:37:54.817Z" }
 wheels = [
@@ -2675,7 +2675,7 @@ name = "sqlalchemy"
 version = "2.0.41"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "greenlet", marker = "(python_full_version < '3.14.0' and platform_machine == 'AMD64') or (python_full_version < '3.14.0' and platform_machine == 'WIN32') or (python_full_version < '3.14.0' and platform_machine == 'aarch64') or (python_full_version < '3.14.0' and platform_machine == 'amd64') or (python_full_version < '3.14.0' and platform_machine == 'ppc64le') or (python_full_version < '3.14.0' and platform_machine == 'win32') or (python_full_version < '3.14.0' and platform_machine == 'x86_64')" },
+    { name = "greenlet", marker = "(python_full_version < '3.14' and platform_machine == 'AMD64') or (python_full_version < '3.14' and platform_machine == 'WIN32') or (python_full_version < '3.14' and platform_machine == 'aarch64') or (python_full_version < '3.14' and platform_machine == 'amd64') or (python_full_version < '3.14' and platform_machine == 'ppc64le') or (python_full_version < '3.14' and platform_machine == 'win32') or (python_full_version < '3.14' and platform_machine == 'x86_64')" },
     { name = "typing-extensions" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/63/66/45b165c595ec89aa7dcc2c1cd222ab269bc753f1fc7a1e68f8481bd957bf/sqlalchemy-2.0.41.tar.gz", hash = "sha256:edba70118c4be3c2b1f90754d308d0b79c6fe2c0fdc52d8ddf603916f83f4db9", size = 9689424, upload-time = "2025-05-14T17:10:32.339Z" }
