@@ -54,7 +54,8 @@ def split_can_ids(raw_ids: str) -> list[int]:
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for Technische Alternative CoE."""
 
-    VERSION = 1
+    VERSION: int = 1
+    MINOR_VERSION: int = 2
 
     override_data: dict[str, Any] = {}
 

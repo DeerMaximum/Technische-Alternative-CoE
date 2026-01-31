@@ -1,7 +1,9 @@
 """The Technische Alternative CoE integration."""
+
 from __future__ import annotations
 
 from datetime import timedelta
+from typing import Any
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_HOST, Platform
@@ -16,8 +18,13 @@ from .const import (
     CONF_SCAN_INTERVAL,
     DOMAIN,
     SCAN_INTERVAL,
-    TYPE_BINARY,
-    TYPE_SENSOR,
+    CONF_ANALOG_ENTITIES,
+    CONF_DIGITAL_ENTITIES,
+    FREE_SLOT_MARKER_ANALOG,
+    FREE_SLOT_MARKER_DIGITAL,
+    DIGITAL_DOMAINS,
+    ANALOG_DOMAINS,
+    ConfEntityToSend,
 )
 from .coordinator import CoEDataUpdateCoordinator
 from .issues import check_coe_server_2x_issue
@@ -103,3 +110,53 @@ async def _async_update_listener(hass: HomeAssistant, entry: ConfigEntry) -> Non
     await hass.config_entries.async_reload(entry.entry_id)
 
 
+async def async_migrate_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Migrate the config to the new format."""
+
+    version = entry.version
+    minor_version = entry.minor_version
+
+    _LOGGER.debug("Migrating from version %s.%s", version, minor_version)
+    if entry.version > 1:
+        # This means the user has downgraded from a future version
+        return False
+
+    if minor_version > 1:
+        return True
+
+    new_sending_data: dict[str, Any] = {
+        CONF_ANALOG_ENTITIES: [],
+        CONF_DIGITAL_ENTITIES: [],
+    }
+
+    digital_id = 1
+    analog_id = 1
+
+    for entity_id in entry.data[CONF_ENTITIES_TO_SEND].values():
+        if entity_id == FREE_SLOT_MARKER_ANALOG:
+            analog_id += 1
+            continue
+        elif entity_id == FREE_SLOT_MARKER_DIGITAL:
+            digital_id += 1
+            continue
+
+        domain = entity_id.split(".")[0]
+        if domain in DIGITAL_DOMAINS:
+            new_sending_data[CONF_DIGITAL_ENTITIES].append(
+                ConfEntityToSend(digital_id, entity_id)
+            )
+            digital_id += 1
+        elif domain in ANALOG_DOMAINS:
+            new_sending_data[CONF_ANALOG_ENTITIES].append(
+                ConfEntityToSend(analog_id, entity_id)
+            )
+            analog_id += 1
+
+    new_data = {**entry.data, CONF_ENTITIES_TO_SEND: new_sending_data}
+
+    hass.config_entries.async_update_entry(
+        entry,
+        data=new_data,
+        minor_version=2,
+    )
+    return True
