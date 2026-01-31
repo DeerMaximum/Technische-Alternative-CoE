@@ -33,6 +33,7 @@ from .state_observer import StateObserver
 from .state_sender import StateSender
 from .state_sender_v1 import StateSenderV1
 from .state_sender_v2 import StateSenderV2
+from .websocket import async_register_websocket_commands
 
 PLATFORMS: list[str] = [Platform.SENSOR, Platform.BINARY_SENSOR]
 
@@ -81,6 +82,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         "observer": observer,
         "task": task,
     }
+
+    async_register_websocket_commands(hass)
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
