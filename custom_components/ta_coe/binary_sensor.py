@@ -12,9 +12,6 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from . import CoEDataUpdateCoordinator
 from .const import (
-    CONF_ANALOG_ENTITIES,
-    CONF_DIGITAL_ENTITIES,
-    CONF_ENTITIES_TO_SEND,
     DOMAIN,
     TYPE_BINARY,
 )
@@ -30,7 +27,7 @@ async def async_setup_entry(
         "coordinator"
     ]
 
-    entities: list[DeviceChannelBinary | CoESendState] = []
+    entities: list[DeviceChannelBinary] = []
 
     for can_id in coordinator.data.keys():
         for index, _ in coordinator.data[can_id][TYPE_BINARY].items():
@@ -38,10 +35,6 @@ async def async_setup_entry(
                 coordinator, can_id, index
             )
             entities.append(channel)
-
-    entities.append(
-        CoESendState(coordinator.config_entry.data.get(CONF_ENTITIES_TO_SEND, {}))
-    )
 
     async_add_entities(entities)
 
@@ -71,33 +64,3 @@ class DeviceChannelBinary(CoordinatorEntity, BinarySensorEntity):
         value: str = channel_raw["value"]
 
         return value in ("on", "yes")
-
-
-class CoESendState(BinarySensorEntity):
-    """Representation of the coe send values state."""
-
-    def __init__(self, entity_config: dict[str, Any]) -> None:
-        """Initialize."""
-        self._entity_config = entity_config
-
-        self._attr_name: str = "CoE: Send value state"
-        self._attr_unique_id: str = "ta-coe-send-value-state"
-
-    @property
-    def is_on(self) -> bool:
-        """Return the state of the sensor."""
-        return (
-            len(
-                self._entity_config.get(CONF_ANALOG_ENTITIES, [])
-                + self._entity_config.get(CONF_DIGITAL_ENTITIES, [])
-            )
-            > 0
-        )
-
-    @property
-    def extra_state_attributes(self) -> dict[str, Any]:
-        """Return extra attributes of the sensor."""
-        if not self.is_on:
-            return {}
-
-        return self._entity_config
