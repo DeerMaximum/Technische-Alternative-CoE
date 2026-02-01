@@ -1,5 +1,4 @@
 """CoE state observer to track state changes."""
-from typing import Any
 
 from homeassistant.const import ATTR_UNIT_OF_MEASUREMENT, STATE_ON
 from homeassistant.core import Event, HomeAssistant, State, callback
@@ -13,6 +12,9 @@ from .const import (
     FREE_SLOT_MARKERS,
     TYPE_BINARY,
     TYPE_SENSOR,
+    ConfEntityToSend,
+    CONF_ANALOG_ENTITIES,
+    CONF_DIGITAL_ENTITIES,
 )
 from .state_sender import StateSender
 
@@ -25,14 +27,18 @@ class StateObserver:
         hass: HomeAssistant,
         coe: CoE,
         sender: StateSender,
-        entity_list: dict[str, Any],
+        entity_config: dict[str, list[ConfEntityToSend]],
     ):
         """Initialize."""
         self._hass = hass
         self._coe = coe
         self._sender = sender
-        self._entity_dict = entity_list
-        self._entity_list = entity_list.values()
+        self._entity_dict = entity_config
+        self._entity_list = [
+            x.entity_id
+            for x in entity_config.get(CONF_ANALOG_ENTITIES, [])
+            + entity_config.get(CONF_DIGITAL_ENTITIES, [])
+        ]
 
         self._states = {TYPE_BINARY: {}, TYPE_SENSOR: {}}
 
