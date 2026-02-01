@@ -15,10 +15,9 @@ from custom_components.ta_coe.const import (
 )
 from custom_components.ta_coe.state_sender_v1 import AnalogValue
 from tests import (
-    COE_SEND_ANALOG_VALUES_PACKAGE,
-    COE_SEND_DIGITAL_VALUES_PACKAGE,
     create_dummy_conf_entity_to_send,
 )
+from tests.const import COE_SEND_ANALOG_VALUES_PACKAGE, COE_SEND_DIGITAL_VALUES_PACKAGE
 
 coe = CoE("")
 

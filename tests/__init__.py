@@ -1,73 +1,22 @@
 """Tests for the Technische Alternative CoE integration."""
 
-from typing import Any
+from unittest.mock import patch
 
-from ta_cmi import CoE
+from homeassistant.config_entries import ConfigEntryState
+from homeassistant.const import Platform
+from homeassistant.core import HomeAssistant
+from pytest_homeassistant_custom_component.common import MockConfigEntry
+from ta_cmi import CoE, CoEServerConfig
 
 from custom_components.ta_coe import ConfEntityToSend
 from custom_components.ta_coe.state_sender import StateSender
-
-COEAPI_PACKAGE = "ta_cmi.coe_api.CoEAPI.get_coe_data"
-COE_SEND_ANALOG_VALUES_PACKAGE = "ta_cmi.coe.CoE.send_analog_values"
-COE_SEND_DIGITAL_VALUES_PACKAGE = "ta_cmi.coe.CoE.send_digital_values"
-COE_SEND_ANALOG_VALUES_V2_PACKAGE = "ta_cmi.coe.CoE.send_analog_values_v2"
-COE_SEND_DIGITAL_VALUES_V2_PACKAGE = "ta_cmi.coe.CoE.send_digital_values_v2"
-COEAPI_RAW_REQUEST_PACKAGE = "ta_cmi.coe_api.CoEAPI._make_request_get"
-COE_VERSION_CHECK_PACKAGE = "ta_cmi.coe.CoEAPI.get_coe_version"
-COE_CHECK_SERVER_VERSION_PACKAGE = "ta_cmi.coe.CoE.get_server_config"
-SETUP_ENTRY_PACKAGE = "custom_components.ta_coe.async_setup_entry"
-STATE_AVAILABLE_PACKAGE = "homeassistant.core.StateMachine.get"
-STATE_SENDER_UPDATE_DIGITAL_MANUEL_PACKAGE = (
-    "custom_components.ta_coe.state_sender.StateSender.update_digital_manuel"
+from tests.const import (
+    COEAPI_PACKAGE,
+    COE_CHECK_SERVER_VERSION_PACKAGE,
+    COE_VERSION_CHECK_PACKAGE,
+    DUMMY_DEVICE_API_DATA,
+    OBSERVER_GET_ALL_STATES,
 )
-STATE_SENDER_UPDATE_ANALOG_MANUEL_PACKAGE = (
-    "custom_components.ta_coe.state_sender.StateSender.update_analog_manuel"
-)
-STATE_SENDER_STUB_UPDATE_DIGITAL_PACKAGE = "tests.StubStateSender.update_digital"
-STATE_SENDER_STUB_UPDATE_ANALOG_PACKAGE = "tests.StubStateSender.update_analog"
-STATE_SENDER_STUB_UPDATE = "tests.StubStateSender.update"
-STATE_SENDER_V1_UPDATE_DIGITAL_MANUEL_PACKAGE = (
-    "custom_components.ta_coe.state_sender_v1.StateSenderV1.update_digital_manuel"
-)
-STATE_SENDER_V1_UPDATE_ANALOG_MANUEL_PACKAGE = (
-    "custom_components.ta_coe.state_sender_v1.StateSenderV1.update_analog_manuel"
-)
-STATE_SENDER_V1_UPDATE_DIGITAL_PACKAGE = (
-    "custom_components.ta_coe.state_sender_v1.StateSenderV1.update_digital"
-)
-STATE_SENDER_V1_UPDATE_ANALOG_PACKAGE = (
-    "custom_components.ta_coe.state_sender_v1.StateSenderV1.update_analog"
-)
-STATE_SENDER_V1_UPDATE = "custom_components.ta_coe.state_sender_v1.StateSenderV1.update"
-STATE_SENDER_V2_UPDATE_DIGITAL_MANUEL_PACKAGE = (
-    "custom_components.ta_coe.state_sender_v2.StateSenderV2.update_digital_manuel"
-)
-STATE_SENDER_V2_UPDATE_ANALOG_MANUEL_PACKAGE = (
-    "custom_components.ta_coe.state_sender_v2.StateSenderV2.update_analog_manuel"
-)
-STATE_SENDER_V2_UPDATE_DIGITAL_PACKAGE = (
-    "custom_components.ta_coe.state_sender_v2.StateSenderV2.update_digital"
-)
-STATE_SENDER_V2_UPDATE_ANALOG_PACKAGE = (
-    "custom_components.ta_coe.state_sender_v2.StateSenderV2.update_analog"
-)
-STATE_SENDER_V2_UPDATE = "custom_components.ta_coe.state_sender_v2.StateSenderV2.update"
-OBSERVER_GET_ALL_STATES = (
-    "custom_components.ta_coe.state_observer.StateObserver.get_all_states"
-)
-REFRESH_TASK_START_PACKAGE = "custom_components.ta_coe.refresh_task.RefreshTask.start"
-
-DUMMY_DEVICE_API_DATA: dict[str, Any] = {
-    "digital": [{"value": True, "unit": 43}],
-    "analog": [
-        {"value": 34.4, "unit": 1},
-        {"value": 50, "unit": 11},
-        {"value": 60, "unit": 12},
-        {"value": 60, "unit": 19},
-    ],
-    "last_update_unix": 1680410064.03764,
-    "last_update": "2023-04-01T12:00:00",
-}
 
 
 def create_dummy_conf_entity_to_send(domain: str, count: int) -> list[ConfEntityToSend]:
@@ -78,6 +27,43 @@ def create_dummy_conf_entity_to_send(domain: str, count: int) -> list[ConfEntity
         dummy_data.append(ConfEntityToSend(i, f"{domain}.{i}"))
 
     return dummy_data
+
+
+async def setup_single_platform(
+    hass: HomeAssistant,
+    config_entry: MockConfigEntry,
+    platform: Platform | None,
+) -> None:
+    """Set up a single NINA platform."""
+    server_config = CoEServerConfig(coe_version=1)
+    with (
+        patch(COEAPI_PACKAGE, return_value=DUMMY_DEVICE_API_DATA),
+        patch(OBSERVER_GET_ALL_STATES),
+        patch(COE_VERSION_CHECK_PACKAGE, return_value=None),
+        patch(COE_CHECK_SERVER_VERSION_PACKAGE, return_value=server_config),
+    ):
+        platforms = [platform] if platform else []
+
+        with patch("custom_components.ta_coe.PLATFORMS", platforms):
+            assert await hass.config_entries.async_setup(config_entry.entry_id)
+        await hass.async_block_till_done()
+
+        assert config_entry.state is ConfigEntryState.LOADED
+
+
+async def setup_platform(hass: HomeAssistant, config_entry: MockConfigEntry) -> None:
+    """Set up the platform."""
+    server_config = CoEServerConfig(coe_version=1)
+    with (
+        patch(COEAPI_PACKAGE, return_value=DUMMY_DEVICE_API_DATA),
+        patch(OBSERVER_GET_ALL_STATES),
+        patch(COE_VERSION_CHECK_PACKAGE, return_value=None),
+        patch(COE_CHECK_SERVER_VERSION_PACKAGE, return_value=server_config),
+    ):
+        await hass.config_entries.async_setup(config_entry.entry_id)
+        await hass.async_block_till_done()
+
+        assert config_entry.state is ConfigEntryState.LOADED
 
 
 class StubStateSender(StateSender):
