@@ -132,7 +132,7 @@ async def async_migrate_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     digital_id = 1
     analog_id = 1
 
-    for entity_id in entry.data[CONF_ENTITIES_TO_SEND].values():
+    for entity_id in entry.data.get(CONF_ENTITIES_TO_SEND, {}).values():
         if entity_id == FREE_SLOT_MARKER_ANALOG:
             analog_id += 1
             continue
