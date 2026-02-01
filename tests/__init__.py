@@ -3,6 +3,7 @@
 from unittest.mock import patch
 
 from homeassistant.config_entries import ConfigEntryState
+from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 from ta_cmi import CoE, CoEServerConfig
@@ -26,6 +27,28 @@ def create_dummy_conf_entity_to_send(domain: str, count: int) -> list[ConfEntity
         dummy_data.append(ConfEntityToSend(i, f"{domain}.{i}"))
 
     return dummy_data
+
+
+async def setup_single_platform(
+    hass: HomeAssistant,
+    config_entry: MockConfigEntry,
+    platform: Platform | None,
+) -> None:
+    """Set up a single NINA platform."""
+    server_config = CoEServerConfig(coe_version=1)
+    with (
+        patch(COEAPI_PACKAGE, return_value=DUMMY_DEVICE_API_DATA),
+        patch(OBSERVER_GET_ALL_STATES),
+        patch(COE_VERSION_CHECK_PACKAGE, return_value=None),
+        patch(COE_CHECK_SERVER_VERSION_PACKAGE, return_value=server_config),
+    ):
+        platforms = [platform] if platform else []
+
+        with patch("custom_components.ta_coe.PLATFORMS", platforms):
+            assert await hass.config_entries.async_setup(config_entry.entry_id)
+        await hass.async_block_till_done()
+
+        assert config_entry.state is ConfigEntryState.LOADED
 
 
 async def setup_platform(hass: HomeAssistant, config_entry: MockConfigEntry) -> None:
