@@ -3,7 +3,7 @@
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.components import websocket_api
 
-from .send import coe_exposed_entities_config
+from .expose import coe_exposed_entities_config
 
 
 @callback
