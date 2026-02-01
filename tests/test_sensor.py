@@ -13,14 +13,8 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 from ta_cmi import CoEServerConfig
 
 from custom_components.ta_coe.const import CONF_CAN_IDS, DOMAIN
-from tests import (
-    COEAPI_PACKAGE,
-    COE_CHECK_SERVER_VERSION_PACKAGE,
-    COE_VERSION_CHECK_PACKAGE,
-    DUMMY_DEVICE_API_DATA,
-    OBSERVER_GET_ALL_STATES,
-    REFRESH_TASK_START_PACKAGE,
-)
+from tests.const import COEAPI_PACKAGE, COE_VERSION_CHECK_PACKAGE, COE_CHECK_SERVER_VERSION_PACKAGE, \
+    OBSERVER_GET_ALL_STATES, REFRESH_TASK_START_PACKAGE, DUMMY_DEVICE_API_DATA
 
 ENTRY_DATA: dict[str, Any] = {CONF_HOST: "http://192.168.2.101", CONF_CAN_IDS: [1, 20]}
 

@@ -18,10 +18,7 @@ from custom_components.ta_coe.const import (
     CONF_SCAN_INTERVAL,
     DOMAIN,
 )
-from tests import (
-    COE_VERSION_CHECK_PACKAGE,
-    COEAPI_RAW_REQUEST_PACKAGE,
-)
+from tests.const import COEAPI_RAW_REQUEST_PACKAGE, COE_VERSION_CHECK_PACKAGE
 
 DUMMY_HOST = "http://1.2.3.4"
 

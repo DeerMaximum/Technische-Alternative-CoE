@@ -3,7 +3,7 @@ from unittest import mock
 
 import pytest
 
-from tests import COE_VERSION_CHECK_PACKAGE
+from tests.const import COE_VERSION_CHECK_PACKAGE
 
 
 @pytest.fixture(autouse=True)
