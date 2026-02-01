@@ -96,7 +96,7 @@ async def test_step_user(hass: HomeAssistant) -> None:
         )
 
         assert result["type"] == FlowResultType.CREATE_ENTRY
-        assert result["title"] == "CoE"
+        assert result["title"] == "1.2.3.4"
         assert result["data"] == {
             CONF_HOST: DUMMY_HOST, CONF_CAN_IDS: [19]
         }
