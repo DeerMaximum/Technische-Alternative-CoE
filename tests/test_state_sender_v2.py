@@ -1,10 +1,17 @@
 """Test the Technische Alternative CoE state sender V2."""
+
 from unittest.mock import patch
 
 import pytest
 from ta_cmi import ChannelMode, CoE, CoEChannel
 
-from custom_components.ta_coe.const import ANALOG_DOMAINS, DIGITAL_DOMAINS
+from custom_components.ta_coe.const import (
+    ANALOG_DOMAINS,
+    CONF_ANALOG_ENTITIES,
+    CONF_DIGITAL_ENTITIES,
+    DIGITAL_DOMAINS,
+    ConfEntityToSend,
+)
 from custom_components.ta_coe.state_sender import AnalogValue
 from custom_components.ta_coe.state_sender_v2 import StateSenderV2
 from tests import (
@@ -12,7 +19,7 @@ from tests import (
     COE_SEND_DIGITAL_VALUES_V2_PACKAGE,
     STATE_SENDER_V2_UPDATE_ANALOG_MANUEL_PACKAGE,
     STATE_SENDER_V2_UPDATE_DIGITAL_MANUEL_PACKAGE,
-    create_dummy_ids,
+    create_dummy_conf_entity_to_send,
 )
 
 coe = CoE("")
@@ -20,12 +27,12 @@ coe = CoE("")
 
 def test_sender_digital_manuel_change_digital_state():
     """Test when state manuel added then the state on position is updated."""
-    entities_ids = create_dummy_ids(DIGITAL_DOMAINS[0], 8)
-    sender = StateSenderV2(coe, entities_ids)
+    entities_ids = create_dummy_conf_entity_to_send(DIGITAL_DOMAINS[0], 8)
+    sender = StateSenderV2(coe, {CONF_DIGITAL_ENTITIES: entities_ids})
 
     index_to_change = 1
 
-    sender.update_digital_manuel(entities_ids[str(index_to_change)], True)
+    sender.update_digital_manuel(entities_ids[index_to_change].entity_id, True)
 
     for i in range(0, 8):
         if i == index_to_change:
@@ -36,15 +43,15 @@ def test_sender_digital_manuel_change_digital_state():
 
 def test_sender_analog_manuel_change_analog_state():
     """Test when state manuel added then the state on position is updated."""
-    entities_ids = create_dummy_ids(ANALOG_DOMAINS[0], 8)
-    sender = StateSenderV2(coe, entities_ids)
+    entities_ids = create_dummy_conf_entity_to_send(ANALOG_DOMAINS[0], 8)
+    sender = StateSenderV2(coe, {CONF_ANALOG_ENTITIES: entities_ids})
 
     index_to_change = 1
 
     value = AnalogValue(5.5, "°C")
 
     sender.update_analog_manuel(
-        entities_ids[str(index_to_change)], value.value, value.unit
+        entities_ids[index_to_change].entity_id, value.value, value.unit
     )
 
     for i in range(0, 8):
@@ -57,48 +64,53 @@ def test_sender_analog_manuel_change_analog_state():
 @pytest.mark.asyncio
 async def test_sender_update_digital():
     """Test the update_digital function."""
-    entities_ids = {"0": "binary_sensor.test0"}
-    sender = StateSenderV2(coe, entities_ids)
+    entities_ids = [ConfEntityToSend(1, "binary_sensor.test0")]
+    sender = StateSenderV2(coe, {CONF_DIGITAL_ENTITIES: entities_ids})
 
-    with patch(COE_SEND_DIGITAL_VALUES_V2_PACKAGE) as update_mock, patch(
-        STATE_SENDER_V2_UPDATE_DIGITAL_MANUEL_PACKAGE
-    ) as update_manual_mock:
-        await sender.update_digital(entities_ids["0"], True)
+    with (
+        patch(COE_SEND_DIGITAL_VALUES_V2_PACKAGE) as update_mock,
+        patch(STATE_SENDER_V2_UPDATE_DIGITAL_MANUEL_PACKAGE) as update_manual_mock,
+    ):
+        await sender.update_digital(entities_ids[0].entity_id, True)
 
         expected = CoEChannel(ChannelMode.DIGITAL, 1, True, "43")
 
         update_mock.assert_called_once_with([expected])
-        update_manual_mock.assert_called_once_with(entities_ids["0"], True)
+        update_manual_mock.assert_called_once_with(entities_ids[0].entity_id, True)
 
 
 @pytest.mark.asyncio
 async def test_sender_update_analog():
     """Test the update_analog function."""
-    entities_ids = {"0": "sensor.test0"}
-    sender = StateSenderV2(coe, entities_ids)
+    entities_ids = [ConfEntityToSend(1, "sensor.test0")]
+    sender = StateSenderV2(coe, {CONF_ANALOG_ENTITIES: entities_ids})
 
-    with patch(COE_SEND_ANALOG_VALUES_V2_PACKAGE) as update_mock, patch(
-        STATE_SENDER_V2_UPDATE_ANALOG_MANUEL_PACKAGE
-    ) as update_manual_mock:
-        await sender.update_analog(entities_ids["0"], 43.2, "kW")
+    with (
+        patch(COE_SEND_ANALOG_VALUES_V2_PACKAGE) as update_mock,
+        patch(STATE_SENDER_V2_UPDATE_ANALOG_MANUEL_PACKAGE) as update_manual_mock,
+    ):
+        await sender.update_analog(entities_ids[0].entity_id, 43.2, "kW")
 
         expected = CoEChannel(ChannelMode.ANALOG, 1, 43.2, "10")
 
         update_mock.assert_called_once_with([expected])
-        update_manual_mock.assert_called_once_with(entities_ids["0"], 43.2, "kW")
+        update_manual_mock.assert_called_once_with(
+            entities_ids[0].entity_id, 43.2, "kW"
+        )
 
 
 @pytest.mark.asyncio
 async def test_sender_update_test_digital():
     """Test when updated all states are send to the server. Test with digital states."""
-    entities_ids = create_dummy_ids(DIGITAL_DOMAINS[0], 30)
-    sender = StateSenderV2(coe, entities_ids)
+    entities_ids = create_dummy_conf_entity_to_send(DIGITAL_DOMAINS[0], 30)
+    sender = StateSenderV2(coe, {CONF_DIGITAL_ENTITIES: entities_ids})
 
-    with patch(COE_SEND_DIGITAL_VALUES_V2_PACKAGE) as update_mock, patch(
-        COE_SEND_ANALOG_VALUES_V2_PACKAGE
+    with (
+        patch(COE_SEND_DIGITAL_VALUES_V2_PACKAGE) as update_mock,
+        patch(COE_SEND_ANALOG_VALUES_V2_PACKAGE),
     ):
         for i in range(30):
-            sender.update_digital_manuel(entities_ids[str(i)], (i % 2 == 1))
+            sender.update_digital_manuel(entities_ids[i].entity_id, (i % 2 == 1))
 
         await sender.update()
 
@@ -113,14 +125,15 @@ async def test_sender_update_test_digital():
 @pytest.mark.asyncio
 async def test_sender_update_test_analog():
     """Test when updated all states are send to the server. Test with analog states."""
-    entities_ids = create_dummy_ids(ANALOG_DOMAINS[0], 30)
-    sender = StateSenderV2(coe, entities_ids)
+    entities_ids = create_dummy_conf_entity_to_send(ANALOG_DOMAINS[0], 30)
+    sender = StateSenderV2(coe, {CONF_ANALOG_ENTITIES: entities_ids})
 
-    with patch(COE_SEND_ANALOG_VALUES_V2_PACKAGE) as update_mock, patch(
-        COE_SEND_DIGITAL_VALUES_V2_PACKAGE
+    with (
+        patch(COE_SEND_ANALOG_VALUES_V2_PACKAGE) as update_mock,
+        patch(COE_SEND_DIGITAL_VALUES_V2_PACKAGE),
     ):
         for i in range(30):
-            sender.update_analog_manuel(entities_ids[str(i)], i % 10, "kW")
+            sender.update_analog_manuel(entities_ids[i].entity_id, i % 10, "kW")
 
         await sender.update()
 
