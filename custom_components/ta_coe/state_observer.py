@@ -9,7 +9,6 @@ from .const import (
     _LOGGER,
     ANALOG_DOMAINS,
     DIGITAL_DOMAINS,
-    FREE_SLOT_MARKERS,
     TYPE_BINARY,
     TYPE_SENSOR,
     ConfEntityToSend,
@@ -63,8 +62,6 @@ class StateObserver:
         _LOGGER.debug("Update all states")
 
         for entity_id in self._entity_list:
-            if entity_id in FREE_SLOT_MARKERS:
-                continue
 
             state = self._hass.states.get(entity_id)
             domain = entity_id[0 : entity_id.find(".")]
@@ -97,7 +94,6 @@ class StateObserver:
             new_state is None
             or not self._is_state_valid(new_state.state)
             or not self._has_state_changed(new_state)
-            or new_state.entity_id in FREE_SLOT_MARKERS
         ):
             return
 
