@@ -178,7 +178,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                 return self.async_create_entry(title="", data=self.data)
 
         return self.async_show_form(
-            step_id="general",
+            step_id="init",
             data_schema=get_schema(self.data),
             errors=errors,
         )
