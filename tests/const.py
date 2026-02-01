@@ -21,9 +21,9 @@ STATE_SENDER_UPDATE_DIGITAL_MANUEL_PACKAGE = (
 STATE_SENDER_UPDATE_ANALOG_MANUEL_PACKAGE = (
     "custom_components.ta_coe.state_sender.StateSender.update_analog_manuel"
 )
-STATE_SENDER_STUB_UPDATE_DIGITAL_PACKAGE = "tests.StubStateSender.update_digital"
-STATE_SENDER_STUB_UPDATE_ANALOG_PACKAGE = "tests.StubStateSender.update_analog"
-STATE_SENDER_STUB_UPDATE = "tests.StubStateSender.update"
+STATE_SENDER_STUB_UPDATE_DIGITAL_PACKAGE = "tests.common.StubStateSender.update_digital"
+STATE_SENDER_STUB_UPDATE_ANALOG_PACKAGE = "tests.common.StubStateSender.update_analog"
+STATE_SENDER_STUB_UPDATE = "tests.common.StubStateSender.update"
 STATE_SENDER_V1_UPDATE_DIGITAL_MANUEL_PACKAGE = (
     "custom_components.ta_coe.state_sender_v1.StateSenderV1.update_digital_manuel"
 )

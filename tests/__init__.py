@@ -6,10 +6,9 @@ from homeassistant.config_entries import ConfigEntryState
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from pytest_homeassistant_custom_component.common import MockConfigEntry
-from ta_cmi import CoE, CoEServerConfig
+from ta_cmi import CoEServerConfig
 
 from custom_components.ta_coe import ConfEntityToSend
-from custom_components.ta_coe.state_sender import StateSender
 from tests.const import (
     COEAPI_PACKAGE,
     COE_CHECK_SERVER_VERSION_PACKAGE,
@@ -64,22 +63,3 @@ async def setup_platform(hass: HomeAssistant, config_entry: MockConfigEntry) -> 
         await hass.async_block_till_done()
 
         assert config_entry.state is ConfigEntryState.LOADED
-
-
-class StubStateSender(StateSender):
-    def __init__(
-        self, coe_intern: CoE, entity_config: dict[str, list[ConfEntityToSend]]
-    ):
-        super().__init__(coe_intern, entity_config)
-
-    async def update_digital(self, entity_id: str, state: bool) -> None:
-        """Update a digital state with sending update."""
-        pass
-
-    async def update_analog(self, entity_id: str, state: float, unit: str) -> None:
-        """Update an analog state with sending update."""
-        pass
-
-    async def update(self) -> None:
-        """Send all values to the server."""
-        pass

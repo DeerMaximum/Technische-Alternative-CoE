@@ -7,7 +7,7 @@ from custom_components.ta_coe.const import (
     CONF_DIGITAL_ENTITIES,
     ConfEntityToSend,
 )
-from tests import StubStateSender
+from tests.common import StubStateSender
 
 coe = CoE("")
 

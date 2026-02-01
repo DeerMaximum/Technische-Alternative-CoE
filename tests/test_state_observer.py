@@ -19,9 +19,7 @@ from custom_components.ta_coe.const import (
     TYPE_SENSOR,
     ConfEntityToSend,
 )
-from tests import (
-    StubStateSender,
-)
+from tests.common import StubStateSender
 from tests.const import STATE_AVAILABLE_PACKAGE, STATE_SENDER_UPDATE_DIGITAL_MANUEL_PACKAGE, \
     STATE_SENDER_UPDATE_ANALOG_MANUEL_PACKAGE, STATE_SENDER_STUB_UPDATE_DIGITAL_PACKAGE, \
     STATE_SENDER_STUB_UPDATE_ANALOG_PACKAGE, STATE_SENDER_STUB_UPDATE, STATE_SENDER_V1_UPDATE_DIGITAL_PACKAGE, \

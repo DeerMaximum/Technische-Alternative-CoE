@@ -30,6 +30,7 @@ def patch_coe_server_check(request):
 
     request.addfinalizer(unpatch)
 
+
 @pytest.fixture
 def mock_setup_entry() -> Generator[AsyncMock]:
     """Override async_setup_entry."""
@@ -37,6 +38,7 @@ def mock_setup_entry() -> Generator[AsyncMock]:
         "custom_components.ta_coe.async_setup_entry", return_value=True
     ) as mock_setup_entry:
         yield mock_setup_entry
+
 
 @pytest.fixture
 def mock_config_entry(hass: HomeAssistant) -> MockConfigEntry:
