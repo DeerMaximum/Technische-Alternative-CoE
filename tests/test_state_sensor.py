@@ -14,14 +14,14 @@ from custom_components.ta_coe.const import (
     ATTR_ANALOG_ORDER,
     ATTR_DIGITAL_ORDER,
     CONF_CAN_IDS,
-    FREE_SLOT_MARKER_ANALOGE,
+    FREE_SLOT_MARKER_ANALOG,
     FREE_SLOT_MARKER_DIGITAL,
 )
 from tests import (
+    COEAPI_PACKAGE,
     COE_CHECK_SERVER_VERSION_PACKAGE,
     COE_SEND_ANALOG_VALUES_PACKAGE,
     COE_SEND_DIGITAL_VALUES_PACKAGE,
-    COEAPI_PACKAGE,
     DUMMY_DEVICE_API_DATA,
     OBSERVER_GET_ALL_STATES,
     REFRESH_TASK_START_PACKAGE,
@@ -31,7 +31,7 @@ ENTRY_DATA: dict[str, Any] = {
     CONF_HOST: "http://192.168.2.101",
     CONF_CAN_IDS: [1, 20],
     CONF_ENTITIES_TO_SEND: {
-        1: FREE_SLOT_MARKER_ANALOGE,
+        1: FREE_SLOT_MARKER_ANALOG,
         2: FREE_SLOT_MARKER_DIGITAL,
         3: "sensor.coe_analog_2",
         4: "binary_sensor.coe_digital_2",
@@ -51,13 +51,14 @@ server_config = CoEServerConfig(coe_version=2)
 @pytest.mark.asyncio
 async def test_state_sensor_off(hass: HomeAssistant) -> None:
     """Test the creation and values of the state sensors when no values are send."""
-    with patch(COEAPI_PACKAGE, return_value=DUMMY_DEVICE_API_DATA), patch(
-        OBSERVER_GET_ALL_STATES
-    ) as observer_mock, patch(REFRESH_TASK_START_PACKAGE) as start_task_mock, patch(
-        COE_CHECK_SERVER_VERSION_PACKAGE, return_value=server_config
+    with (
+        patch(COEAPI_PACKAGE, return_value=DUMMY_DEVICE_API_DATA),
+        patch(OBSERVER_GET_ALL_STATES) as observer_mock,
+        patch(REFRESH_TASK_START_PACKAGE) as start_task_mock,
+        patch(COE_CHECK_SERVER_VERSION_PACKAGE, return_value=server_config),
     ):
         conf_entry: MockConfigEntry = MockConfigEntry(
-            domain=DOMAIN, title="CoE", data=ENTRY_DATA_NO_SENDING
+            domain=DOMAIN, title="CoE", data=ENTRY_DATA_NO_SENDING, minor_version=2
         )
 
         entity_registry: er = er.async_get(hass)
@@ -83,17 +84,16 @@ async def test_state_sensor_off(hass: HomeAssistant) -> None:
 @pytest.mark.asyncio
 async def test_state_sensor_on(hass: HomeAssistant) -> None:
     """Test the creation and values of the state sensors when values are send.."""
-    with patch(COEAPI_PACKAGE, return_value=DUMMY_DEVICE_API_DATA), patch(
-        COE_SEND_ANALOG_VALUES_PACKAGE
-    ), patch(COE_SEND_DIGITAL_VALUES_PACKAGE), patch(
-        OBSERVER_GET_ALL_STATES
-    ) as observer_mock, patch(
-        REFRESH_TASK_START_PACKAGE
-    ) as start_task_mock, patch(
-        COE_CHECK_SERVER_VERSION_PACKAGE, return_value=server_config
+    with (
+        patch(COEAPI_PACKAGE, return_value=DUMMY_DEVICE_API_DATA),
+        patch(COE_SEND_ANALOG_VALUES_PACKAGE),
+        patch(COE_SEND_DIGITAL_VALUES_PACKAGE),
+        patch(OBSERVER_GET_ALL_STATES) as observer_mock,
+        patch(REFRESH_TASK_START_PACKAGE) as start_task_mock,
+        patch(COE_CHECK_SERVER_VERSION_PACKAGE, return_value=server_config),
     ):
         conf_entry: MockConfigEntry = MockConfigEntry(
-            domain=DOMAIN, title="CoE", data=ENTRY_DATA
+            domain=DOMAIN, title="CoE", data=ENTRY_DATA, minor_version=2
         )
 
         entity_registry: er = er.async_get(hass)

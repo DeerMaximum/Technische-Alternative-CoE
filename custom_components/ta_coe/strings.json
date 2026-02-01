@@ -7,20 +7,6 @@
           "host": "Base url of the server (http://IP:PORT)",
           "can_ids": "Target CAN-IDs (Comma separated)"
         }
-      },
-      "menu": {
-        "title": "Next step",
-        "menu_options": {
-          "send_values": "Provision of sensors via CoE",
-          "exit": "Finish wizard"
-        }
-      },
-      "send_values": {
-        "title": "Entities to send",
-        "data": {
-          "entities_to_send": "Entity id to send",
-          "next": "Add more entities"
-        }
       }
     },
     "abort": {
@@ -35,27 +21,6 @@
   "options": {
     "step": {
       "init":{
-        "title": "Options",
-        "menu_options": {
-          "add_send_values": "Add exposed sensors",
-          "change_send_values": "Change an exposed sensor",
-          "delete_send_values": "Delete exposed sensors",
-          "general": "General settings"
-        }
-      },
-      "add_send_values": {
-        "title": "Add sensor",
-        "data": {
-          "entities_to_send": "Entity id to send"
-        }
-      },
-      "delete_send_values": {
-        "title": "Delete sensors",
-        "data": {
-          "entities_to_send": "Sensors to delete"
-        }
-      },
-      "general": {
         "title": "General",
         "data": {
           "scan_interval": "Update interval (minutes)",
@@ -66,7 +31,6 @@
     "error": {
       "cannot_connect": "[%key:common::config_flow::error::cannot_connect%]",
       "invalid_can_id": "Invalid CAN-ID",
-      "invalid_entity" : "Invalid entity",
       "unknown": "[%key:common::config_flow::error::unknown%]"
     }
   },

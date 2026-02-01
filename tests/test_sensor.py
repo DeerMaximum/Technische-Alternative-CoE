@@ -1,4 +1,5 @@
 """Test the Technische Alternative CoE sensor."""
+
 from typing import Any
 from unittest.mock import patch
 
@@ -13,9 +14,9 @@ from ta_cmi import CoEServerConfig
 
 from custom_components.ta_coe.const import CONF_CAN_IDS, DOMAIN
 from tests import (
+    COEAPI_PACKAGE,
     COE_CHECK_SERVER_VERSION_PACKAGE,
     COE_VERSION_CHECK_PACKAGE,
-    COEAPI_PACKAGE,
     DUMMY_DEVICE_API_DATA,
     OBSERVER_GET_ALL_STATES,
     REFRESH_TASK_START_PACKAGE,
@@ -29,15 +30,15 @@ server_config = CoEServerConfig(coe_version=1)
 @pytest.mark.asyncio
 async def test_sensors(hass: HomeAssistant) -> None:
     """Test the creation and values of the sensors."""
-    with patch(COEAPI_PACKAGE, return_value=DUMMY_DEVICE_API_DATA), patch(
-        OBSERVER_GET_ALL_STATES
-    ), patch(REFRESH_TASK_START_PACKAGE), patch(
-        COE_VERSION_CHECK_PACKAGE, return_value=None
-    ), patch(
-        COE_CHECK_SERVER_VERSION_PACKAGE, return_value=server_config
+    with (
+        patch(COEAPI_PACKAGE, return_value=DUMMY_DEVICE_API_DATA),
+        patch(OBSERVER_GET_ALL_STATES),
+        patch(REFRESH_TASK_START_PACKAGE),
+        patch(COE_VERSION_CHECK_PACKAGE, return_value=None),
+        patch(COE_CHECK_SERVER_VERSION_PACKAGE, return_value=server_config),
     ):
         conf_entry: MockConfigEntry = MockConfigEntry(
-            domain=DOMAIN, title="CoE", data=ENTRY_DATA
+            domain=DOMAIN, title="CoE", data=ENTRY_DATA, minor_version=2
         )
 
         entity_registry: er = er.async_get(hass)

@@ -1,11 +1,17 @@
 """CoE state sender base."""
+
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass
-from typing import Any
 
 from ta_cmi import CoE
 
-from custom_components.ta_coe.const import _LOGGER, DIGITAL_DOMAINS
+from custom_components.ta_coe.const import (
+    _LOGGER,
+    DIGITAL_DOMAINS,
+    CONF_ANALOG_ENTITIES,
+    ConfEntityToSend,
+    CONF_DIGITAL_ENTITIES,
+)
 
 
 @dataclass
@@ -17,11 +23,11 @@ class AnalogValue:
 class StateSender(metaclass=ABCMeta):
     """Base class to handle the transfer to the CoE server."""
 
-    def __init__(self, coe: CoE, entity_list: dict[str, Any]):
+    def __init__(self, coe: CoE, entity_config: dict[str, list[ConfEntityToSend]]):
         """Initialize."""
         self._coe = coe
 
-        self._entity_list = entity_list
+        self._entity_config = entity_config
         self._index_from_id: dict[str, str] = {}
 
         self._digital_states: dict[str, bool] = {}
@@ -31,15 +37,12 @@ class StateSender(metaclass=ABCMeta):
 
     def _init_generate_id_mapping(self) -> None:
         """Create the entity index mapping."""
-        digital_index = 0
-        analog_index = 0
-        for entity_id in self._entity_list.values():
-            if self._is_domain_digital(entity_id):
-                self._index_from_id[entity_id] = str(digital_index)
-                digital_index += 1
-            else:
-                self._index_from_id[entity_id] = str(analog_index)
-                analog_index += 1
+
+        for entity in self._entity_config.get(CONF_ANALOG_ENTITIES, []):
+            self._index_from_id[entity.entity_id] = str(entity.id - 1)
+
+        for entity in self._entity_config.get(CONF_DIGITAL_ENTITIES, []):
+            self._index_from_id[entity.entity_id] = str(entity.id - 1)
 
     @staticmethod
     def _is_domain_digital(entity_id: str) -> bool:
@@ -49,7 +52,10 @@ class StateSender(metaclass=ABCMeta):
 
     def has_entities(self) -> bool:
         """Check if the sender has entities in the entity_list"""
-        return len(self._entity_list) > 0
+        return (
+            len(self._entity_config[CONF_ANALOG_ENTITIES]) > 0
+            or len(self._entity_config[CONF_DIGITAL_ENTITIES]) > 0
+        )
 
     def update_digital_manuel(self, entity_id: str, state: bool):
         """Update a digital state without sending update."""

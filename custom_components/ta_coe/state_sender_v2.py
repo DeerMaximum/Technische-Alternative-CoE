@@ -1,4 +1,5 @@
 """CoE state sender to send values V2."""
+
 from typing import Any
 
 from ta_cmi import ChannelMode, CoE, CoEChannel
@@ -13,9 +14,9 @@ class StateSenderV2(StateSender):
 
     DIGITAL_UNIT = "43"
 
-    def __init__(self, coe: CoE, entity_list: dict[str, Any]):
+    def __init__(self, coe: CoE, entity_config: dict[str, Any]):
         """Initialize."""
-        super().__init__(coe, entity_list)
+        super().__init__(coe, entity_config)
 
     @staticmethod
     def _convert_unit_to_id(unit: str) -> str:
@@ -65,7 +66,7 @@ class StateSenderV2(StateSender):
 
     async def update(self):
         """Send all values to the server."""
-        _LOGGER.debug(f"Send all {len(self._entity_list)} values to server")
+        _LOGGER.debug(f"Send all {len(self._entity_config)} values to server")
 
         analog_channels = [
             CoEChannel(

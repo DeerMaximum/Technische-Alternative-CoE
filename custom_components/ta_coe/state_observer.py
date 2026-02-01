@@ -1,5 +1,4 @@
 """CoE state observer to track state changes."""
-from typing import Any
 
 from homeassistant.const import ATTR_UNIT_OF_MEASUREMENT, STATE_ON
 from homeassistant.core import Event, HomeAssistant, State, callback
@@ -10,9 +9,11 @@ from .const import (
     _LOGGER,
     ANALOG_DOMAINS,
     DIGITAL_DOMAINS,
-    FREE_SLOT_MARKERS,
     TYPE_BINARY,
     TYPE_SENSOR,
+    ConfEntityToSend,
+    CONF_ANALOG_ENTITIES,
+    CONF_DIGITAL_ENTITIES,
 )
 from .state_sender import StateSender
 
@@ -25,14 +26,18 @@ class StateObserver:
         hass: HomeAssistant,
         coe: CoE,
         sender: StateSender,
-        entity_list: dict[str, Any],
+        entity_config: dict[str, list[ConfEntityToSend]],
     ):
         """Initialize."""
         self._hass = hass
         self._coe = coe
         self._sender = sender
-        self._entity_dict = entity_list
-        self._entity_list = entity_list.values()
+        self._entity_dict = entity_config
+        self._entity_list = [
+            x.entity_id
+            for x in entity_config.get(CONF_ANALOG_ENTITIES, [])
+            + entity_config.get(CONF_DIGITAL_ENTITIES, [])
+        ]
 
         self._states = {TYPE_BINARY: {}, TYPE_SENSOR: {}}
 
@@ -57,8 +62,6 @@ class StateObserver:
         _LOGGER.debug("Update all states")
 
         for entity_id in self._entity_list:
-            if entity_id in FREE_SLOT_MARKERS:
-                continue
 
             state = self._hass.states.get(entity_id)
             domain = entity_id[0 : entity_id.find(".")]
@@ -91,7 +94,6 @@ class StateObserver:
             new_state is None
             or not self._is_state_valid(new_state.state)
             or not self._has_state_changed(new_state)
-            or new_state.entity_id in FREE_SLOT_MARKERS
         ):
             return
 

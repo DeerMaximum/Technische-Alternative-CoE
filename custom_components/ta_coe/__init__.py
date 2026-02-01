@@ -1,15 +1,15 @@
 """The Technische Alternative CoE integration."""
+
 from __future__ import annotations
 
 from datetime import timedelta
 from typing import Any
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_HOST, STATE_OFF, STATE_ON, Platform
+from homeassistant.const import CONF_HOST, Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
-from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
-from ta_cmi import ApiError, ChannelMode, CoE, CoEChannel
+from ta_cmi import CoE
 
 from .const import (
     _LOGGER,
@@ -18,9 +18,15 @@ from .const import (
     CONF_SCAN_INTERVAL,
     DOMAIN,
     SCAN_INTERVAL,
-    TYPE_BINARY,
-    TYPE_SENSOR,
+    CONF_ANALOG_ENTITIES,
+    CONF_DIGITAL_ENTITIES,
+    FREE_SLOT_MARKER_ANALOG,
+    FREE_SLOT_MARKER_DIGITAL,
+    DIGITAL_DOMAINS,
+    ANALOG_DOMAINS,
+    ConfEntityToSend,
 )
+from .coordinator import CoEDataUpdateCoordinator
 from .issues import check_coe_server_2x_issue
 from .refresh_task import RefreshTask
 from .state_observer import StateObserver
@@ -104,78 +110,53 @@ async def _async_update_listener(hass: HomeAssistant, entry: ConfigEntry) -> Non
     await hass.config_entries.async_reload(entry.entry_id)
 
 
-class CoEDataUpdateCoordinator(DataUpdateCoordinator):
-    """Class to manage fetching CoE data."""
+async def async_migrate_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Migrate the config to the new format."""
 
-    channel_count: dict[int, int] = {}
+    version = entry.version
+    minor_version = entry.minor_version
 
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        config_entry: ConfigEntry,
-        coe: CoE,
-        can_ids: list[int],
-        update_interval: timedelta,
-    ) -> None:
-        """Initialize."""
-        self.config_entry = config_entry
+    _LOGGER.debug("Migrating from version %s.%s", version, minor_version)
+    if entry.version > 1:
+        # This means the user has downgraded from a future version
+        return False
 
-        self.coe = coe
-        self.can_ids = can_ids
+    if minor_version > 1:
+        return True
 
-        _LOGGER.debug("Used update interval: %s", update_interval)
+    new_sending_data: dict[str, Any] = {
+        CONF_ANALOG_ENTITIES: [],
+        CONF_DIGITAL_ENTITIES: [],
+    }
 
-        super().__init__(hass, _LOGGER, name=DOMAIN, update_interval=update_interval)
+    digital_id = 1
+    analog_id = 1
 
-    @staticmethod
-    def _format_input(target_channel: CoEChannel) -> tuple[str, str]:
-        """Format the unit and value."""
-        unit: str = target_channel.get_unit()
-        value: str | float = target_channel.value
+    for entity_id in entry.data.get(CONF_ENTITIES_TO_SEND, {}).values():
+        if entity_id == FREE_SLOT_MARKER_ANALOG:
+            analog_id += 1
+            continue
+        elif entity_id == FREE_SLOT_MARKER_DIGITAL:
+            digital_id += 1
+            continue
 
-        if unit == "On/Off":
-            unit = ""
-            if bool(value):
-                value = STATE_ON
-            else:
-                value = STATE_OFF
+        domain = entity_id.split(".")[0]
+        if domain in DIGITAL_DOMAINS:
+            new_sending_data[CONF_DIGITAL_ENTITIES].append(
+                ConfEntityToSend(digital_id, entity_id)
+            )
+            digital_id += 1
+        elif domain in ANALOG_DOMAINS:
+            new_sending_data[CONF_ANALOG_ENTITIES].append(
+                ConfEntityToSend(analog_id, entity_id)
+            )
+            analog_id += 1
 
-        if unit == "No/Yes":
-            unit = ""
-            if bool(value):
-                value = "yes"
-            else:
-                value = "no"
+    new_data = {**entry.data, CONF_ENTITIES_TO_SEND: new_sending_data}
 
-        return value, unit
-
-    @staticmethod
-    def _get_type(mode: ChannelMode) -> str:
-        """Get the data type."""
-        if mode is ChannelMode.ANALOG:
-            return TYPE_SENSOR
-
-        return TYPE_BINARY
-
-    async def _async_update_data(self) -> dict[int, Any]:
-        """Update data."""
-        try:
-            return_data: dict[int, dict[str, Any]] = {}
-            _LOGGER.debug("Try to update CoE")
-
-            for can_id in self.can_ids:
-                return_data[can_id] = {TYPE_BINARY: {}, TYPE_SENSOR: {}}
-
-                await self.coe.update(can_id)
-
-                for mode in ChannelMode:
-                    for index, channel in self.coe.get_channels(can_id, mode).items():
-                        value, unit = self._format_input(channel)
-                        return_data[can_id][self._get_type(mode)][index] = {
-                            "value": value,
-                            "unit": unit,
-                        }
-
-            return return_data
-        except ApiError as err:
-            raise UpdateFailed(err) from err
+    hass.config_entries.async_update_entry(
+        entry,
+        data=new_data,
+        minor_version=2,
+    )
+    return True

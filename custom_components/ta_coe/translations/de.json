@@ -7,20 +7,6 @@
           "host": "Basis URL des Servers (http://IP:PORT)",
           "can_ids": "Zu empfangende CAN-IDs (Durch Kommas getrennt)"
         }
-      },
-      "menu": {
-        "title": "Nächster Schritt",
-        "menu_options": {
-          "send_values": "Bereitstellung von Sensoren via C.M.I.",
-          "exit": "Einrichtung abschließen"
-        }
-      },
-      "send_values": {
-        "title": "Entitäten zu senden",
-        "data": {
-          "entities_to_send": "ID der Entität zum senden",
-          "next": "Weitere hinzufügen"
-        }
       }
     },
     "abort": {
@@ -34,28 +20,7 @@
   },
   "options": {
     "step": {
-      "init":{
-        "title": "Optionen",
-        "menu_options": {
-          "add_send_values": "CoE Sensoren hinzufügen",
-          "change_send_values": "CoE Sensor ändern",
-          "delete_send_values": "CoE Sensoren löschen",
-          "general": "Allgemeine Optionen"
-        }
-      },
-      "add_send_values": {
-        "title": "Sensor hinzufügen",
-        "data": {
-          "entities_to_send": "ID der Entität zum senden"
-        }
-      },
-      "delete_send_values": {
-        "title": "Sensoren löschen",
-        "data": {
-          "entities_to_send": "Zu löschende Entitäten"
-        }
-      },
-      "general": {
+      "init": {
         "title": "Allgemein",
         "data": {
           "scan_interval": "Aktualisierungsintervall (Minuten)",
@@ -66,7 +31,6 @@
     "error": {
       "cannot_connect": "[%key:common::config_flow::error::cannot_connect%]",
       "invalid_can_id": "Ungültige CAN-ID",
-      "invalid_entity" : "Ungültige Entität",
       "unknown": "[%key:common::config_flow::error::unknown%]"
     }
   },

@@ -1,19 +1,24 @@
 """CoE state sender to send values V1."""
+
 from typing import Any
 
 from ta_cmi import CoE, CoEChannel
 from ta_cmi.const import UNITS_EN, ChannelMode
 
-from custom_components.ta_coe.const import _LOGGER
+from custom_components.ta_coe.const import (
+    CONF_ANALOG_ENTITIES,
+    CONF_DIGITAL_ENTITIES,
+    _LOGGER,
+)
 from custom_components.ta_coe.state_sender import AnalogValue, StateSender
 
 
 class StateSenderV1(StateSender):
     """Handle the transfer to the CoE server V1."""
 
-    def __init__(self, coe: CoE, entity_list: dict[str, Any]):
+    def __init__(self, coe: CoE, entity_config: dict[str, Any]):
         """Initialize."""
-        super().__init__(coe, entity_list)
+        super().__init__(coe, entity_config)
 
         self._init_digital_states()
         self._init_analog_states()
@@ -21,16 +26,16 @@ class StateSenderV1(StateSender):
     def _init_digital_states(self) -> None:
         """Create an empty digital states dict."""
         index = 0
-        for entity_id in self._entity_list.values():
-            if self._is_domain_digital(entity_id):
+        for config in self._entity_config.get(CONF_DIGITAL_ENTITIES, []):
+            if self._is_domain_digital(config.entity_id):
                 self._digital_states[str(index)] = False
                 index += 1
 
     def _init_analog_states(self) -> None:
         """Create an empty analog states dict."""
         index = 0
-        for entity_id in self._entity_list.values():
-            if not self._is_domain_digital(entity_id):
+        for config in self._entity_config.get(CONF_ANALOG_ENTITIES, []):
+            if not self._is_domain_digital(config.entity_id):
                 self._analog_states[str(index)] = AnalogValue(0, "0")
                 index += 1
 
@@ -113,7 +118,7 @@ class StateSenderV1(StateSender):
 
     async def update(self):
         """Send all values to the server."""
-        _LOGGER.debug(f"Send all {len(self._entity_list)} values to server")
+        _LOGGER.debug(f"Send all {len(self._entity_config)} values to server")
 
         analog_page = self._build_analog_page()
 
