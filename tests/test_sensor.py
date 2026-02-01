@@ -6,23 +6,28 @@ from unittest.mock import patch
 import pytest
 from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
 from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_HOST, STATE_ON
+from homeassistant.const import STATE_ON
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 from ta_cmi import CoEServerConfig
 
-from custom_components.ta_coe.const import CONF_CAN_IDS, DOMAIN
-from tests.const import COEAPI_PACKAGE, COE_VERSION_CHECK_PACKAGE, COE_CHECK_SERVER_VERSION_PACKAGE, \
-    OBSERVER_GET_ALL_STATES, REFRESH_TASK_START_PACKAGE, DUMMY_DEVICE_API_DATA
-
-ENTRY_DATA: dict[str, Any] = {CONF_HOST: "http://192.168.2.101", CONF_CAN_IDS: [1, 20]}
+from custom_components.ta_coe.const import CONF_CAN_IDS
+from tests.const import (
+    COEAPI_PACKAGE,
+    COE_CHECK_SERVER_VERSION_PACKAGE,
+    COE_VERSION_CHECK_PACKAGE,
+    DUMMY_CONFIG_ENTRY,
+    DUMMY_DEVICE_API_DATA,
+    OBSERVER_GET_ALL_STATES,
+    REFRESH_TASK_START_PACKAGE,
+)
 
 server_config = CoEServerConfig(coe_version=1)
 
 
 @pytest.mark.asyncio
-async def test_sensors(hass: HomeAssistant) -> None:
+async def test_sensors(hass: HomeAssistant, mock_config_entry: MockConfigEntry) -> None:
     """Test the creation and values of the sensors."""
     with (
         patch(COEAPI_PACKAGE, return_value=DUMMY_DEVICE_API_DATA),
@@ -31,19 +36,14 @@ async def test_sensors(hass: HomeAssistant) -> None:
         patch(COE_VERSION_CHECK_PACKAGE, return_value=None),
         patch(COE_CHECK_SERVER_VERSION_PACKAGE, return_value=server_config),
     ):
-        conf_entry: MockConfigEntry = MockConfigEntry(
-            domain=DOMAIN, title="CoE", data=ENTRY_DATA, minor_version=2
-        )
-
-        entity_registry: er = er.async_get(hass)
-        conf_entry.add_to_hass(hass)
-
-        await hass.config_entries.async_setup(conf_entry.entry_id)
+        await hass.config_entries.async_setup(mock_config_entry.entry_id)
         await hass.async_block_till_done()
 
-        assert conf_entry.state == ConfigEntryState.LOADED
+        assert mock_config_entry.state == ConfigEntryState.LOADED
 
-        for can_id in ENTRY_DATA[CONF_CAN_IDS]:
+        entity_registry: er = er.async_get(hass)
+
+        for can_id in DUMMY_CONFIG_ENTRY[CONF_CAN_IDS]:
             state_a1 = hass.states.get(f"sensor.coe_analog_can{can_id}_1")
             entry_a1 = entity_registry.async_get(f"sensor.coe_analog_can{can_id}_1")
 

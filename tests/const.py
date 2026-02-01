@@ -1,5 +1,10 @@
 from typing import Any
 
+from homeassistant.const import CONF_HOST
+
+from custom_components.ta_coe import CONF_CAN_IDS, CONF_ENTITIES_TO_SEND, CONF_ANALOG_ENTITIES, CONF_DIGITAL_ENTITIES, \
+    ConfEntityToSend
+
 COEAPI_PACKAGE = "ta_cmi.coe_api.CoEAPI.get_coe_data"
 COE_SEND_ANALOG_VALUES_PACKAGE = "ta_cmi.coe.CoE.send_analog_values"
 COE_SEND_DIGITAL_VALUES_PACKAGE = "ta_cmi.coe.CoE.send_digital_values"
@@ -49,6 +54,7 @@ OBSERVER_GET_ALL_STATES = (
     "custom_components.ta_coe.state_observer.StateObserver.get_all_states"
 )
 REFRESH_TASK_START_PACKAGE = "custom_components.ta_coe.refresh_task.RefreshTask.start"
+
 DUMMY_DEVICE_API_DATA: dict[str, Any] = {
     "digital": [{"value": True, "unit": 43}],
     "analog": [
@@ -59,4 +65,13 @@ DUMMY_DEVICE_API_DATA: dict[str, Any] = {
     ],
     "last_update_unix": 1680410064.03764,
     "last_update": "2023-04-01T12:00:00",
+}
+
+DUMMY_CONFIG_ENTRY: dict[str, Any] = {
+    CONF_HOST: "http://192.168.2.101",
+    CONF_CAN_IDS: [1, 20],
+    CONF_ENTITIES_TO_SEND: {
+        CONF_ANALOG_ENTITIES: [ConfEntityToSend(1, "sensor.coe_analog")],
+        CONF_DIGITAL_ENTITIES: [ConfEntityToSend(1, "binary_sensor.coe_digital")],
+    },
 }

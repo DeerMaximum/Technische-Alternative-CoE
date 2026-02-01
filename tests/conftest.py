@@ -1,9 +1,14 @@
 """Fixtures for testing."""
+
+from copy import deepcopy
 from unittest import mock
 
 import pytest
+from homeassistant.core import HomeAssistant
+from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from tests.const import COE_VERSION_CHECK_PACKAGE
+from custom_components.ta_coe import DOMAIN
+from tests.const import COE_VERSION_CHECK_PACKAGE, DUMMY_CONFIG_ENTRY
 
 
 @pytest.fixture(autouse=True)
@@ -22,3 +27,19 @@ def patch_coe_server_check(request):
         patched.__exit__(None, None, None)
 
     request.addfinalizer(unpatch)
+
+
+@pytest.fixture
+def mock_config_entry(hass: HomeAssistant) -> MockConfigEntry:
+    """Provide a common mock config entry."""
+    config_entry: MockConfigEntry = MockConfigEntry(
+        domain=DOMAIN,
+        title="CoE",
+        data=deepcopy(DUMMY_CONFIG_ENTRY),
+        minor_version=2,
+        version=1,
+    )
+
+    config_entry.add_to_hass(hass)
+
+    return config_entry
