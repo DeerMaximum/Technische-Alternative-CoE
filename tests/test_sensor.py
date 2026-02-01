@@ -1,8 +1,5 @@
 """Test the Technische Alternative CoE sensor."""
 
-from typing import Any
-from unittest.mock import patch
-
 import pytest
 from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
 from homeassistant.const import STATE_ON

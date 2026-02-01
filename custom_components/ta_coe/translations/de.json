@@ -36,21 +36,21 @@
   },
   "issues": {
     "add_missing_can_id": {
-    "title": "Füge fehlende CAN-ID hinzu",
-    "fix_flow": {
-      "step": {
-        "form": {
+      "title": "Füge fehlende CAN-ID hinzu",
+      "fix_flow": {
+        "step": {
+          "form": {
             "title": "Füge fehlende CAN-ID hinzu",
             "description": "Füge die CAN-IDs hinzu, die du in den CoE einstellungen gewählt hast.",
             "data": {
               "can_ids": "Zu empfangende CAN-IDs (Durch Kommas getrennt)"
             }
+          }
+        },
+        "error": {
+          "invalid_can_id": "Ungültige CAN-ID"
         }
-      },
-      "error": {
-        "invalid_can_id": "Ungültige CAN-ID"
       }
-    }
     }
   }
 }

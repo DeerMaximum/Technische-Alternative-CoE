@@ -1,4 +1,5 @@
 """CoE binary sensor platform."""
+
 from __future__ import annotations
 
 from typing import Any
@@ -11,14 +12,10 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from . import CoEDataUpdateCoordinator
 from .const import (
-    ANALOG_DOMAINS,
-    ATTR_ANALOG_ORDER,
-    ATTR_DIGITAL_ORDER,
+    CONF_ANALOG_ENTITIES,
+    CONF_DIGITAL_ENTITIES,
     CONF_ENTITIES_TO_SEND,
-    DIGITAL_DOMAINS,
     DOMAIN,
-    FREE_SLOT_MARKER_ANALOG,
-    FREE_SLOT_MARKER_DIGITAL,
     TYPE_BINARY,
 )
 
@@ -79,9 +76,9 @@ class DeviceChannelBinary(CoordinatorEntity, BinarySensorEntity):
 class CoESendState(BinarySensorEntity):
     """Representation of the coe send values state."""
 
-    def __init__(self, entities_to_send: dict[str, Any]) -> None:
+    def __init__(self, entity_config: dict[str, Any]) -> None:
         """Initialize."""
-        self._entity = entities_to_send
+        self._entity_config = entity_config
 
         self._attr_name: str = "CoE: Send value state"
         self._attr_unique_id: str = "ta-coe-send-value-state"
@@ -89,7 +86,13 @@ class CoESendState(BinarySensorEntity):
     @property
     def is_on(self) -> bool:
         """Return the state of the sensor."""
-        return len(self._entity) > 0
+        return (
+            len(
+                self._entity_config.get(CONF_ANALOG_ENTITIES, [])
+                + self._entity_config.get(CONF_DIGITAL_ENTITIES, [])
+            )
+            > 0
+        )
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
@@ -97,23 +100,4 @@ class CoESendState(BinarySensorEntity):
         if not self.is_on:
             return {}
 
-        digital = {}
-        analog = {}
-
-        index = 1
-        for x in self._entity.values():
-            if x.split(".")[0] in DIGITAL_DOMAINS:
-                digital[index] = x
-                index += 1
-            elif x == FREE_SLOT_MARKER_DIGITAL:
-                index += 1
-
-        index = 1
-        for x in self._entity.values():
-            if x.split(".")[0] in ANALOG_DOMAINS:
-                analog[index] = x
-                index += 1
-            elif x == FREE_SLOT_MARKER_ANALOG:
-                index += 1
-
-        return {ATTR_ANALOG_ORDER: analog, ATTR_DIGITAL_ORDER: digital}
+        return self._entity_config
