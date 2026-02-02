@@ -72,3 +72,8 @@ DEFAULT_DEVICE_CLASS_MAP: dict[str, SensorDeviceClass] = {
 
 TYPE_BINARY = "binary"
 TYPE_SENSOR = "sensor"
+
+PANEL_NAME = f"{DOMAIN}-panel"
+
+PANEL_TITLE = "CoE"
+PANEL_ICON = "mdi:coffee-to-go"

@@ -28,6 +28,7 @@ from .const import (
 )
 from .coordinator import CoEDataUpdateCoordinator
 from .issues import check_coe_server_2x_issue
+from .panel import async_register_panel, async_unregister_panel
 from .refresh_task import RefreshTask
 from .state_observer import StateObserver
 from .state_sender import StateSender
@@ -84,6 +85,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     }
 
     async_register_websocket_commands(hass)
+    await async_register_panel(hass)
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
@@ -99,6 +101,8 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     task: RefreshTask = hass.data[DOMAIN][entry.entry_id]["task"]
 
     await task.stop()
+
+    async_unregister_panel(hass)
 
     return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
 
