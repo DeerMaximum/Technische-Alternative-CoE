@@ -8,3 +8,22 @@
     font-weight: bold;
   }
 }
+
+#selection-preview-container{
+  display: flex;
+  align-items: center;
+
+  select2{
+    width: 80%;
+
+    --select2-single-height: 40px;
+    --select2-selection-line-height: 40px;
+  }
+
+  p{
+    display: block;
+    width: 20%;
+
+    text-align: center;
+  }
+}

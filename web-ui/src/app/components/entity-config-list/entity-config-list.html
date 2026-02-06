@@ -1,9 +1,10 @@
 <div class="container">
   <h2>{{heading()}}</h2>
   <div id="fields">
-    <app-entity-config-entry></app-entity-config-entry>
-    <app-entity-config-entry></app-entity-config-entry>
-    <app-entity-config-entry></app-entity-config-entry>
+    @for (_ of [].constructor(slot_count); track $index){
+      <app-entity-config-entry [index]="$index" [entity_ids]="sample_data"></app-entity-config-entry>
+    }
   </div>
+  <button class="add-button" (click)="onAdd()">Add New Slot</button>
 </div>
 

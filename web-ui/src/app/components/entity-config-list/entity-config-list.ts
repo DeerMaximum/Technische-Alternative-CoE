@@ -11,4 +11,12 @@ import {EntityConfigEntry} from '../entity-config-entry/entity-config-entry';
 })
 export class EntityConfigList {
   heading = input.required<string>();
+
+  protected slot_count = 1;
+
+  sample_data: string[] = ['foo', 'bar'];
+
+  onAdd() {
+    this.slot_count++;
+  }
 }
