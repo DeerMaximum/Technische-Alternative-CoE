@@ -1,17 +1,13 @@
 .dropdown-container {
   margin-bottom: 20px;
 
-  select {
-    width: 100%;
+  label{
+    margin-bottom: 5px;
+    display: block;
+  }
 
-    padding: 10px;
-    margin-top: 10px;
-
-    font-size: 16px;
-
-    border: 1px solid #ddd;
-    border-radius: 4px;
-
-    background-color: white;
+  select2{
+    --select2-single-height: 40px;
+    --select2-selection-padding: 6px;
   }
 }
