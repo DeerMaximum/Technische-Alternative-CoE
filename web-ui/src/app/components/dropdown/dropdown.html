@@ -1,0 +1,8 @@
+<div class="dropdown-container">
+  <label for="select">{{heading()}}</label>
+  <select id="select" (change)="on_change($event)">
+    @for (value of values() ; track value[0]) {
+      <option value="{{value[0]}}">{{value[1]}}</option>
+    }
+  </select>
+</div>
