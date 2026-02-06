@@ -1,11 +1,13 @@
 import {Component} from '@angular/core';
 import {Dropdown} from './components/dropdown/dropdown';
+import {EntityConfigList} from './components/entity-config-list/entity-config-list';
 
 
 @Component({
   selector: 'app-root',
   imports: [
-    Dropdown
+    Dropdown,
+    EntityConfigList
   ],
   templateUrl: './app.html',
   styleUrl: './app.scss'

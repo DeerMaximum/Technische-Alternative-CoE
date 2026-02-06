@@ -6,3 +6,12 @@
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
+
+.config-container {
+  display: flex;
+  gap: 20px;
+
+  app-entity-config-list{
+    flex: 1;
+  }
+}
