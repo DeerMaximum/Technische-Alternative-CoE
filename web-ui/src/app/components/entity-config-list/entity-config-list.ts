@@ -19,4 +19,8 @@ export class EntityConfigList {
   onAdd() {
     this.slot_count++;
   }
+
+  onSlotDelete() {
+    this.slot_count--;
+  }
 }

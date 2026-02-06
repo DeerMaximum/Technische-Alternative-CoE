@@ -1,8 +1,10 @@
 <div class="container">
-  <h2>{{heading()}}</h2>
+  <h2>{{ heading() }}</h2>
   <div id="fields">
-    @for (_ of [].constructor(slot_count); track $index){
-      <app-entity-config-entry [index]="$index" [entity_ids]="sample_data"></app-entity-config-entry>
+    @for (_ of [].constructor(slot_count); track $index) {
+      @let deletable = $last && $index !== 0;
+      <app-entity-config-entry [index]="$index" [entity_ids]="sample_data" [deletable]="deletable"
+                               (deleted)="onSlotDelete()"></app-entity-config-entry>
     }
   </div>
   <button id="add-button" (click)="onAdd()">Add New Slot</button>

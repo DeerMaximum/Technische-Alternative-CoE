@@ -4,4 +4,9 @@
     <select2 [data]="entity_ids()" (update)="on_change($event)" displaySearchStatus="always" resettable></select2>
     <p class="preview">20 kWh</p>
   </div>
+  @if(deletable()){
+    <div class="field-actions">
+      <button id="delete-button" (click)="on_delete()">Delete</button>
+    </div>
+  }
 </div>
