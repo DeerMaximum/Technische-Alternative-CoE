@@ -17,4 +17,8 @@ export class App {
     {value: "entry_id_one", label: "First Entry"},
     {value: "entry_id_two", label: "Second Entry"},
   ];
+
+  onSave(){
+
+  }
 }
