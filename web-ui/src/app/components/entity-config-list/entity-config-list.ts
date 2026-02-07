@@ -13,10 +13,13 @@ export class EntityConfigList {
   heading = input.required<string>();
 
   protected slot_count = 1;
+  protected slot_limit = 60;
 
   sample_data: string[] = ['foo', 'bar'];
 
   onAdd() {
+    if (this.slot_count >= this.slot_limit)
+      return;
     this.slot_count++;
   }
 
