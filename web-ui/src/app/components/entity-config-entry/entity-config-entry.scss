@@ -1,3 +1,5 @@
+@use "colors";
+
 .container{
   margin-bottom: 15px;
   position: relative;
@@ -18,6 +20,14 @@
 
     --select2-single-height: 40px;
     --select2-selection-line-height: 40px;
+
+    --select2-selection-background: #{colors.$col-background};
+    --select2-selection-border-color: #{colors.$col-borders};
+    --select2-selection-focus-border-color: #{colors.$col-borders-var};
+    --select2-dropdown-background: #{colors.$col-background};
+    --select2-dropdown-border-color: #{colors.$col-borders};
+    --select2-selection-text-color: #{colors.$col-text};
+    --select2-option-text-color: #{colors.$col-text};
   }
 
   p{
