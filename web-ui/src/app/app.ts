@@ -1,8 +1,8 @@
-import {Component, inject, OnInit} from '@angular/core';
+import {Component, computed, effect, inject, OnInit, signal} from '@angular/core';
 import {Dropdown, DropdownValue, DropdownValues} from './components/dropdown/dropdown';
 import {EntityConfigList} from './components/entity-config-list/entity-config-list';
 import {Hass} from './services/hass';
-import {ConfigEntryMetadata} from './types';
+import {ConfigEntryMetadata, ExposedEntitiesConfig} from './types';
 
 
 @Component({
@@ -18,22 +18,37 @@ export class App implements OnInit {
   private hass = inject(Hass);
 
   configEntries: DropdownValues = [];
-  selectedEntry: string | null = null;
+  configEntryID = signal<string | null>(null);
 
-  async ngOnInit(){
+  entityConfig = signal<ExposedEntitiesConfig>({
+    analog: [],
+    digital: []
+  });
+
+  async ngOnInit() {
     document.body.style.colorScheme = this.hass.isDarkMode() ? "dark" : "light";
 
     await this.setUpConfigEntryDropdown();
   }
 
-  onSave(){
-    if(this.selectedEntry === null)
+  async onConfigEntryChange() {
+    const entryID = this.configEntryID()
+
+    if (entryID == null)
       return;
 
-
+    const config = await this.hass.getCurrentConfig(entryID);
+    this.entityConfig.set(config);
   }
 
-  protected async setUpConfigEntryDropdown(){
+  onSave() {
+    if (this.configEntryID() === null)
+      return;
+
+    console.log(this.entityConfig());
+  }
+
+  protected async setUpConfigEntryDropdown() {
     const entries = await this.hass.getConfigEntries();
 
     this.configEntries = entries.map((entry: ConfigEntryMetadata) => {
@@ -43,8 +58,8 @@ export class App implements OnInit {
       } as DropdownValue;
     });
 
-    if(entries.length > 0){
-      this.selectedEntry = entries[0].entry_id;
+    if (entries.length > 0) {
+      this.configEntryID.set(entries[0].entry_id);
     }
   }
 }

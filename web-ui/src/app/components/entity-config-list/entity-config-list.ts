@@ -1,5 +1,6 @@
-import {Component, input} from '@angular/core';
+import {Component, computed, input, model} from '@angular/core';
 import {EntityConfigEntry} from '../entity-config-entry/entity-config-entry';
+import {ExposedEntityConfig} from '../../types';
 
 @Component({
   selector: 'app-entity-config-list',
@@ -12,18 +13,35 @@ import {EntityConfigEntry} from '../entity-config-entry/entity-config-entry';
 export class EntityConfigList {
   heading = input.required<string>();
 
-  protected slot_count = 1;
+  entries = model.required<ExposedEntityConfig[]>();
+
+  protected slot_count = computed(() => this.entries().length);
   protected slot_limit = 60;
 
-  sample_data: string[] = ['foo', 'bar'];
+  sampleIds: string[] = ['foo', 'bar'];
 
   onAdd() {
-    if (this.slot_count >= this.slot_limit)
+    if (this.slot_count() >= this.slot_limit)
       return;
-    this.slot_count++;
+
+    this.entries.update(oldValue => {
+      const newValue: ExposedEntityConfig = {
+        id: this.slot_count() + 1,
+        entity_id: ""
+      };
+
+      return [...oldValue, newValue]
+    })
+  }
+
+  onEntryChange(entry: ExposedEntityConfig) {
+    this.entries.update(oldValue => {
+      const index = entry.id - 1;
+      return [...oldValue.slice(0, index), entry, ...oldValue.slice(index + 1)];
+    });
   }
 
   onSlotDelete() {
-    this.slot_count--;
+    this.entries.update(oldValue => oldValue.slice(0, -1))
   }
 }

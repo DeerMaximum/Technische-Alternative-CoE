@@ -6,7 +6,7 @@
     "start": "ng serve",
     "build": "ng build --base-href=/ta-coe-hass/ && tsc --project tsconfig.panel.json",
     "build:panel": "tsc --project tsconfig.panel.json",
-    "watch": "ng build --watch --base-href=/ta-coe-hass/",
+    "watch": "ng build --watch --base-href=/ta-coe-hass/ --configuration development",
     "test": "ng test"
   },
   "prettier": {

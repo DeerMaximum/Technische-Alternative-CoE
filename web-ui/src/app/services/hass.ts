@@ -1,5 +1,8 @@
 import {Injectable} from '@angular/core';
-import {CustomHomeAssistant, GetConfigEntryResponse, WindowWithHass} from '../types';
+import {
+  CustomHomeAssistant,
+  ExposedEntitiesConfig, ExposedEntitiesConfigResponse, GetConfigEntryResponse, WindowWithHass
+} from '../types';
 
 @Injectable({
   providedIn: 'root',
@@ -25,6 +28,20 @@ export class Hass {
     });
 
     return response?.entries ?? [];
+  }
+
+  async getCurrentConfig(entryID: string) {
+    const response = await this.hass?.callWS<ExposedEntitiesConfigResponse>({
+      type: "ta_coe/expose/info",
+      config_entry_id: entryID
+    });
+
+    const emptyConfig: ExposedEntitiesConfig = {
+      analog: [],
+      digital: []
+    }
+
+    return response?.config ?? emptyConfig;
   }
 
 }

@@ -1,5 +1,6 @@
-import {Component, input, output} from '@angular/core';
+import {Component, input, model, output} from '@angular/core';
 import {Select2, Select2Data, Select2UpdateEvent} from 'ng-select2-component';
+import {ExposedEntityConfig} from '../../types';
 
 @Component({
   selector: 'app-entity-config-entry',
@@ -11,14 +12,22 @@ import {Select2, Select2Data, Select2UpdateEvent} from 'ng-select2-component';
 })
 export class EntityConfigEntry {
 
-  index = input.required<number>();
   deletable = input(false);
+  entry = model.required<ExposedEntityConfig>();
+
   deleted = output<void>();
 
   entity_ids = input.required({transform: transformToSelectData});
 
-  on_change(event:  Select2UpdateEvent): void {
-      //TODO Fetch new state and update preview
+  on_change(event: Select2UpdateEvent): void {
+    const value = event.value as string | null ?? "";
+
+    this.entry.update(oldValue => {
+      oldValue.entity_id = value;
+      return oldValue;
+    })
+
+    //TODO Fetch new state and update preview
   }
 
   on_delete(): void {

@@ -61,7 +61,11 @@
             "development": {
               "optimization": false,
               "extractLicenses": false,
-              "sourceMap": true
+              "sourceMap": true,
+              "outputPath": {
+                "base": "../custom_components/ta_coe/www",
+                "browser": ""
+              }
             }
           },
           "defaultConfiguration": "production"
