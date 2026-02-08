@@ -12,13 +12,12 @@ import {ExposedEntityConfig} from '../../types';
 })
 export class EntityConfigList {
   heading = input.required<string>();
+  entityIDS = input.required<string[]>();
 
   entries = model.required<ExposedEntityConfig[]>();
 
-  protected slot_count = computed(() => this.entries().length);
-  protected slot_limit = 60;
-
-  sampleIds: string[] = ['foo', 'bar'];
+  slot_count = computed(() => this.entries().length);
+  slot_limit = 60;
 
   onAdd() {
     if (this.slot_count() >= this.slot_limit)

@@ -44,4 +44,16 @@ export class Hass {
     return response?.config ?? emptyConfig;
   }
 
+  getEntityIDS(platforms: string[]) {
+    const states = this.hass?.states;
+    if (!states) return [];
+
+    const allIDS = Object.keys(states);
+
+    return allIDS.filter((id) => {
+      const platform = id.split(".")[0];
+      return platforms.indexOf(platform) !== -1;
+    });
+  }
+
 }

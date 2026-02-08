@@ -20,6 +20,9 @@ export class App implements OnInit {
   configEntries: DropdownValues = [];
   configEntryID = signal<string | null>(null);
 
+  analogEntityIDs: string[] = [];
+  digitalEntityIDs: string[] = [];
+
   entityConfig = signal<ExposedEntitiesConfig>({
     analog: [],
     digital: []
@@ -28,7 +31,8 @@ export class App implements OnInit {
   async ngOnInit() {
     document.body.style.colorScheme = this.hass.isDarkMode() ? "dark" : "light";
 
-    await this.setUpConfigEntryDropdown();
+    this.setupEntityIDS();
+    await this.setupConfigEntryDropdown();
   }
 
   async onConfigEntryChange() {
@@ -48,7 +52,7 @@ export class App implements OnInit {
     console.log(this.entityConfig());
   }
 
-  protected async setUpConfigEntryDropdown() {
+  async setupConfigEntryDropdown() {
     const entries = await this.hass.getConfigEntries();
 
     this.configEntries = entries.map((entry: ConfigEntryMetadata) => {
@@ -61,5 +65,13 @@ export class App implements OnInit {
     if (entries.length > 0) {
       this.configEntryID.set(entries[0].entry_id);
     }
+  }
+
+  setupEntityIDS() {
+    const analogPlatforms = ["sensor", "number"];
+    const digitalPlatforms = ["binary_sensor", "input_boolean"];
+
+    this.analogEntityIDs = this.hass.getEntityIDS(analogPlatforms);
+    this.digitalEntityIDs = this.hass.getEntityIDS(digitalPlatforms);
   }
 }

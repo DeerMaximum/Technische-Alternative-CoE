@@ -2,7 +2,7 @@
   <h2>{{ heading() }}</h2>
   <div id="fields">
     @for (entry of entries(); track entry.id) {
-      <app-entity-config-entry [entry]="entry" [entity_ids]="sampleIds" [deletable]="$last"
+      <app-entity-config-entry [entry]="entry" [entity_ids]="entityIDS()" [deletable]="$last"
                                (entryChange)="onEntryChange($event)"
                                (deleted)="onSlotDelete()"></app-entity-config-entry>
     }

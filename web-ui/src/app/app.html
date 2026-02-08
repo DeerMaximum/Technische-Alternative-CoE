@@ -3,8 +3,10 @@
   <app-dropdown [heading]="'Config entry:'" [values]="configEntries" [(selectedValue)]="configEntryID"
                 (selectedValueChange)="onConfigEntryChange()"></app-dropdown>
   <div class="config-container">
-    <app-entity-config-list [heading]="'Analog Sensors'" [(entries)]="entityConfig().analog"></app-entity-config-list>
-    <app-entity-config-list [heading]="'Digital Sensors'" [(entries)]="entityConfig().digital"></app-entity-config-list>
+    <app-entity-config-list [heading]="'Analog Sensors'" [(entries)]="entityConfig().analog"
+                            [entityIDS]="analogEntityIDs"></app-entity-config-list>
+    <app-entity-config-list [heading]="'Digital Sensors'" [(entries)]="entityConfig().digital"
+                            [entityIDS]="digitalEntityIDs"></app-entity-config-list>
   </div>
   <button id="save-button" (click)="onSave()" [disabled]="configEntryID === null">Save Configuration</button>
 </div>
