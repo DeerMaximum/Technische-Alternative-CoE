@@ -56,4 +56,16 @@ export class Hass {
     });
   }
 
+  getEntityState(entityID: string) {
+    const states = this.hass?.states;
+    if (!states) return null;
+
+    const state = states[entityID];
+    if (!state) return null;
+
+    const unit = state.attributes.unit_of_measurement ?? "";
+
+    return `${state.state} ${unit}`
+  }
+
 }

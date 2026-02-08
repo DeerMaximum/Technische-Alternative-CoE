@@ -2,7 +2,7 @@
   <label for="selection">Slot: {{entry().id}}</label>
   <div id="selection-preview-container">
     <select2 [data]="entity_ids()" (update)="on_change($event)" displaySearchStatus="always" resettable></select2>
-    <p class="preview">20 kWh</p>
+    <p class="preview">{{previewValue}}</p>
   </div>
   @if(deletable()){
     <div class="field-actions">
