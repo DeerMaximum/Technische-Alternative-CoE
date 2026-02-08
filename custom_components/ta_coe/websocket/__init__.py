@@ -3,6 +3,7 @@
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.components import websocket_api
 
+from .config import coe_config_entries
 from .expose import coe_exposed_entities_config, coe_exposed_entities_update
 
 
@@ -11,4 +12,5 @@ def async_register_websocket_commands(hass: HomeAssistant) -> None:
     """Register CoE-specific websocket commands."""
     websocket_api.async_register_command(hass, coe_exposed_entities_config)
     websocket_api.async_register_command(hass, coe_exposed_entities_update)
+    websocket_api.async_register_command(hass, coe_config_entries)
 
