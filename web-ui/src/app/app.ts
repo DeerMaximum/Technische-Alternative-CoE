@@ -2,7 +2,7 @@ import {Component, computed, effect, inject, OnInit, signal} from '@angular/core
 import {Dropdown, DropdownValue, DropdownValues} from './components/dropdown/dropdown';
 import {EntityConfigList} from './components/entity-config-list/entity-config-list';
 import {Hass} from './services/hass';
-import {ConfigEntryMetadata, ExposedEntitiesConfig} from './types';
+import {ConfigEntryMetadata, ExposedEntitiesConfig, ExposedEntityConfig} from './types';
 
 
 @Component({
@@ -33,6 +33,7 @@ export class App implements OnInit {
 
     this.setupEntityIDS();
     await this.setupConfigEntryDropdown();
+    await this.onConfigEntryChange(); //Initial change is not captured
   }
 
   async onConfigEntryChange() {
@@ -41,15 +42,28 @@ export class App implements OnInit {
     if (entryID == null)
       return;
 
-    const config = await this.hass.getCurrentConfig(entryID);
+    let config = await this.hass.getCurrentConfig(entryID);
+
+    config.analog = this.addEmptySlots(config.analog);
+    config.digital = this.addEmptySlots(config.digital);
+
     this.entityConfig.set(config);
   }
 
-  onSave() {
-    if (this.configEntryID() === null)
+  async onSave() {
+    const entryId = this.configEntryID();
+    if (entryId === null)
       return;
 
-    console.log(this.entityConfig());
+    let reducedConfig = {
+      analog: [...this.entityConfig().analog],
+      digital: [...this.entityConfig().digital]
+    };
+
+    reducedConfig.digital = reducedConfig.digital.filter(value => value.entity_id.length > 0);
+    reducedConfig.analog = reducedConfig.analog.filter(value => value.entity_id.length > 0);
+
+    await this.hass.setCurrentConfig(entryId, reducedConfig);
   }
 
   async setupConfigEntryDropdown() {
@@ -68,10 +82,31 @@ export class App implements OnInit {
   }
 
   setupEntityIDS() {
-    const analogPlatforms = ["sensor", "number"];
+    const analogPlatforms = ["sensor", "input_number", "number"];
     const digitalPlatforms = ["binary_sensor", "input_boolean"];
 
     this.analogEntityIDs = this.hass.getEntityIDS(analogPlatforms);
     this.digitalEntityIDs = this.hass.getEntityIDS(digitalPlatforms);
+  }
+
+  addEmptySlots(slots: ExposedEntityConfig[]) {
+    if (slots.length == 0)
+      return [];
+
+    const lastID = (slots.at(-1) as ExposedEntityConfig).id;
+    const allIds = [...Array(lastID).keys()].map(value => value + 1);
+    const existingIds = slots.map((entry) => entry.id);
+    const missingIds = allIds.filter(id => !existingIds.includes(id));
+
+    missingIds.forEach(id => {
+      slots.push({
+        id: id,
+        entity_id: ""
+      })
+    });
+
+    slots = slots.sort((a, b) => a.id - b.id);
+
+    return slots;
   }
 }
