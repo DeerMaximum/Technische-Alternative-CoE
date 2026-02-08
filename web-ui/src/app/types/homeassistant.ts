@@ -12,3 +12,12 @@ export interface CustomHomeAssistant extends HomeAssistant {
 export interface CustomThemes extends Themes{
   darkMode: boolean;
 }
+
+export interface GetConfigEntryResponse {
+  entries: ConfigEntryMetadata[]
+}
+
+export interface ConfigEntryMetadata{
+  title: string;
+  entry_id: string;
+}

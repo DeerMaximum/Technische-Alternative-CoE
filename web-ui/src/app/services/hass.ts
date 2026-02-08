@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {CustomHomeAssistant, WindowWithHass} from '../types';
+import {CustomHomeAssistant, GetConfigEntryResponse, WindowWithHass} from '../types';
 
 @Injectable({
   providedIn: 'root',
@@ -15,7 +15,16 @@ export class Hass {
     }
   }
 
-  isDarkMode(){
+  isDarkMode() {
     return this.hass?.themes?.darkMode ?? false;
   }
+
+  async getConfigEntries() {
+    const response = await this.hass?.callWS<GetConfigEntryResponse>({
+      type: "ta_coe/config/list"
+    });
+
+    return response?.entries ?? [];
+  }
+
 }

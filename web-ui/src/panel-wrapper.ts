@@ -9,7 +9,6 @@ declare const window: Window & {
 };
 
 class CoEPanelWrapper extends HTMLElement {
-  private _messageHandler?: (event: MessageEvent) => void;
   private iframe: HTMLIFrameElement | null = null;
   private _hass: HomeAssistant | undefined = undefined;
 

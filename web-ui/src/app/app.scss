@@ -38,4 +38,9 @@
   &:hover{
     background-color: colors.$col-sec-var;
   }
+
+  &:disabled{
+    background-color: gray;
+    cursor: not-allowed;
+  }
 }
