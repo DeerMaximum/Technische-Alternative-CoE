@@ -39,6 +39,7 @@ from .websocket import async_register_websocket_commands
 
 PLATFORMS: list[str] = [Platform.SENSOR, Platform.BINARY_SENSOR]
 
+
 def prepare_send_config(send_config: dict[str, Any]) -> dict[str, Any]:
     """Prepare the send config."""
     analog_config = send_config.get(CONF_ANALOG_ENTITIES, [])
@@ -46,7 +47,7 @@ def prepare_send_config(send_config: dict[str, Any]) -> dict[str, Any]:
 
     return {
         CONF_ANALOG_ENTITIES: [ConfEntityToSend(**x) for x in analog_config],
-        CONF_DIGITAL_ENTITIES: [ConfEntityToSend(**x) for x in digital_config]
+        CONF_DIGITAL_ENTITIES: [ConfEntityToSend(**x) for x in digital_config],
     }
 
 
@@ -76,7 +77,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     _LOGGER.debug(f"CoE server config: Version={server_config.coe_version}")
 
-    send_config: dict[str, list[ConfEntityToSend]] = prepare_send_config(entry.data.get(CONF_ENTITIES_TO_SEND, {}))
+    send_config: dict[str, list[ConfEntityToSend]] = prepare_send_config(
+        entry.data.get(CONF_ENTITIES_TO_SEND, {})
+    )
 
     sender: StateSender
 
@@ -85,9 +88,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     else:
         sender = StateSenderV2(coe, send_config)
 
-    observer = StateObserver(
-        hass, coe, sender, send_config
-    )
+    observer = StateObserver(hass, coe, sender, send_config)
 
     task = RefreshTask(sender)
 
@@ -102,7 +103,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
-    if len(entry.data.get(CONF_ENTITIES_TO_SEND, {})) > 0:
+    if (
+        len(send_config.get(CONF_ANALOG_ENTITIES, []))
+        + len(send_config.get(CONF_DIGITAL_ENTITIES, []))
+        > 0
+    ):
         await observer.get_all_states()
         await task.start()
 
