@@ -8,7 +8,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
 
-from ..const import CONF_ANALOG_ENTITIES, CONF_ENTITIES_TO_SEND, CONF_DIGITAL_ENTITIES, ConfEntityToSend
+from ..const import CONF_ANALOG_ENTITIES, CONF_ENTITIES_TO_SEND, CONF_DIGITAL_ENTITIES, ConfEntityToSend, _LOGGER
 
 
 @websocket_api.websocket_command({
@@ -21,6 +21,7 @@ async def coe_exposed_entities_config(
     hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict[str, Any]
 ) -> None:
     """Return exposed entities configuration."""
+    _LOGGER.debug("Received exposed entities config request: %s", msg)
 
     entry_id = msg["config_entry_id"]
     entry: ConfigEntry = hass.config_entries.async_get_entry(entry_id)
@@ -62,6 +63,7 @@ async def coe_exposed_entities_update(
     hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict[str, Any]
 ) -> None:
     """Update exposed entities configuration."""
+    _LOGGER.debug("Received update exposed entities config request: %s", msg)
 
     entry_id = msg["config_entry_id"]
     entry: ConfigEntry = hass.config_entries.async_get_entry(entry_id)

@@ -1,5 +1,5 @@
 import {Component, input, model} from '@angular/core';
-import {Select2} from 'ng-select2-component';
+import {Select2, Select2UpdateEvent} from 'ng-select2-component';
 
 
 export interface DropdownValue {
@@ -22,4 +22,9 @@ export class Dropdown {
   values = input.required<DropdownValues>();
 
   selectedValue = model<string | null>(null);
+
+  onSelect(event: Select2UpdateEvent){
+    const value = event.value as string | null;
+    this.selectedValue.set(value);
+  }
 }
