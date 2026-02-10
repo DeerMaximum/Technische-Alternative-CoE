@@ -7,8 +7,8 @@ import {Component} from '@angular/core';
   styleUrl: './message-box.scss',
 })
 export class MessageBox {
-  message: string = "";
-  hidden: boolean = true;
+  message = "";
+  hidden = true;
 
   showMessage(message: string, timeoutMS: number) {
     this.message = message;

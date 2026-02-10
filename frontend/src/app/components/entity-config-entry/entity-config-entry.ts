@@ -3,7 +3,7 @@ import {Select2, Select2Data, Select2UpdateEvent} from 'ng-select2-component';
 import {ExposedEntityConfig} from '../../types';
 import {Hass} from '../../services/hass';
 
-const defaultPreviewValue: string = "---";
+const defaultPreviewValue = "---";
 
 @Component({
   selector: 'app-entity-config-entry',
@@ -52,7 +52,7 @@ export class EntityConfigEntry implements OnInit {
 }
 
 function transformToSelectData(values: string[]) {
-  let result: Select2Data = [];
+  const result: Select2Data = [];
 
   values.forEach(value => {
     result.push({

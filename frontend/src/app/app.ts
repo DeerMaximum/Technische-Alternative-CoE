@@ -46,7 +46,7 @@ export class App implements OnInit {
     if (entryID == null)
       return;
 
-    let config = await this.hass.getCurrentConfig(entryID);
+    const config = await this.hass.getCurrentConfig(entryID);
 
     config.analog = this.addEmptySlots(config.analog);
     config.digital = this.addEmptySlots(config.digital);
@@ -59,7 +59,7 @@ export class App implements OnInit {
     if (entryId === null)
       return;
 
-    let reducedConfig = {
+    const reducedConfig = {
       analog: [...this.entityConfig().analog],
       digital: [...this.entityConfig().digital]
     };
