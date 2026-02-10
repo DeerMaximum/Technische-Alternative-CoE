@@ -42,6 +42,6 @@
     "angular-eslint": "21.2.0",
     "eslint": "^9.39.2",
     "typescript": "~5.9.2",
-    "typescript-eslint": "8.50.1"
+    "typescript-eslint": "8.55.0"
   }
 }
