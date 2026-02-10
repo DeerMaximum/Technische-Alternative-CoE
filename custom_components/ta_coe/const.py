@@ -76,4 +76,4 @@ TYPE_SENSOR = "sensor"
 PANEL_NAME = f"{DOMAIN}-panel"
 
 PANEL_TITLE = "CoE"
-PANEL_ICON = "mdi:coffee-to-go"
+PANEL_ICON = "mdi:thermostat-cog"
