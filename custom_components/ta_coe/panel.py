@@ -29,11 +29,9 @@ async def async_register_panel(hass: HomeAssistant) -> None:
     cache_bust = int(time.time())
     module_url = f"/ta-coe-hass/panel-wrapper.js?v={cache_bust}"
 
-    try:
-        hass.data.get("frontend_panels", {}).pop(DOMAIN, None)
-        _LOGGER.info("Removed any existing panel registration")
-    except:
-        pass
+    if hass.data.get("frontend_panels", {}).get(DOMAIN, None):
+        _LOGGER.debug("Skip registering panel because it is already registered")
+        return
 
     await panel_custom.async_register_panel(
         hass,
