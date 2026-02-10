@@ -1,0 +1,14 @@
+@use "colors";
+
+.container{
+  position: absolute;
+  top: 10px;
+  right: 10px;
+
+  padding: 10px;
+
+  background-color: colors.$col-pri;
+  color: white;
+
+  border-radius: 10px;
+}

@@ -1,15 +1,17 @@
-import {Component, computed, effect, inject, OnInit, signal} from '@angular/core';
+import {Component, computed, effect, inject, OnInit, signal, viewChild, ViewChild} from '@angular/core';
 import {Dropdown, DropdownValue, DropdownValues} from './components/dropdown/dropdown';
 import {EntityConfigList} from './components/entity-config-list/entity-config-list';
 import {Hass} from './services/hass';
 import {ConfigEntryMetadata, ExposedEntitiesConfig, ExposedEntityConfig} from './types';
+import {Message} from './components/message/message';
 
 
 @Component({
   selector: 'app-root',
   imports: [
     Dropdown,
-    EntityConfigList
+    EntityConfigList,
+    Message
   ],
   templateUrl: './app.html',
   styleUrl: './app.scss'
@@ -27,6 +29,8 @@ export class App implements OnInit {
     analog: [],
     digital: []
   });
+
+  messageBox = viewChild.required(Message);
 
   async ngOnInit() {
     document.body.style.colorScheme = this.hass.isDarkMode() ? "dark" : "light";
@@ -64,6 +68,8 @@ export class App implements OnInit {
     reducedConfig.analog = reducedConfig.analog.filter(value => value.entity_id.length > 0);
 
     await this.hass.setCurrentConfig(entryId, reducedConfig);
+
+    this.messageBox().showMessage("Config updated", 5000);
   }
 
   async setupConfigEntryDropdown() {
