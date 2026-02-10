@@ -1,4 +1,7 @@
 {
-    "name": "Technische Alternative CoE",
-    "render_readme": true
+  "name": "Technische Alternative CoE",
+  "render_readme": true,
+  "content_in_root": false,
+  "zip_release": true,
+  "filename": "ta_coe.zip"
 }

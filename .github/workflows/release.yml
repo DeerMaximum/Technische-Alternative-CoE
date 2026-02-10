@@ -1,0 +1,51 @@
+name: release.yml
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  build-and-upload:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - uses: "actions/checkout@v6"
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v3
+        with:
+          node-version: 24
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm install
+      - name: Lint
+        working-directory: frontend
+        run: npm run build
+      - name: Verify www directory was created
+        run: |
+          ls -la custom_components/ta_coe/
+          ls -la custom_components/ta_coe/www/ || echo "www directory missing!"
+      - name: Create release archives
+        run: |
+          # Create zip with files at root (for HACS)
+          cd custom_components/ta_coe
+          zip -r ../../ta_coe.zip . -x "*.DS_Store" "*/.DS_Store"
+          
+          # Create alternative tar.gz
+          tar -czf ../../ta_coe.tar.gz --exclude="*.DS_Store" .
+          cd ../..
+          
+          echo "Created archives:"
+          ls -la *.zip *.tar.gz
+
+      - name: Upload Release Assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            ta_coe.zip
+            ta_coe.tar.gz
+          tag_name: ${{ github.ref_name }}
+          token: ${{ secrets.GITHUB_TOKEN }}
