@@ -123,7 +123,7 @@ async def _async_update_listener(hass: HomeAssistant, entry: ConfigEntry) -> Non
     config = dict(entry.data)
     if entry.options:
         config.update(entry.options)
-        hass.config_entries.async_update_entry(entry, data=config)
+        hass.config_entries.async_update_entry(entry, data=config, options={})
 
     await hass.config_entries.async_reload(entry.entry_id)
 
@@ -175,6 +175,7 @@ async def async_migrate_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hass.config_entries.async_update_entry(
         entry,
         data=new_data,
+        options={},
         minor_version=2,
     )
     return True
