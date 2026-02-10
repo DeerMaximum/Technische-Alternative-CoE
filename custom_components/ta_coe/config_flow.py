@@ -110,7 +110,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 errors["base"] = "unknown"
             else:
                 self._config = user_input
-                return self.async_create_entry(title="CoE", data=self._config)
+                entry_name = user_input[CONF_HOST].replace("http://", "")
+                return self.async_create_entry(title=entry_name, data=self._config)
 
         return self.async_show_form(
             step_id="user",

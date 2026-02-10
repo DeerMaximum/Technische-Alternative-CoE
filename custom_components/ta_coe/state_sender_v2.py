@@ -66,7 +66,7 @@ class StateSenderV2(StateSender):
 
     async def update(self):
         """Send all values to the server."""
-        _LOGGER.debug(f"Send all {len(self._entity_config)} values to server")
+        _LOGGER.debug(f"Send all {self.entity_count()} values to server")
 
         analog_channels = [
             CoEChannel(

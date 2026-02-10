@@ -1,0 +1,31 @@
+@use "colors";
+
+.container{
+  width: 100%;
+
+  h2 {
+    margin-top: 0;
+    color: colors.$col-text-var;
+    border-bottom: 1px solid colors.$col-borders;
+    padding-bottom: 10px;
+  }
+}
+
+#add-button{
+  width: 100%;
+
+  padding: 10px 15px;
+
+  border: none;
+  border-radius: 4px;
+
+  color: white;
+  background-color: colors.$col-pri;
+
+  cursor: pointer;
+  font-size: 14px;
+
+  &:hover{
+    background-color: colors.$col-pri-var;
+  }
+}

@@ -48,6 +48,7 @@ The following domains are supported:
 * sensor
 * binary_sensor
 * number
+* input_number
 * input_boolean
 
 [taWebsite]: https://www.ta.co.at/

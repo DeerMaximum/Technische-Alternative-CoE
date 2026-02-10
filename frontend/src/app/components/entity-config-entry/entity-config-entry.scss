@@ -1,0 +1,56 @@
+@use "colors";
+
+.container{
+  margin-bottom: 15px;
+  position: relative;
+
+  label{
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+  }
+}
+
+#selection-preview-container{
+  display: flex;
+  align-items: center;
+
+  select2{
+    width: 80%;
+
+    --select2-single-height: 40px;
+    --select2-selection-line-height: 40px;
+
+    --select2-selection-background: #{colors.$col-background};
+    --select2-selection-border-color: #{colors.$col-borders};
+    --select2-selection-focus-border-color: #{colors.$col-borders-var};
+    --select2-dropdown-background: #{colors.$col-background};
+    --select2-dropdown-border-color: #{colors.$col-borders};
+    --select2-selection-text-color: #{colors.$col-text};
+    --select2-option-text-color: #{colors.$col-text};
+  }
+
+  p{
+    display: block;
+    width: 20%;
+
+    text-align: center;
+  }
+}
+
+#delete-button{
+  padding: 5px 10px;
+
+  border: none;
+  border-radius: 4px;
+
+  background-color: #f44336;
+  color: white;
+
+  cursor: pointer;
+  font-size: 12px;
+
+  &:hover{
+    background-color: #f32e20;
+  }
+}

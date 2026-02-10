@@ -6,11 +6,11 @@ from dataclasses import dataclass
 from ta_cmi import CoE
 
 from custom_components.ta_coe.const import (
-    _LOGGER,
-    DIGITAL_DOMAINS,
     CONF_ANALOG_ENTITIES,
-    ConfEntityToSend,
     CONF_DIGITAL_ENTITIES,
+    DIGITAL_DOMAINS,
+    _LOGGER,
+    ConfEntityToSend,
 )
 
 
@@ -55,6 +55,12 @@ class StateSender(metaclass=ABCMeta):
         return (
             len(self._entity_config[CONF_ANALOG_ENTITIES]) > 0
             or len(self._entity_config[CONF_DIGITAL_ENTITIES]) > 0
+        )
+
+    def entity_count(self) -> int:
+        """Return the number of entities"""
+        return len(self._entity_config.get(CONF_ANALOG_ENTITIES, [])) + len(
+            self._entity_config.get(CONF_DIGITAL_ENTITIES, [])
         )
 
     def update_digital_manuel(self, entity_id: str, state: bool):

@@ -13,6 +13,8 @@ coverage.xml
 .idea
 .run
 
+custom_components/ta_coe/www
+
 
 # Home Assistant configuration
 .cloud

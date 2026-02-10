@@ -1,0 +1,47 @@
+// Light
+$col-light-pri: #4CAF50;
+$col-light-pri-var: #2cb631;
+
+$col-light-sec: #2196F3;
+$col-light-sec-var: #0b7dda;
+
+$col-light-text: black;
+$col-light-text-var: #444;
+
+$col-light-borders: #aaa;
+$col-light-borders-var: #000;
+
+$col-light-background: white;
+$col-light-background-var: #f5f5f5;
+
+// Dark
+$col-dark-pri: #4CAF50;
+$col-dark-pri-var: #2cb631;
+
+$col-dark-sec: #2196F3;
+$col-dark-sec-var: #0b7dda;
+
+$col-dark-text: white;
+$col-dark-text-var: #bdb7af;
+
+$col-dark-borders: #484e51;
+$col-dark-borders-var: #fff;
+
+$col-dark-background: #181a1b;
+$col-dark-background-var: #1E2021;
+
+//Theme
+$col-pri: light-dark($col-light-pri, $col-dark-pri);
+$col-pri-var: light-dark($col-light-pri-var, $col-dark-pri-var);
+
+$col-sec: light-dark($col-light-sec, $col-dark-sec);
+$col-sec-var: light-dark($col-light-sec-var, $col-dark-sec-var);
+
+$col-text: light-dark($col-light-text, $col-dark-text);
+$col-text-var: light-dark($col-light-text-var, $col-dark-text-var);
+
+$col-borders: light-dark($col-light-borders, $col-dark-borders);
+$col-borders-var: light-dark($col-light-borders-var, $col-dark-borders-var);
+
+$col-background: light-dark($col-light-background, $col-dark-background);
+$col-background-var: light-dark($col-light-background-var, $col-dark-background-var);

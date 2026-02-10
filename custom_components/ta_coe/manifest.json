@@ -1,6 +1,7 @@
 {
   "domain": "ta_coe",
   "name": "Technische Alternative CoE",
+  "after_dependencies": ["http"],
   "codeowners": [
     "@DeerMaximum"
   ],

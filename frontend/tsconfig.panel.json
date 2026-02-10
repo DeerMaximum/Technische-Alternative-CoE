@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "target": "ES2020",
+    "module": "preserve",
+    "outDir": "../custom_components/ta_coe/www",
+  },
+  "include": [
+      "src/panel-wrapper.ts"
+    ]
+}

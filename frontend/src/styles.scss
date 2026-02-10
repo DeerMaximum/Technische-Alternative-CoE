@@ -1,0 +1,14 @@
+@use "colors";
+
+body {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+  background-color: colors.$col-background-var;
+  color: colors.$col-text;
+
+  color-scheme: light dark;
+}
+
+h1 {
+  text-align: center;
+}

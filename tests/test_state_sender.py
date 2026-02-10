@@ -7,7 +7,7 @@ from custom_components.ta_coe.const import (
     CONF_DIGITAL_ENTITIES,
     ConfEntityToSend,
 )
-from tests import StubStateSender
+from tests.common import StubStateSender
 
 coe = CoE("")
 
@@ -47,3 +47,9 @@ def test_sender_has_entities_with_entities():
     sender = StubStateSender(coe, DUMMY_SEND_CONFIG)
 
     assert sender.has_entities()
+
+
+def test_senser_entity_count():
+    """Test the entity count."""
+    sender = StubStateSender(coe, DUMMY_SEND_CONFIG)
+    assert sender.entity_count() == 4

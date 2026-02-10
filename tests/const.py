@@ -2,8 +2,12 @@ from typing import Any
 
 from homeassistant.const import CONF_HOST
 
-from custom_components.ta_coe import CONF_CAN_IDS, CONF_ENTITIES_TO_SEND, CONF_ANALOG_ENTITIES, CONF_DIGITAL_ENTITIES, \
-    ConfEntityToSend
+from custom_components.ta_coe import (
+    CONF_ANALOG_ENTITIES,
+    CONF_CAN_IDS,
+    CONF_DIGITAL_ENTITIES,
+    CONF_ENTITIES_TO_SEND,
+)
 
 COEAPI_PACKAGE = "ta_cmi.coe_api.CoEAPI.get_coe_data"
 COE_SEND_ANALOG_VALUES_PACKAGE = "ta_cmi.coe.CoE.send_analog_values"
@@ -21,9 +25,9 @@ STATE_SENDER_UPDATE_DIGITAL_MANUEL_PACKAGE = (
 STATE_SENDER_UPDATE_ANALOG_MANUEL_PACKAGE = (
     "custom_components.ta_coe.state_sender.StateSender.update_analog_manuel"
 )
-STATE_SENDER_STUB_UPDATE_DIGITAL_PACKAGE = "tests.StubStateSender.update_digital"
-STATE_SENDER_STUB_UPDATE_ANALOG_PACKAGE = "tests.StubStateSender.update_analog"
-STATE_SENDER_STUB_UPDATE = "tests.StubStateSender.update"
+STATE_SENDER_STUB_UPDATE_DIGITAL_PACKAGE = "tests.common.StubStateSender.update_digital"
+STATE_SENDER_STUB_UPDATE_ANALOG_PACKAGE = "tests.common.StubStateSender.update_analog"
+STATE_SENDER_STUB_UPDATE = "tests.common.StubStateSender.update"
 STATE_SENDER_V1_UPDATE_DIGITAL_MANUEL_PACKAGE = (
     "custom_components.ta_coe.state_sender_v1.StateSenderV1.update_digital_manuel"
 )
@@ -71,7 +75,7 @@ DUMMY_CONFIG_ENTRY: dict[str, Any] = {
     CONF_HOST: "http://192.168.2.101",
     CONF_CAN_IDS: [1, 20],
     CONF_ENTITIES_TO_SEND: {
-        CONF_ANALOG_ENTITIES: [ConfEntityToSend(1, "sensor.coe_analog")],
-        CONF_DIGITAL_ENTITIES: [ConfEntityToSend(1, "binary_sensor.coe_digital")],
+        CONF_ANALOG_ENTITIES: [{"id": 1, "entity_id": "sensor.coe_analog"}],
+        CONF_DIGITAL_ENTITIES: [{"id": 1, "entity_id": "binary_sensor.coe_digital"}],
     },
 }
