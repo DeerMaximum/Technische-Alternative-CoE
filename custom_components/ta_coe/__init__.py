@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import dataclasses
 from datetime import timedelta
 from typing import Any
 
@@ -12,18 +13,18 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from ta_cmi import CoE
 
 from .const import (
-    _LOGGER,
+    ANALOG_DOMAINS,
+    CONF_ANALOG_ENTITIES,
     CONF_CAN_IDS,
+    CONF_DIGITAL_ENTITIES,
     CONF_ENTITIES_TO_SEND,
     CONF_SCAN_INTERVAL,
+    DIGITAL_DOMAINS,
     DOMAIN,
-    SCAN_INTERVAL,
-    CONF_ANALOG_ENTITIES,
-    CONF_DIGITAL_ENTITIES,
     FREE_SLOT_MARKER_ANALOG,
     FREE_SLOT_MARKER_DIGITAL,
-    DIGITAL_DOMAINS,
-    ANALOG_DOMAINS,
+    SCAN_INTERVAL,
+    _LOGGER,
     ConfEntityToSend,
 )
 from .coordinator import CoEDataUpdateCoordinator
@@ -37,6 +38,16 @@ from .state_sender_v2 import StateSenderV2
 from .websocket import async_register_websocket_commands
 
 PLATFORMS: list[str] = [Platform.SENSOR, Platform.BINARY_SENSOR]
+
+def prepare_send_config(send_config: dict[str, Any]) -> dict[str, Any]:
+    """Prepare the send config."""
+    analog_config = send_config.get(CONF_ANALOG_ENTITIES, [])
+    digital_config = send_config.get(CONF_DIGITAL_ENTITIES, [])
+
+    return {
+        CONF_ANALOG_ENTITIES: [ConfEntityToSend(**x) for x in analog_config],
+        CONF_DIGITAL_ENTITIES: [ConfEntityToSend(**x) for x in digital_config]
+    }
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -65,15 +76,17 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     _LOGGER.debug(f"CoE server config: Version={server_config.coe_version}")
 
+    send_config: dict[str, list[ConfEntityToSend]] = prepare_send_config(entry.data.get(CONF_ENTITIES_TO_SEND, {}))
+
     sender: StateSender
 
     if server_config.coe_version == 1:
-        sender = StateSenderV1(coe, entry.data.get(CONF_ENTITIES_TO_SEND, {}))
+        sender = StateSenderV1(coe, send_config)
     else:
-        sender = StateSenderV2(coe, entry.data.get(CONF_ENTITIES_TO_SEND, {}))
+        sender = StateSenderV2(coe, send_config)
 
     observer = StateObserver(
-        hass, coe, sender, entry.data.get(CONF_ENTITIES_TO_SEND, {})
+        hass, coe, sender, send_config
     )
 
     task = RefreshTask(sender)
@@ -101,8 +114,6 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     task: RefreshTask = hass.data[DOMAIN][entry.entry_id]["task"]
 
     await task.stop()
-
-    async_unregister_panel(hass)
 
     return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
 
@@ -150,12 +161,12 @@ async def async_migrate_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         domain = entity_id.split(".")[0]
         if domain in DIGITAL_DOMAINS:
             new_sending_data[CONF_DIGITAL_ENTITIES].append(
-                ConfEntityToSend(digital_id, entity_id)
+                dataclasses.asdict(ConfEntityToSend(digital_id, entity_id))
             )
             digital_id += 1
         elif domain in ANALOG_DOMAINS:
             new_sending_data[CONF_ANALOG_ENTITIES].append(
-                ConfEntityToSend(analog_id, entity_id)
+                dataclasses.asdict(ConfEntityToSend(analog_id, entity_id))
             )
             analog_id += 1
 

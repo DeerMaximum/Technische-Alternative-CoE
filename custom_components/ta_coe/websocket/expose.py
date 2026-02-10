@@ -1,5 +1,5 @@
 """Websocket commands for configuring exposed entities."""
-
+from dataclasses import asdict
 from typing import Any
 
 import voluptuous as vol
@@ -70,8 +70,8 @@ async def coe_exposed_entities_update(
         entry, data={
             **entry.data,
             CONF_ENTITIES_TO_SEND: {
-                CONF_ANALOG_ENTITIES: [ConfEntityToSend(**x) for x in msg["config"][CONF_ANALOG_ENTITIES]],
-                CONF_DIGITAL_ENTITIES: [ConfEntityToSend(**x) for x in msg["config"][CONF_DIGITAL_ENTITIES]],
+                CONF_ANALOG_ENTITIES: [asdict(ConfEntityToSend(**x)) for x in msg["config"][CONF_ANALOG_ENTITIES]],
+                CONF_DIGITAL_ENTITIES: [asdict(ConfEntityToSend(**x)) for x in msg["config"][CONF_DIGITAL_ENTITIES]],
             }
         }
     )

@@ -16,10 +16,15 @@ from custom_components.ta_coe import (
     DOMAIN,
     FREE_SLOT_MARKER_ANALOG,
     FREE_SLOT_MARKER_DIGITAL,
-    ConfEntityToSend,
 )
-from tests.const import COEAPI_PACKAGE, COE_VERSION_CHECK_PACKAGE, COE_CHECK_SERVER_VERSION_PACKAGE, \
-    OBSERVER_GET_ALL_STATES, REFRESH_TASK_START_PACKAGE, DUMMY_DEVICE_API_DATA
+from tests.const import (
+    COEAPI_PACKAGE,
+    COE_CHECK_SERVER_VERSION_PACKAGE,
+    COE_VERSION_CHECK_PACKAGE,
+    DUMMY_DEVICE_API_DATA,
+    OBSERVER_GET_ALL_STATES,
+    REFRESH_TASK_START_PACKAGE,
+)
 
 server_config = CoEServerConfig(coe_version=2)
 
@@ -27,8 +32,8 @@ ENTRY_DATA: dict[str, Any] = {
     CONF_HOST: "http://192.168.2.101",
     CONF_CAN_IDS: [1, 20],
     CONF_ENTITIES_TO_SEND: {
-        CONF_ANALOG_ENTITIES: [ConfEntityToSend(2, "sensor.coe_analog_2")],
-        CONF_DIGITAL_ENTITIES: [ConfEntityToSend(2, "binary_sensor.coe_digital_2")],
+        CONF_ANALOG_ENTITIES: [{"id": 2, "entity_id": "sensor.coe_analog_2"}],
+        CONF_DIGITAL_ENTITIES: [{"id": 2, "entity_id": "binary_sensor.coe_digital_2"}],
     },
 }
 

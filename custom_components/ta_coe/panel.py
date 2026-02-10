@@ -12,6 +12,10 @@ async def async_register_panel(hass: HomeAssistant) -> None:
     """Register the panel"""
     www_path = Path(__file__).parent / "www"
 
+    if hass.http is None:
+        _LOGGER.error("hass.http is not available, cannot register panel")
+        return
+
     # Register static path for the frontend assets
     await hass.http.async_register_static_paths([
         StaticPathConfig("/ta-coe-hass", str(www_path), False)
