@@ -29,7 +29,7 @@ from .const import (
 )
 from .coordinator import CoEDataUpdateCoordinator
 from .issues import check_coe_server_2x_issue
-from .panel import async_register_panel, async_unregister_panel
+from .panel import async_register_panel
 from .refresh_task import RefreshTask
 from .state_observer import StateObserver
 from .state_sender import StateSender

@@ -7,7 +7,6 @@ from custom_components.ta_coe import (
     CONF_CAN_IDS,
     CONF_DIGITAL_ENTITIES,
     CONF_ENTITIES_TO_SEND,
-    ConfEntityToSend,
 )
 
 COEAPI_PACKAGE = "ta_cmi.coe_api.CoEAPI.get_coe_data"
