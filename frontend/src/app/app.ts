@@ -1,9 +1,9 @@
-import {Component, computed, effect, inject, OnInit, signal, viewChild, ViewChild} from '@angular/core';
+import {Component, inject, OnInit, signal, viewChild} from '@angular/core';
 import {Dropdown, DropdownValue, DropdownValues} from './components/dropdown/dropdown';
 import {EntityConfigList} from './components/entity-config-list/entity-config-list';
 import {Hass} from './services/hass';
 import {ConfigEntryMetadata, ExposedEntitiesConfig, ExposedEntityConfig} from './types';
-import {Message} from './components/message/message';
+import {MessageBox} from './components/message-box/message-box';
 
 
 @Component({
@@ -11,7 +11,7 @@ import {Message} from './components/message/message';
   imports: [
     Dropdown,
     EntityConfigList,
-    Message
+    MessageBox
   ],
   templateUrl: './app.html',
   styleUrl: './app.scss'
@@ -30,7 +30,7 @@ export class App implements OnInit {
     digital: []
   });
 
-  messageBox = viewChild.required(Message);
+  messageBox = viewChild.required(MessageBox);
 
   async ngOnInit() {
     document.body.style.colorScheme = this.hass.isDarkMode() ? "dark" : "light";

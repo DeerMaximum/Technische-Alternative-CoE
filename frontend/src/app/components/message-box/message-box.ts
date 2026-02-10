@@ -1,12 +1,12 @@
 import {Component} from '@angular/core';
 
 @Component({
-  selector: 'app-message',
+  selector: 'app-message-box',
   imports: [],
-  templateUrl: './message.html',
-  styleUrl: './message.scss',
+  templateUrl: './message-box.html',
+  styleUrl: './message-box.scss',
 })
-export class Message {
+export class MessageBox {
   message: string = "";
   hidden: boolean = true;
 
