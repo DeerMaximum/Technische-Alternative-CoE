@@ -2,13 +2,15 @@ import {Component, inject, input, model, OnInit, output} from '@angular/core';
 import {Select2, Select2Data, Select2UpdateEvent} from 'ng-select2-component';
 import {ExposedEntityConfig} from '../../types';
 import {Hass} from '../../services/hass';
+import {TranslatePipe} from '@ngx-translate/core';
 
 const defaultPreviewValue = "---";
 
 @Component({
   selector: 'app-entity-config-entry',
   imports: [
-    Select2
+    Select2,
+    TranslatePipe
   ],
   templateUrl: './entity-config-entry.html',
   styleUrl: './entity-config-entry.scss',

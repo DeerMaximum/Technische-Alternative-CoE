@@ -4,6 +4,7 @@ import {EntityConfigList} from './components/entity-config-list/entity-config-li
 import {Hass} from './services/hass';
 import {ConfigEntryMetadata, ExposedEntitiesConfig, ExposedEntityConfig} from './types';
 import {MessageBox} from './components/message-box/message-box';
+import {_, TranslatePipe, TranslateService} from '@ngx-translate/core';
 
 
 @Component({
@@ -11,13 +12,15 @@ import {MessageBox} from './components/message-box/message-box';
   imports: [
     Dropdown,
     EntityConfigList,
-    MessageBox
+    MessageBox,
+    TranslatePipe
   ],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
 export class App implements OnInit {
   private hass = inject(Hass);
+  private translate = inject(TranslateService);
 
   configEntries: DropdownValues = [];
   configEntryID = signal<string | null>(null);
@@ -31,6 +34,10 @@ export class App implements OnInit {
   });
 
   messageBox = viewChild.required(MessageBox);
+
+  constructor() {
+    this.translate.addLangs(['de', 'en']);
+  }
 
   async ngOnInit() {
     document.body.style.colorScheme = this.hass.isDarkMode() ? "dark" : "light";
@@ -69,7 +76,7 @@ export class App implements OnInit {
 
     await this.hass.setCurrentConfig(entryId, reducedConfig);
 
-    this.messageBox().showMessage("Config updated", 5000);
+    this.messageBox().showMessage(this.translate.instant(_("app.message.successfullySaved")), 5000);
   }
 
   async setupConfigEntryDropdown() {
