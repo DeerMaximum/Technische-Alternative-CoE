@@ -42,6 +42,8 @@ export class App implements OnInit {
   async ngOnInit() {
     document.body.style.colorScheme = this.hass.isDarkMode() ? "dark" : "light";
 
+    this.translate.use(this.hass.getLanguage());
+
     this.setupEntityIDS();
     await this.setupConfigEntryDropdown();
     await this.onConfigEntryChange(); //Initial change is not captured

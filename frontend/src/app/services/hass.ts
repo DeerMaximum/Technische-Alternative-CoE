@@ -23,6 +23,10 @@ export class Hass {
     return this.hass?.themes?.darkMode ?? false;
   }
 
+  getLanguage(): string {
+    return this.hass?.locale?.language ?? 'en';
+  }
+
   async getConfigEntries() {
     const response = await this.hass?.callWS<GetConfigEntryResponse>({
       type: "ta_coe/config/list"
