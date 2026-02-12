@@ -8,7 +8,7 @@
     }
   </div>
   @if (slot_count() < slot_limit) {
-    <button id="add-button" (click)="onAdd()" [hidden]="">Add New Slot</button>
+    <button id="add-button" (click)="onAdd()" [hidden]="">{{"app.sensorConfig.newSlotButton" | translate}}</button>
   }
 </div>
 

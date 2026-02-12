@@ -1,0 +1,19 @@
+{
+  "app": {
+    "heading": "Exposed Entity Configuration",
+    "configEntryDropdownLabel" : "Config entry:",
+    "sensorConfig": {
+      "heading": {
+        "analog": "Analog Sensors",
+        "digital": "Digital Sensors",
+        "slot": "Slot: {{id}}"
+      },
+      "newSlotButton": "Add New Slot",
+      "deleteButton": "Delete",
+      "saveButton": "Save Configuration"
+    },
+    "message": {
+      "successfullySaved": "Config updated"
+    }
+  }
+}

@@ -1,12 +1,13 @@
 <div class="container">
-  <label for="selection">Slot: {{entry().id}}</label>
+  <label for="selection">{{ 'app.sensorConfig.heading.slot' | translate:{id: entry().id} }}</label>
   <div id="selection-preview-container">
-    <select2 [data]="entity_ids()" [value]="selectedValue" (update)="on_change($event)" displaySearchStatus="always" resettable></select2>
-    <p class="preview">{{previewValue}}</p>
+    <select2 [data]="entity_ids()" [value]="selectedValue" (update)="on_change($event)" displaySearchStatus="always"
+             resettable></select2>
+    <p class="preview">{{ previewValue }}</p>
   </div>
-  @if(deletable()){
+  @if (deletable()) {
     <div class="field-actions">
-      <button id="delete-button" (click)="on_delete()">Delete</button>
+      <button id="delete-button" (click)="on_delete()">{{ "app.sensorConfig.deleteButton" | translate }}</button>
     </div>
   }
 </div>

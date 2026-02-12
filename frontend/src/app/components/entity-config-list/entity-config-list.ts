@@ -1,11 +1,13 @@
 import {Component, computed, input, model} from '@angular/core';
 import {EntityConfigEntry} from '../entity-config-entry/entity-config-entry';
 import {ExposedEntityConfig} from '../../types';
+import {TranslatePipe} from '@ngx-translate/core';
 
 @Component({
   selector: 'app-entity-config-list',
   imports: [
-    EntityConfigEntry
+    EntityConfigEntry,
+    TranslatePipe
   ],
   templateUrl: './entity-config-list.html',
   styleUrl: './entity-config-list.scss',

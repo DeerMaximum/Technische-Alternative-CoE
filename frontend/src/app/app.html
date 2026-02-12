@@ -1,13 +1,18 @@
 <div class="container">
-  <h1>Exposed Entity Configuration</h1>
-  <app-dropdown [heading]="'Config entry:'" [values]="configEntries" [(selectedValue)]="configEntryID"
+  <h1>{{ "app.heading" | translate }}</h1>
+  <app-dropdown [heading]="'app.configEntryDropdownLabel' | translate" [values]="configEntries"
+                [(selectedValue)]="configEntryID"
                 (selectedValueChange)="onConfigEntryChange()"></app-dropdown>
   <div class="config-container">
-    <app-entity-config-list [heading]="'Analog Sensors'" [(entries)]="entityConfig().analog"
+    <app-entity-config-list [heading]="'app.sensorConfig.heading.analog' | translate"
+                            [(entries)]="entityConfig().analog"
                             [entityIDS]="analogEntityIDs"></app-entity-config-list>
-    <app-entity-config-list [heading]="'Digital Sensors'" [(entries)]="entityConfig().digital"
+    <app-entity-config-list [heading]="'app.sensorConfig.heading.digital' | translate"
+                            [(entries)]="entityConfig().digital"
                             [entityIDS]="digitalEntityIDs"></app-entity-config-list>
   </div>
-  <button id="save-button" (click)="onSave()" [disabled]="configEntryID === null">Save Configuration</button>
+  <button id="save-button" (click)="onSave()"
+          [disabled]="configEntryID === null">{{ "app.sensorConfig.saveButton" | translate }}
+  </button>
   <app-message-box></app-message-box>
 </div>

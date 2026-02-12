@@ -1,0 +1,19 @@
+{
+  "app": {
+    "heading": "Konfiguration der geteilten Entitäten",
+    "configEntryDropdownLabel" : "Konfigurationseintrag:",
+    "sensorConfig": {
+      "heading": {
+        "analog": "Analoge Sensoren",
+        "digital": "Digitale Sensoren",
+        "slot": "Slot: {{id}}"
+      },
+      "newSlotButton": " Slot hinzufügen",
+      "deleteButton": "Löschen",
+      "saveButton": "Konfiguration speichern"
+    },
+    "message": {
+      "successfullySaved": "Konfiguration aktualisiert"
+    }
+  }
+}
