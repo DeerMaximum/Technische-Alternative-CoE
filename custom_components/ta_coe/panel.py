@@ -42,7 +42,6 @@ async def async_register_panel(hass: HomeAssistant) -> None:
         sidebar_icon=PANEL_ICON,
         require_admin=True,
         config={},
-        config_panel_domain=DOMAIN,
     )
 
     _LOGGER.info("ta_coe panel registered successfully with iframe wrapper")
