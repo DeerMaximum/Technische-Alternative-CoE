@@ -2412,15 +2412,15 @@ wheels = [
 
 [[package]]
 name = "ta-cmi"
-version = "3.4.0"
+version = "3.5.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp" },
     { name = "yarl" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/35/78/bdcf00aa4e07604b6cf555abfa7951dda1a452d3cc5a8d31b50f7a1c31e4/ta_cmi-3.4.0.tar.gz", hash = "sha256:e061ad20294d876b3fe343b218e16ad5b97d9aa345c09786400f3ecd26300e20", size = 17842, upload-time = "2025-12-31T10:24:05.303Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/ef/86/7f35fa59f9512b37134dce9c438fceb2af3027ac433c9d243b4f755312da/ta_cmi-3.5.0.tar.gz", hash = "sha256:193c01cf360fe34f0afa235c6f519d1ce5a5075db40b8636e9717c759af05c9f", size = 17852, upload-time = "2026-02-17T12:20:25.938Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/11/26/871a8ef1720aa162dbbcf29808a0b62ecec58ef92a33d7e6d86c7ad1d606/ta_cmi-3.4.0-py3-none-any.whl", hash = "sha256:1c539366cbdad9f1e58ec4e0581c5f49f2a2f990ee2ab602ff63b3c0767a39a6", size = 14013, upload-time = "2025-12-31T10:24:04.079Z" },
+    { url = "https://files.pythonhosted.org/packages/74/20/e8ec9c04b4d365b4fce782f42a75d5873477eea0fb5c6633538d0643b1fd/ta_cmi-3.5.0-py3-none-any.whl", hash = "sha256:3f1d77d45c5e89c4302a17f6c12aa9c97189a7420f6879b5f864fe5950f028ab", size = 14015, upload-time = "2026-02-17T12:20:25.08Z" },
 ]
 
 [[package]]
@@ -2443,7 +2443,7 @@ lint = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "ta-cmi", specifier = "==3.4.0" }]
+requires-dist = [{ name = "ta-cmi", specifier = "==3.5.0" }]
 
 [package.metadata.requires-dev]
 dev = [
