@@ -2143,7 +2143,7 @@ wheels = [
 
 [[package]]
 name = "ta-coe"
-version = "2.1.4"
+version = "2.1.5"
 source = { virtual = "." }
 dependencies = [
     { name = "ta-cmi" },
