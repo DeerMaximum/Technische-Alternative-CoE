@@ -1,9 +1,10 @@
-import {Component} from '@angular/core';
+import {Component, ChangeDetectionStrategy} from '@angular/core';
 
 @Component({
   selector: 'app-message-box',
   imports: [],
   templateUrl: './message-box.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './message-box.scss',
 })
 export class MessageBox {

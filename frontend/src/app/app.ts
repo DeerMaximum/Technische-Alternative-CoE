@@ -1,4 +1,4 @@
-import {Component, inject, OnInit, signal, viewChild} from '@angular/core';
+import {Component, inject, OnInit, signal, viewChild, ChangeDetectionStrategy} from '@angular/core';
 import {Dropdown, DropdownValue, DropdownValues} from './components/dropdown/dropdown';
 import {EntityConfigList} from './components/entity-config-list/entity-config-list';
 import {Hass} from './services/hass';
@@ -16,6 +16,7 @@ import {_, TranslatePipe, TranslateService} from '@ngx-translate/core';
     TranslatePipe
   ],
   templateUrl: './app.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './app.scss'
 })
 export class App implements OnInit {

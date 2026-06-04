@@ -1,4 +1,4 @@
-import {Component, computed, input, model} from '@angular/core';
+import {Component, computed, input, model, ChangeDetectionStrategy} from '@angular/core';
 import {EntityConfigEntry} from '../entity-config-entry/entity-config-entry';
 import {ExposedEntityConfig} from '../../types';
 import {TranslatePipe} from '@ngx-translate/core';
@@ -10,6 +10,7 @@ import {TranslatePipe} from '@ngx-translate/core';
     TranslatePipe
   ],
   templateUrl: './entity-config-list.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './entity-config-list.scss',
 })
 export class EntityConfigList {

@@ -1,4 +1,4 @@
-import {Component, input, model} from '@angular/core';
+import {Component, input, model, ChangeDetectionStrategy} from '@angular/core';
 import {Select2, Select2UpdateEvent} from 'ng-select2-component';
 
 
@@ -15,6 +15,7 @@ export type DropdownValues = DropdownValue[]
     Select2
   ],
   templateUrl: './dropdown.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './dropdown.scss',
 })
 export class Dropdown {
