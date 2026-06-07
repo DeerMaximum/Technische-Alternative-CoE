@@ -1,4 +1,4 @@
-import {Component, inject, input, model, OnInit, output, ChangeDetectionStrategy} from '@angular/core';
+import {Component, inject, input, model, OnInit, output} from '@angular/core';
 import {Select2, Select2Data, Select2UpdateEvent} from 'ng-select2-component';
 import {ExposedEntityConfig} from '../../types';
 import {Hass} from '../../services/hass';
@@ -13,7 +13,6 @@ const defaultPreviewValue = "---";
     TranslatePipe
   ],
   templateUrl: './entity-config-entry.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './entity-config-entry.scss',
 })
 export class EntityConfigEntry implements OnInit {
