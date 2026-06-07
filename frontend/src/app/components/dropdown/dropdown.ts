@@ -23,7 +23,7 @@ export class Dropdown {
 
   selectedValue = model<string | null>(null);
 
-  onSelect(event: Select2UpdateEvent){
+  onSelect(event: Select2UpdateEvent) {
     const value = event.value as string | null;
     this.selectedValue.set(value);
   }
