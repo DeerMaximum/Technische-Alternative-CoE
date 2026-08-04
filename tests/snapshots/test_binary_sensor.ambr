@@ -39,7 +39,7 @@
 # name: test_binary_sensors[binary_sensor.coe_digital_can1_1-state]
   StateSnapshot({
     'attributes': ReadOnlyDict({
-      'friendly_name': 'CoE Digital - CAN1 1',
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'CoE Digital - CAN1 1',
     }),
     'context': <ANY>,
     'entity_id': 'binary_sensor.coe_digital_can1_1',
@@ -89,7 +89,7 @@
 # name: test_binary_sensors[binary_sensor.coe_digital_can20_1-state]
   StateSnapshot({
     'attributes': ReadOnlyDict({
-      'friendly_name': 'CoE Digital - CAN20 1',
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'CoE Digital - CAN20 1',
     }),
     'context': <ANY>,
     'entity_id': 'binary_sensor.coe_digital_can20_1',
