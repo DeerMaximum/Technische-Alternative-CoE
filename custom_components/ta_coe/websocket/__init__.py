@@ -1,7 +1,7 @@
 """Custom websocket handlers for the Technische Alternative CoE integration."""
 
-from homeassistant.core import HomeAssistant, callback
 from homeassistant.components import websocket_api
+from homeassistant.core import HomeAssistant, callback
 
 from .config import coe_config_entries
 from .expose import coe_exposed_entities_config, coe_exposed_entities_update

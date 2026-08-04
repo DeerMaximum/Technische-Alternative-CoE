@@ -6,14 +6,14 @@ from homeassistant.helpers.event import async_track_state_change_event
 from ta_cmi import CoE
 
 from .const import (
-    _LOGGER,
     ANALOG_DOMAINS,
+    CONF_ANALOG_ENTITIES,
+    CONF_DIGITAL_ENTITIES,
     DIGITAL_DOMAINS,
     TYPE_BINARY,
     TYPE_SENSOR,
+    _LOGGER,
     ConfEntityToSend,
-    CONF_ANALOG_ENTITIES,
-    CONF_DIGITAL_ENTITIES,
 )
 from .state_sender import StateSender
 

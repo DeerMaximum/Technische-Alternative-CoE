@@ -29,8 +29,8 @@ async def async_setup_entry(
 
     entities: list[DeviceChannelBinary] = []
 
-    for can_id in coordinator.data.keys():
-        for index, _ in coordinator.data[can_id][TYPE_BINARY].items():
+    for can_id in coordinator.data:
+        for index in coordinator.data[can_id][TYPE_BINARY]:
             channel: DeviceChannelBinary = DeviceChannelBinary(
                 coordinator, can_id, index
             )

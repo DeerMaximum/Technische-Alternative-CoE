@@ -17,8 +17,12 @@ from custom_components.ta_coe.state_sender_v2 import StateSenderV2
 from tests import (
     create_dummy_conf_entity_to_send,
 )
-from tests.const import COE_SEND_ANALOG_VALUES_V2_PACKAGE, COE_SEND_DIGITAL_VALUES_V2_PACKAGE, \
-    STATE_SENDER_V2_UPDATE_DIGITAL_MANUEL_PACKAGE, STATE_SENDER_V2_UPDATE_ANALOG_MANUEL_PACKAGE
+from tests.const import (
+    COE_SEND_ANALOG_VALUES_V2_PACKAGE,
+    COE_SEND_DIGITAL_VALUES_V2_PACKAGE,
+    STATE_SENDER_V2_UPDATE_ANALOG_MANUEL_PACKAGE,
+    STATE_SENDER_V2_UPDATE_DIGITAL_MANUEL_PACKAGE,
+)
 
 coe = CoE("")
 
@@ -32,7 +36,7 @@ def test_sender_digital_manuel_change_digital_state():
 
     sender.update_digital_manuel(entities_ids[index_to_change].entity_id, True)
 
-    for i in range(0, 8):
+    for i in range(8):
         if i == index_to_change:
             assert sender._digital_states[str(i)]
         else:
@@ -52,7 +56,7 @@ def test_sender_analog_manuel_change_analog_state():
         entities_ids[index_to_change].entity_id, value.value, value.unit
     )
 
-    for i in range(0, 8):
+    for i in range(8):
         if i == index_to_change:
             assert sender._analog_states[str(i)] == value
         else:

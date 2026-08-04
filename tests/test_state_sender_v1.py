@@ -31,7 +31,7 @@ def test_sender_init_create_digital_pages():
 
     assert len(sender._digital_states) == count
 
-    for i in range(0, count):
+    for i in range(count):
         assert not sender._digital_states[str(i)]
 
 
@@ -44,7 +44,7 @@ def test_sender_init_create_analog_pages():
 
     assert len(sender._analog_states) == count
 
-    for i in range(0, count):
+    for i in range(count):
         assert sender._analog_states[str(i)] == AnalogValue(0, "0")
 
 
@@ -57,7 +57,7 @@ def test_sender_digital_manuel_change_digital_page():
 
     sender.update_digital_manuel(entities_ids[index_to_change].entity_id, True)
 
-    for i in range(0, 8):
+    for i in range(8):
         assert sender._digital_states[str(i)] == (i == index_to_change)
 
 
@@ -74,7 +74,7 @@ def test_sender_analog_manuel_change_analog_page():
         entities_ids[index_to_change].entity_id, value.value, value.unit
     )
 
-    for i in range(0, 8):
+    for i in range(8):
         if i == index_to_change:
             assert sender._analog_states[str(i)] == value
         else:
@@ -100,7 +100,7 @@ async def test_sender_digital_change_digital_page(page: int):
 
         update_mock.assert_called_once_with(expected, (page == 2))
 
-        for i in range(0, 18):
+        for i in range(18):
             assert sender._digital_states[str(i)] == (i == index_to_change)
 
 
@@ -129,7 +129,7 @@ async def test_sender_analog_change_analog_page(page: int):
 
         update_mock.assert_called_once_with(expected, page)
 
-        for i in range(0, 30):
+        for i in range(30):
             if i == index_to_change:
                 assert sender._analog_states[str(i)] == value
             else:

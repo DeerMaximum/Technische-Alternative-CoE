@@ -8,7 +8,13 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
 
-from ..const import CONF_ANALOG_ENTITIES, CONF_ENTITIES_TO_SEND, CONF_DIGITAL_ENTITIES, ConfEntityToSend, _LOGGER
+from ..const import (
+    CONF_ANALOG_ENTITIES,
+    CONF_DIGITAL_ENTITIES,
+    CONF_ENTITIES_TO_SEND,
+    _LOGGER,
+    ConfEntityToSend,
+)
 
 
 @websocket_api.websocket_command({
