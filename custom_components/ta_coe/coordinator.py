@@ -4,18 +4,16 @@ from datetime import timedelta
 from typing import Any
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import STATE_ON, STATE_OFF
+from homeassistant.const import STATE_OFF, STATE_ON
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
-from ta_cmi import CoE, CoEChannel, ChannelMode, ApiError
+from ta_cmi import ApiError, ChannelMode, CoE, CoEChannel
 
-from .const import _LOGGER, DOMAIN, TYPE_SENSOR, TYPE_BINARY
+from .const import DOMAIN, TYPE_BINARY, TYPE_SENSOR, _LOGGER
 
 
 class CoEDataUpdateCoordinator(DataUpdateCoordinator):
     """Class to manage fetching CoE data."""
-
-    channel_count: dict[int, int] = {}
 
     def __init__(
         self,

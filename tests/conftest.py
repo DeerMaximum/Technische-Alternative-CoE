@@ -1,7 +1,7 @@
 """Fixtures for testing."""
 
+from collections.abc import Generator
 from copy import deepcopy
-from typing import Generator
 from unittest import mock
 from unittest.mock import AsyncMock, patch
 

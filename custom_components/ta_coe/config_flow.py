@@ -1,7 +1,6 @@
 """Config flow for Technische Alternative CoE integration."""
 from __future__ import annotations
 
-import asyncio
 from datetime import timedelta
 from typing import Any
 
@@ -16,7 +15,6 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from ta_cmi import ApiError, CoE
 
 from .const import (
-    _LOGGER,
     ADDON_DEFAULT_PORT,
     ADDON_HOSTNAME,
     ALLOWED_DOMAINS,
@@ -24,6 +22,7 @@ from .const import (
     CONF_SCAN_INTERVAL,
     DOMAIN,
     SCAN_INTERVAL,
+    _LOGGER,
 )
 
 
@@ -57,7 +56,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     VERSION: int = 1
     MINOR_VERSION: int = 2
 
-    override_data: dict[str, Any] = {}
+    #For tests
+    override_data: dict[str, Any] = {}  # ruff: ignore[mutable-class-default]
 
     def __init__(self):
         self._config = self.override_data
@@ -71,7 +71,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         try:
             async with timeout(10):
                 await coe.update(1)
-        except (ApiError, asyncio.TimeoutError):
+        except (TimeoutError, ApiError):
             return False
         else:
             return True
@@ -101,11 +101,11 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 )
                 async with timeout(10):
                     await coe.get_server_version()
-            except (ApiError, asyncio.TimeoutError):
+            except (TimeoutError, ApiError):
                 errors["base"] = "cannot_connect"
             except CANIDError:
                 errors["base"] = "invalid_can_id"
-            except Exception as err:  # pylint: disable=broad-except
+            except Exception as err:  # ruff: ignore[blind-except]
                 _LOGGER.exception("Unexpected exception: %s", err)
                 errors["base"] = "unknown"
             else:

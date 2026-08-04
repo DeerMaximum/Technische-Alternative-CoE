@@ -11,12 +11,9 @@ class StubStateSender(StateSender):
 
     async def update_digital(self, entity_id: str, state: bool) -> None:
         """Update a digital state with sending update."""
-        pass
 
     async def update_analog(self, entity_id: str, state: float, unit: str) -> None:
         """Update an analog state with sending update."""
-        pass
 
     async def update(self) -> None:
         """Send all values to the server."""
-        pass

@@ -1,11 +1,17 @@
-from pathlib import Path
 import time
+from pathlib import Path
 
-from homeassistant.components import panel_custom, frontend
+from homeassistant.components import frontend, panel_custom
 from homeassistant.components.http import StaticPathConfig
 from homeassistant.core import HomeAssistant
 
-from custom_components.ta_coe.const import DOMAIN, _LOGGER, PANEL_NAME, PANEL_TITLE, PANEL_ICON
+from custom_components.ta_coe.const import (
+    DOMAIN,
+    PANEL_ICON,
+    PANEL_NAME,
+    PANEL_TITLE,
+    _LOGGER,
+)
 
 
 async def async_register_panel(hass: HomeAssistant) -> None:
