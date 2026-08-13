@@ -9,13 +9,15 @@ updates:
     schedule:
       interval: daily
     ignore:
-      dependency-type: all
-      update-types: ["version-update:semver-patch"]
+      - dependency-type: all
+        update-types: 
+          - "version-update:semver-patch"
   - package-ecosystem: npm
     directory: "/frontend"
     schedule:
       interval: daily
     ignore:
-      dependency-type: all
-      update-types: ["version-update:semver-patch"]
+      - dependency-type: all
+        update-types: 
+          - "version-update:semver-patch"
       
