@@ -9,7 +9,7 @@ updates:
     schedule:
       interval: daily
     ignore:
-      - dependency-type: all
+      - dependency-name: *
         update-types: 
           - "version-update:semver-patch"
   - package-ecosystem: npm
@@ -17,7 +17,7 @@ updates:
     schedule:
       interval: daily
     ignore:
-      - dependency-type: all
+      - dependency-name: *
         update-types: 
           - "version-update:semver-patch"
       
