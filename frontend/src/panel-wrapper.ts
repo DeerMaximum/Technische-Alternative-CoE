@@ -26,7 +26,7 @@ class CoEPanelWrapper extends HTMLElement {
     // Style the wrapper to fill the container
     this.style.display = 'block';
     this.style.width = '100%';
-    this.style.height = '100%';
+    this.style.height = '100vh';
     this.style.position = 'relative';
 
     // Detect dark mode from hass to set initial background and avoid white flash
