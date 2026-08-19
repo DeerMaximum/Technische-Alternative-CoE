@@ -23,29 +23,29 @@
   },
   "private": true,
   "dependencies": {
-    "@angular/common": "^22.0.0",
-    "@angular/compiler": "^22.0.0",
-    "@angular/core": "^22.0.0",
-    "@angular/forms": "^22.0.0",
-    "@angular/platform-browser": "^22.0.0",
-    "@angular/router": "^22.0.0",
+    "@angular/common": "22.1.2",
+    "@angular/compiler": "22.1.2",
+    "@angular/core": "22.1.2",
+    "@angular/forms": "22.1.2",
+    "@angular/platform-browser": "22.1.2",
+    "@angular/router": "22.1.2",
     "@ngx-translate/core": "^18.0.0",
     "@ngx-translate/http-loader": "^18.0.0",
     "custom-card-helpers": "^2.0.0",
-    "ng-select2-component": "^19.0.0",
+    "ng-select2-component": "^19.0.2",
     "rxjs": "~7.8.2",
     "tslib": "^2.8.1",
     "zone.js": "~0.16.1"
   },
   "devDependencies": {
-    "@angular/build": "^22.0.0",
-    "@angular/cli": "^22.0.0",
-    "@angular/compiler-cli": "^22.0.0",
+    "@angular/build": "22.1.2",
+    "@angular/cli": "22.1.2",
+    "@angular/compiler-cli": "22.1.2",
     "@eslint/js": "^10.0.1",
+    "angular-eslint": "^22.1.0",
     "eslint": "^10.4.1",
     "istanbul-lib-instrument": "^6.0.3",
     "typescript": "~6.0.3",
-    "typescript-eslint": "8.59.3",
-    "angular-eslint": "^22.1.0"
+    "typescript-eslint": "8.59.3"
   }
 }
