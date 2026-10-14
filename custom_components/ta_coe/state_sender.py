@@ -1,6 +1,6 @@
 """CoE state sender base."""
 
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
 from ta_cmi import CoE
@@ -20,7 +20,7 @@ class AnalogValue:
     unit: str
 
 
-class StateSender(metaclass=ABCMeta):
+class StateSender(ABC):
     """Base class to handle the transfer to the CoE server."""
 
     def __init__(self, coe: CoE, entity_config: dict[str, list[ConfEntityToSend]]):
