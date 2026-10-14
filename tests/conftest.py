@@ -29,7 +29,6 @@ def snapshot(snapshot: SnapshotAssertion) -> SnapshotAssertion:
 def patch_coe_server_check(request):
     """Patch the ta-cmi CoE server version check."""
     patched = mock.patch(COE_VERSION_CHECK_PACKAGE, return_value=None)
-    patched.__enter__()
 
     def unpatch():
         patched.__exit__(None, None, None)
