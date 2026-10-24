@@ -41,9 +41,13 @@ class StateObserver:
 
         self._states = {TYPE_BINARY: {}, TYPE_SENSOR: {}}
 
-        async_track_state_change_event(
+        self._unsubscribe = async_track_state_change_event(
             self._hass, self._entity_list, self._update_listener
         )
+
+    def unload(self) -> None:
+        """Remove the state change listener."""
+        self._unsubscribe()
 
     @staticmethod
     def _is_state_valid(state: str) -> bool:
