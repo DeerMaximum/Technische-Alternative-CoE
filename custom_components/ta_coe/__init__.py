@@ -89,6 +89,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         sender = StateSenderV2(coe, send_config)
 
     observer = StateObserver(hass, coe, sender, send_config)
+    entry.async_on_unload(observer.unload)
 
     task = RefreshTask(sender)
 
