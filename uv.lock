@@ -1,6 +1,6 @@
 version = 1
-revision = 3
-requires-python = ">=3.14.2"
+revision = 5
+requires-python = ">=3.14.9"
 
 [[package]]
 name = "acme"
@@ -2422,6 +2422,7 @@ wheels = [
 name = "ta-coe"
 version = "2.1.9"
 source = { virtual = "." }
+default-groups = "all"
 dependencies = [
     { name = "ta-cmi" },
 ]
