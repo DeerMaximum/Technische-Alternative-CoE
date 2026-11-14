@@ -7,18 +7,13 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 from homeassistant.core import HomeAssistant
-from pytest_homeassistant_custom_component.common import MockConfigEntry
-from pytest_homeassistant_custom_component.syrupy import HomeAssistantSnapshotExtension
+from pytest_homeassistant.common import MockConfigEntry
+from pytest_homeassistant.syrupy import HomeAssistantSnapshotExtension
 from syrupy import SnapshotAssertion
 
 from custom_components.ta_coe import DOMAIN
 from tests.const import COE_VERSION_CHECK_PACKAGE, DUMMY_CONFIG_ENTRY
 
-
-@pytest.fixture(autouse=True)
-def auto_enable_custom_integrations(enable_custom_integrations):
-    """Enable enable_custom_integrations"""
-    yield
 
 @pytest.fixture
 def snapshot(snapshot: SnapshotAssertion) -> SnapshotAssertion:

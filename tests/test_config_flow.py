@@ -11,7 +11,7 @@ from homeassistant.config_entries import SOURCE_USER
 from homeassistant.const import CONF_HOST
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
-from pytest_homeassistant_custom_component.common import MockConfigEntry
+from pytest_homeassistant.common import MockConfigEntry
 from ta_cmi import ApiError
 
 from custom_components.ta_coe.const import (

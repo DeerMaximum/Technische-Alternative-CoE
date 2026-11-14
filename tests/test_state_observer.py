@@ -6,7 +6,7 @@ from unittest.mock import patch
 import pytest
 from homeassistant.const import ATTR_UNIT_OF_MEASUREMENT
 from homeassistant.core import HomeAssistant, State
-from pytest_homeassistant_custom_component.common import mock_state_change_event
+from pytest_homeassistant.common import mock_state_change_event
 from ta_cmi import CoE
 
 from custom_components.ta_coe import StateObserver
