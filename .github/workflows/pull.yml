@@ -102,7 +102,6 @@ jobs:
             --timeout=9 \
             --durations=10 \
             --cov custom_components.ta_coe \
-            --asyncio-mode=auto \
             -o console_output_style=count \
             -p no:sugar \
             tests
@@ -112,7 +111,6 @@ jobs:
             -qq \
             --timeout=9 \
             --durations=10 \
-            --asyncio-mode=auto \
             -o console_output_style=count \
             -p no:sugar \
             tests | grep -q "snapshots unused" && exit 1 || exit 0
